@@ -1,0 +1,2 @@
+edge_id:int64,source_id:int64,target_id:int64,label_id:int
+10,3,2,1

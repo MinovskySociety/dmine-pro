@@ -1,0 +1,5 @@
+type,x_id,x_attr,y_id,y_attr,edge_label,c
+Edge,x,,y,,q,
+Attribute,x,attr,,,,
+Variable,x,attr,y,attr,,
+Constant,x,attr,,,,value;type

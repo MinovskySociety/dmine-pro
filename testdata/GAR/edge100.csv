@@ -1,0 +1,5 @@
+edge_id:int64,source_id:int64,target_id:int64,label_id:int
+1,3,1,2001
+2,3,4,2002
+3,3,5,1
+4,1,2,1
