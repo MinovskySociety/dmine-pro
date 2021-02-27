@@ -1,0 +1,22 @@
+Graph:  
+  Name: liantong	
+  Dir: /Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/
+  VertexFile: 
+    - node.csv
+  EdgeFile: 
+    - edge1.csv
+
+GAR:    
+  - 
+    Name: gar1		
+    Dir: /Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/
+    VertexFile: node.csv
+    EdgeFile: edge.csv
+    LiteralX: X.csv
+    LiteralY: Y.csv
+
+OutputGraph:
+  Name: liantong_chase
+  Dir: /Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/
+  VertexFile: node100.csv
+  EdgeFile: edge100.csv

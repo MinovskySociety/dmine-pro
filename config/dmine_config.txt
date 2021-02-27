@@ -1,0 +1,8 @@
+cu100/cu100_n.csv
+cu100/cu100_e.csv
+cu100_dmine
+4
+9
+3
+-1
+3

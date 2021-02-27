@@ -1,0 +1,21 @@
+﻿
+#aux_source_directory(. DIR_LIB_SRCS)
+# 生成链接库
+set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin/test)
+
+add_executable(test_garchase  test_garchase.cpp)
+add_executable(test_garmatch  test_garmatch.cpp)
+add_executable(test_garcopy   test_garcopy.cpp)
+add_executable(test_csvgar    test_csvgar.cpp)
+add_executable(test_csvgraph  test_csvgraph.cpp)
+add_executable(test_vf2       test_vf2.cpp)
+add_executable(test_match     test_match.cpp)
+add_executable(test_boost_iso test_boost_iso.cpp)
+add_executable(test_count     test_count.cpp)
+add_executable(test_openmp    test_openmp.cpp)
+add_executable(test_yaml      test_yamlcpp.cpp)
+add_executable(test_small_graph      test_small_graph.cpp)
+add_executable(test_large_graph      test_large_graph_remove.cpp)
+target_link_libraries(test_yaml PRIVATE yaml-cpp glog::glog)
+target_link_libraries(test_garmatch PRIVATE yaml-cpp glog::glog)
+#add_library (test ${DIR_LIB_SRCS})

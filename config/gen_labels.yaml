@@ -1,0 +1,26 @@
+Graph:  
+  Name: liantong	
+  Dir: .\cu100
+  LabelFile: liantong_label.csv
+  VertexFile:
+    - liantong_.csv    #可以指定多个文件
+    -
+  EdgeFile: 
+    - liantong_e.csv  
+
+Attribute:
+  - user:
+    - fake_type
+  - phone:
+    #- node_name
+    - head
+    - len
+    - call_type
+  - 
+  - 
+    Name: gar2
+    Dir: .\gar
+    VertexFile: gar2_n.csv
+    EdgeFile: gar2_e.csv
+    LiteralX: gar2_x.csv
+    LiteralY: gar2_y.csv

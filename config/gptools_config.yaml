@@ -1,0 +1,42 @@
+Graph:
+  Dir: cu4999_0
+  Name: liantong	  
+  IsGrouping: true
+  HasAttributes: true
+
+ActionList:
+  -
+    Action: RegisterStandardType
+    TypeName: bool
+  -
+    Action: RegisterStandardType
+    TypeName: int
+    Min: 0
+    Max: 25
+  -
+    Action: RegisterAttribute
+    Label: user
+    AttributeKey: [fake_type]
+    ValueType: bool
+  -
+    Action: RegisterAttribute
+    Label: [phone]
+    AttributeKey: phone_head
+  -
+    Action: RegisterAttribute
+    Label: phone
+    AttributeKey: phone_length
+    ValueType: int
+  -
+    Action: FoldAttribute
+    VertexLabel: user
+    AttributeKey: fake_type
+  -
+    Action: FoldAttribute
+    VertexLabel: phone    
+
+ResultGraph: 
+  Dir: cu4999_0a
+  Name: liantong
+  IsGrouping: true
+  HasAttributes: true

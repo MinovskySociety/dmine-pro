@@ -1,0 +1,25 @@
+Graph:  
+  Name: liantong	
+  Dir: .\cu100
+  VertexFile:
+    - liantong_n.csv    
+  EdgeFile: 
+    - liantong_e.csv
+
+GAR:    
+  - 
+    Name: gar1		
+    Dir: .\gar
+    VertexFile: gar1_n.csv
+    EdgeFile: gar1_e.csv
+    LiteralX: gar1_x.csv   
+    LiteralY: gar1_y.csv
+  - 
+    Name: gar2
+    Dir: .\gar
+    VertexFile: gar2_n.csv
+    EdgeFile: gar2_e.csv
+    LiteralX: gar2_x.csv
+    LiteralY: gar2_y.csv
+
+ResultDir: .\cu100_result   

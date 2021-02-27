@@ -1,0 +1,7 @@
+# one of below choices need to be set.
+# 0 is default. when both set, first consider the first.
+TimeWindowNumber: 3
+TimeWindowSize: 0
+# UsePartition: if true, cut graph with time window number or size,
+# else do not call partition, read graph by time window number
+UsePartition: true

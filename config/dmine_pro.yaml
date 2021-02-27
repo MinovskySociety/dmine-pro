@@ -1,0 +1,9 @@
+NodeFile: /Users/apple/Desktop/buaa/data/cu4999_1_remove_web/liantong_v.csv
+EdgeFile: /Users/apple/Desktop/buaa/data/cu4999_1_remove_web/liantong_e.csv
+OutputDir: /Users/apple/Desktop/buaa/code/dmine-pro/output/dmineresult/
+NodeXLabel: 1001
+NodeYLabel: 1000000002
+EdgeQLabel: 3
+SuppRLimit: 200
+Radius: 10
+TopK: 45

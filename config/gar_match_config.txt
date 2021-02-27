@@ -1,0 +1,7 @@
+C:\\Users\\Administrator\\Desktop\\buaa\\dmine-pro\\testdata\\gar_liantong\\node.csv
+C:\\Users\\Administrator\\Desktop\\buaa\\dmine-pro\\testdata\\gar_liantong\\edge.csv
+C:\\Users\\Administrator\\Desktop\\buaa\\dmine-pro\\testdata\\gar_liantong\\x.csv
+C:\\Users\\Administrator\\Desktop\\buaa\\dmine-pro\\testdata\\gar_liantong\\y.csv
+C:\\Users\\Administrator\\Desktop\\buaa\\dmine-pro\\testdata\\liantong_n1.csv
+C:\\Users\\Administrator\\Desktop\\buaa\\dmine-pro\\testdata\\liantong_e1.csv
+C:\\Users\\Administrator\\Desktop\\buaa\\dmine-pro\\output\\match_result1.csv

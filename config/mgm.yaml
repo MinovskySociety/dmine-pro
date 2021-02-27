@@ -1,0 +1,17 @@
+Graph:
+  Name: liantong
+  Dir: /home/sunguangzhi/code/new_gbp/data/cu100/
+  VertexFile: liantong_v.csv
+  EdgeFile: liantong_e.csv
+
+MGM:
+  Supp: 12
+  Conf: 0.2
+  EdgeSize: 3
+  TopK: 100
+  SrcNodeLabel: 1001
+  DstNodeLabel: 1000000002
+  EdgeLabel: 3
+
+OutputGraph:
+  Dir: /home/sunguangzhi/code/new_gbp/data/output/dmineresult/mgm_cu100/

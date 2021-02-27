@@ -1,0 +1,9 @@
+1
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/node.csv
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/edge.csv
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/X.csv
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/Y.csv
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/node.csv
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/edge1.csv
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/node100.csv
+/Users/apple/Desktop/buaa/code/dmine-pro/testdata/GAR/edge100.csv

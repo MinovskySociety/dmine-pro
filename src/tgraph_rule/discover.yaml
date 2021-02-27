@@ -1,0 +1,30 @@
+Graph:
+  Name: liantong
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/
+  VertexFile: liantong_100_d3_v.csv
+  EdgeFile: liantong_100_d3_e.csv
+
+OutputGraph:
+  Name: found_tgr
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/
+
+Settings:
+  # q(x,y), label of x
+  NodeXLabel: 1001
+  # q(x,y), label of y
+  NodeYLabel: 1000000002
+  # q(x,y), label of edge(x,y)
+  EdgeQLabel: 3
+  # whether edge(x,y) has order
+  EdgeQHasOrder: false
+  # support threshold for prune
+  SuppRLimit: 10
+  # selected number k
+  TopK: 10
+  # Max diameter
+  Radius: 5
+  # edge frequency (0-1), frequency of one vlabel1-vlabel2-elabel / all frequencies
+  # edge will not be expanded if below this percent
+  EdgeFrequency: 0
+  # threads number
+  ThreadNum: 4

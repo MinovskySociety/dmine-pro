@@ -1,0 +1,35 @@
+Graph:
+  Name: liantong
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/
+  VertexFile: liantong_100_d3_v.csv
+  EdgeFile: liantong_100_d3_e.csv
+
+TGR:
+- Name: pattern_1
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/pattern_1/
+  VertexFile: pattern_1_v.csv
+  EdgeFile: pattern_1_e.csv
+  LiteralX: pattern_1_x.csv
+  LiteralY: pattern_1_y.csv
+- Name: pattern_2
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/pattern_2/
+  VertexFile: pattern_2_v.csv
+  EdgeFile: pattern_2_e.csv
+  LiteralX: pattern_2_x.csv
+  LiteralY: pattern_2_y.csv
+- Name: pattern_3
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/pattern_3/
+  VertexFile: pattern_3_v.csv
+  EdgeFile: pattern_3_e.csv
+  LiteralX: pattern_3_x.csv
+  LiteralY: pattern_3_y.csv
+- Name: pattern_4
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/pattern_4/
+  VertexFile: pattern_4_v.csv
+  EdgeFile: pattern_4_e.csv
+  LiteralX: pattern_4_x.csv
+  LiteralY: pattern_4_y.csv
+
+OutputGraph:
+  Name: tgr_matches
+  Dir: /home/naughtycat/TGR/src/tgraph_rule/tgr-test/
