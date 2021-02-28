@@ -1,7 +1,7 @@
-#include <gundam/csvgraph.h>
-#include <gundam/large_graph.h>
-#include <gundam/matchresult.h>
-#include <gundam/small_graph.h>
+#include <gundam/graph_type/large_graph.h>
+#include <gundam/graph_type/small_graph.h>
+#include <gundam/io/csvgraph.h>
+#include <gundam/match/matchresult.h>
 
 #include <cstring>
 #include <fstream>

@@ -1,18 +1,19 @@
 #ifndef _DMINE_ALGO_H
 #define _DMINE_ALGO_H
 
+#include <omp.h>
+
 #include <algorithm>
 #include <chrono>
-#include <omp.h>
 
 #include "get_datagraph_information.h"
 #include "gpar.h"
-#include "gundam/dp_iso.h"
-#include "gundam/csvgraph.h"
-#include "gundam/vf2.h"
+#include "gundam/algorithm/dp_iso.h"
+#include "gundam/algorithm/vf2.h"
+#include "gundam/io/csvgraph.h"
 namespace gmine_new {
-//omp_lock_t expand_lock;
-//omp_lock_t filter_lock;
+// omp_lock_t expand_lock;
+// omp_lock_t filter_lock;
 int gen_maxid = 0;
 template <class GraphType>
 void TransposePattern(const GraphType &G) {
@@ -89,34 +90,34 @@ template <class TopKContainerType>
 inline void OutputDiscoverResult(TopKContainerType &top_k_container,
                                  const char *output_dir);
 template <class Pattern, class DataGraph>
-inline void collectResult(std::vector<DiscoverdGPAR<Pattern, DataGraph>>& total_gpar_set){
-  int* log = new int[20];
-  int num =0;
+inline void collectResult(
+    std::vector<DiscoverdGPAR<Pattern, DataGraph>> &total_gpar_set) {
+  int *log = new int[20];
+  int num = 0;
   double score = 0;
-  for(int i=0;i<20;i++)
-    log[i] = 0;
-  for(auto& gpar : total_gpar_set){
+  for (int i = 0; i < 20; i++) log[i] = 0;
+  for (auto &gpar : total_gpar_set) {
     double tmp_score = gpar.conf();
     score += tmp_score;
     num++;
     int index, mod;
     index = tmp_score / 0.05;
-    mod = fmod(tmp_score,0.05) > 0.0 ? 1 : 0;
-    log[index+mod-1]++;
+    mod = fmod(tmp_score, 0.05) > 0.0 ? 1 : 0;
+    log[index + mod - 1]++;
   }
   std::cout << "-----------------result-----------------" << std::endl;
-  for(int i=0;i<20;i++){
-    std::cout << "conf = " << i*0.05 << "-" << (i+1)*0.05 << " : " << log[i] << std::endl;
+  for (int i = 0; i < 20; i++) {
+    std::cout << "conf = " << i * 0.05 << "-" << (i + 1) * 0.05 << " : "
+              << log[i] << std::endl;
   }
-  if(num!=0)
-    std::cout << "avg conf = " << score/num << std::endl;
+  if (num != 0) std::cout << "avg conf = " << score / num << std::endl;
   std::cout << "------------------over------------------" << std::endl;
   return;
 }
 template <class Pattern, class DataGraph>
 inline void DMineAlgo(
-    int argc, char* argv[],
-    const char *v_file, const char *e_file,  // data graph
+    int argc, char *argv[], const char *v_file,
+    const char *e_file,  // data graph
     const typename Pattern::VertexType::LabelType x_node_label,
     const typename Pattern::VertexType::LabelType y_node_label,
     const typename Pattern::EdgeType::LabelType q_edge_label,  // q(x,y)
@@ -125,7 +126,7 @@ inline void DMineAlgo(
     const size_t d,                                            // radius of GPAR
     const char *output_dir) {
   gen_maxid = 0;
-//  omp_set_num_threads(omp_get_num_procs()-1);
+  //  omp_set_num_threads(omp_get_num_procs()-1);
   using DataGraphVertexLabelType = typename DataGraph::VertexType::LabelType;
   using DataGraphEdgeLabelType = typename DataGraph::EdgeType::LabelType;
   // data graph
@@ -178,8 +179,8 @@ inline void DMineAlgo(
   if (supp_r_size < sigma) {
     return;
   }
-//  omp_init_lock(&expand_lock);
-//  omp_init_lock(&filter_lock);
+  //  omp_init_lock(&expand_lock);
+  //  omp_init_lock(&filter_lock);
   root_gpar.Setid(gen_maxid++);
   last_round_gpar.push_back(root_gpar);
   auto r_begin = std::chrono::system_clock::now();
@@ -222,18 +223,19 @@ inline void DMineAlgo(
     }
     end = std::chrono::system_clock::now();
     std::cout << "inc div time is " << CalTimeOrigin(begin, end) << std::endl;
-    
+
     int conf_max_num = 0;
-    for (auto gpar : last_round_gpar){
-      if (gpar.conf() >= 0.8){
-        conf_max_num ++;
+    for (auto gpar : last_round_gpar) {
+      if (gpar.conf() >= 0.8) {
+        conf_max_num++;
       }
     }
-    std::cout << "gpar edge size = " << r << " ==> size = " << conf_max_num <<std::endl;
+    std::cout << "gpar edge size = " << r << " ==> size = " << conf_max_num
+              << std::endl;
     collectResult(total_gpar);
     auto r_end = std::chrono::system_clock::now();
-    std::cout << "round " << r << " match time is " << CalTimeOrigin(r_begin, r_end)
-              << std::endl;
+    std::cout << "round " << r << " match time is "
+              << CalTimeOrigin(r_begin, r_end) << std::endl;
   }
   auto end = std::chrono::system_clock::now();
   std::cout << "total iteration time = " << CalTimeOrigin(begin, end)
@@ -494,7 +496,7 @@ inline void FilterGPARUsingSuppRLimit(GPARList &gpar_list,
                                       const SuppType &sigma) {
   GPARList filter_gpar_list;
   using SuppContainerType = std::set<typename DataGraph::VertexConstPtr>;
-//#pragma omp parallel for schedule(static, omp_get_num_procs()-1)
+  //#pragma omp parallel for schedule(static, omp_get_num_procs()-1)
   for (auto &gpar : gpar_list) {
     auto t_begin = clock();
     CalSuppQ(gpar, data_graph);
@@ -502,12 +504,12 @@ inline void FilterGPARUsingSuppRLimit(GPARList &gpar_list,
     t_begin = clock();
     CalSuppR(gpar, data_graph);
     t_end = clock();
-//    omp_set_lock(&filter_lock);
+    //    omp_set_lock(&filter_lock);
     if (gpar.supp_R().size() >= sigma) {
       gpar.CalConf();
       filter_gpar_list.push_back(gpar);
     }
-//    omp_unset_lock(&filter_lock);
+    //    omp_unset_lock(&filter_lock);
   }
   std::swap(filter_gpar_list, gpar_list);
 }

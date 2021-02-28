@@ -1,7 +1,7 @@
 #ifndef _GETDATAGRAPHINFORMATION_H
 #define _GETDATAGRAPHINFORMATION_H
 #include <iostream>
-
+#include <set>
 namespace gmine_new {
 // 不会出现在GPAR里的边的label
 std::set<int> erase_edge_label;

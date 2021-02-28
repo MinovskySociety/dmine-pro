@@ -1,8 +1,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include "gpar_template/gpar_origin.h"
-#include "gundam/large_graph2.h"
-#include "gundam/small_graph.h"
+#include "gundam/graph_type/large_graph2.h"
+#include "gundam/graph_type/small_graph.h"
 
 int main(int argc, char* argv[]) {
   if (argc > 2) {
@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
   }
   using Pattern = GUNDAM::SmallGraph<uint32_t, uint32_t, uint32_t, uint32_t>;
   using DataGraph = GUNDAM::LargeGraph2<uint64_t, uint32_t, std::string,
-                                       uint64_t, uint32_t, std::string>;
+                                        uint64_t, uint32_t, std::string>;
   using PatternVertexLabelType = Pattern::VertexType::LabelType;
   using PatternEdgeLabelType = Pattern::EdgeType::LabelType;
   std::ifstream config_file(config_file_path);

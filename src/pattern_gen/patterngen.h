@@ -5,16 +5,16 @@
 
 #include "../gpar/test.cpp"
 #include "../gpar_template/get_datagraph_information.h"
-#include "gundam/csvgraph.h"
+#include "gundam/io/csvgraph.h"
 //#include "gundam/graph.h"
-#include "gundam/large_graph.h"
+#include "gundam/graph_type/large_graph.h"
 
 namespace gmine_new {
 void PatternGen(const char* v_file, const char* e_file, unsigned int edge_num,
                 unsigned int pattern_num) {
   srand((unsigned)time(NULL));
   using namespace gmine_new;
-  
+
   const VertexLabelType fake = 7, not_fake = 8, user = 4, phone = 5, web = 6;
   const EdgeLabelType call = 0, send = 1, visit = 2;
   const int user_num = 3;

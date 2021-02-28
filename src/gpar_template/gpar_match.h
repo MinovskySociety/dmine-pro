@@ -8,9 +8,9 @@
 
 #include "gpar_config.h"
 #include "gpar_new.h"
-#include "gundam/dp_iso.h"
-#include "gundam/vf2.h"
-#include "gundam/vf2_boost.h"
+#include "gundam/algorithm/dp_iso.h"
+#include "gundam/algorithm/vf2.h"
+#include "gundam/algorithm/vf2_boost.h"
 namespace gmine_new {
 template <class GPAR, class DataGraph>
 inline void GPARMatch(GPAR &gpar, const DataGraph &data_graph) {

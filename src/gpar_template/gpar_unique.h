@@ -2,7 +2,7 @@
 #define _GPARUNIQUE_H
 #include "gpar_dfs_code.h"
 #include "gpar_new.h"
-#include "gundam/vf2.h"
+#include "gundam/algorithm/vf2.h"
 namespace gmine_new {
 template <class GPAR>
 bool CheckIsIso(const GPAR &query, const GPAR &target) {

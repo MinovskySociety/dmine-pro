@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "gundam/csvgraph.h"
+#include "gundam/io/csvgraph.h"
 //#include "gundam/graph.h"
 namespace gmine_new {
 template <class Pattern>

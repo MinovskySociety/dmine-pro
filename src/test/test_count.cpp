@@ -1,9 +1,10 @@
-#include "gundam/large_graph.h"
+#include "gundam/graph_type/large_graph.h"
 
 int main() {
   using namespace GUNDAM;
 
-  LargeGraph<uint32_t, uint32_t, std::string, uint32_t, uint32_t, std::string> g;
+  LargeGraph<uint32_t, uint32_t, std::string, uint32_t, uint32_t, std::string>
+      g;
 
   g.AddVertex(1, 1);
   g.AddVertex(2, 1);

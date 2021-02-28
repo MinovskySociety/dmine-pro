@@ -13,11 +13,11 @@
 #include <unistd.h>
 #endif
 
-#include "gundam/csvgraph.h"
-#include "gundam/dp_iso.h"
-#include "gundam/large_graph.h"
-#include "gundam/large_graph2.h"
-#include "gundam/vf2_boost.h"
+#include "gundam/algorithm/dp_iso.h"
+#include "gundam/algorithm/vf2_boost.h"
+#include "gundam/graph_type/large_graph.h"
+#include "gundam/graph_type/large_graph2.h"
+#include "gundam/io/csvgraph.h"
 
 namespace toy {
 using namespace GUNDAM;
@@ -48,7 +48,7 @@ const std::string ERROR_SYMBOL = "[ERROR] ";
 
 /* Prediction Link
  * @desc: store information of prediction link
-*/
+ */
 struct LinkBase {
   EID_T id_;
   VID_T from_;
@@ -62,7 +62,7 @@ struct LinkBase {
 
 /* Prediction Link
  * @desc: store information of prediction link
-*/
+ */
 struct NewEdge {
   VID_T expand_vid_;        // expand from this vid
   VLABEL_T expand_vlabel_;  // its label
@@ -302,7 +302,7 @@ void RemoveLink(Q &query, const LinkBase &link) {
  * @param: src id, dst id, elabel
  * @return: hash code
  * @desc: calculate hash code by given numbers
-*/
+ */
 uint64_t GetHash(uint64_t from, uint64_t to, uint64_t elabel) {
   return (from << (MAX_NODE_ID + MAX_LABEL_ID)) + (to << MAX_LABEL_ID) + elabel;
 }
@@ -311,7 +311,7 @@ uint64_t GetHash(uint64_t from, uint64_t to, uint64_t elabel) {
  * @param: vertex label1, vertex label2, elabel
  * @return: hash code
  * @desc: calculate hash code by given numbers
-*/
+ */
 uint64_t GetLabelHash(VLABEL_T vlabel1, VLABEL_T vlabel2, ELABEL_T elabel) {
   return (vlabel1 << (MAX_LABEL_ID * 2)) + (vlabel2 << MAX_LABEL_ID) + elabel;
 }
@@ -320,7 +320,7 @@ uint64_t GetLabelHash(VLABEL_T vlabel1, VLABEL_T vlabel2, ELABEL_T elabel) {
  * @param: vertex label1, vertex label2
  * @return: hash code
  * @desc: calculate hash code by given numbers
-*/
+ */
 uint64_t GetLabelHash(VLABEL_T vlabel1, VLABEL_T vlabel2) {
   return (vlabel1 << MAX_LABEL_ID) + vlabel2;
 }

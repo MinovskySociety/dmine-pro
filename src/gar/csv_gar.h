@@ -1,9 +1,8 @@
 #ifndef _CSVGAR_H
 #define _CSVGAR_H
 
-#include <gundam/csvgraph.h>
-
 #include "gar.h"
+#include "gundam/io/csvgraph.h"
 
 namespace gmine_new {
 

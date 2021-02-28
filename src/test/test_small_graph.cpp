@@ -1,10 +1,10 @@
 #include "../gpar_template/gpar_new.h"
-#include "gundam/csvgraph.h"
-#include "gundam/dp_iso.h"
-#include "gundam/large_graph2.h"
-#include "gundam/simple_small_graph.h"
-#include "gundam/small_graph.h"
-#include "gundam/vf2.h"
+#include "gundam/algorithm/dp_iso.h"
+#include "gundam/algorithm/vf2.h"
+#include "gundam/graph_type/large_graph2.h"
+#include "gundam/graph_type/simple_small_graph.h"
+#include "gundam/graph_type/small_graph.h"
+#include "gundam/io/csvgraph.h"
 int main() {
   using Pattern = GUNDAM::SmallGraph<unsigned int, unsigned int, unsigned int,
                                      unsigned int>;

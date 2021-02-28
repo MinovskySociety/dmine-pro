@@ -1,8 +1,8 @@
 #ifndef _GPDEF_H
 #define _GPDEF_H
 
-#include <gundam/datatype.h>
-#include <gundam/geneator.h>
+#include <gundam/component/generator.h>
+#include <gundam/data_type/datatype.h>
 
 #include <cstdint>
 #include <string>

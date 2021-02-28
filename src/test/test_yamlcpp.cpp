@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include "gundam/datatype.h"
-#include "gundam/large_graph.h"
+#include "gundam/data_type/datatype.h"
+#include "gundam/graph_type/large_graph.h"
 #include "yaml-cpp/yaml.h"
 int main() {
   YAML::Node config = YAML::LoadFile("./test.yaml");

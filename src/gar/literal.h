@@ -1,11 +1,11 @@
 #ifndef _LITERAL_H
 #define _LITERAL_H
 
-#include <gundam/datatype.h>
-#include <gundam/geneator.h>
-
 #include <map>
 #include <set>
+
+#include "gundam/component/generator.h"
+#include "gundam/data_type/datatype.h"
 
 namespace gmine_new {
 

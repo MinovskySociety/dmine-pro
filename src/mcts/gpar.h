@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "gundam/csvgraph.h"
+#include "gundam/io/csvgraph.h"
 //#include "gundam/graph.h"
 namespace gmine_new {
 template <class Pattern>
@@ -68,7 +68,8 @@ class GPAR {
          vertex_it++) {
       data[index++] = vertex_it->id();
       data[index++] = vertex_it->label();
-      std::cout << "send pattern support V " << vertex_it->id() << " : " << vertex_it->label() << std::endl;
+      std::cout << "send pattern support V " << vertex_it->id() << " : " <<
+  vertex_it->label() << std::endl;
     }
     for (auto vertex_it = this->pattern.VertexCBegin(); !vertex_it.IsDone();
          vertex_it++) {
@@ -78,17 +79,20 @@ class GPAR {
         data[index++] = edge_it->src_id();
         data[index++] = edge_it->dst_id();
         data[index++] = edge_it->label();
-        std::cout << "send pattern support E " << edge_it->id() << " : " << edge_it->src_id() << " : " << edge_it->dst_id() << " : " << edge_it->label() << std::endl;
+        std::cout << "send pattern support E " << edge_it->id() << " : " <<
+  edge_it->src_id() << " : " << edge_it->dst_id() << " : " << edge_it->label()
+  << std::endl;
       }
     }
     data[index++] = this->x_node_ptr_->id();
     data[index++] = this->y_node_ptr_->id();
     data[index++] = this->q_edge_label_;
-    std::cout << "send pattern source_id " << this->x_node_ptr_->id() << " :target_id " << this->y_node_ptr_->id() << " ;edge_label " << this->q_edge_label_ << std::endl;
-    if(flag){
-      data[index++] = this->supp_Q_size_;
-      data[index++] = this->supp_R_size_;
-      std::cout << "send pattern support Q " << this->supp_Q_size_ << " ; support R " << this->supp_R_size_ << std::endl;
+    std::cout << "send pattern source_id " << this->x_node_ptr_->id() << "
+  :target_id " << this->y_node_ptr_->id() << " ;edge_label " <<
+  this->q_edge_label_ << std::endl; if(flag){ data[index++] =
+  this->supp_Q_size_; data[index++] = this->supp_R_size_; std::cout << "send
+  pattern support Q " << this->supp_Q_size_ << " ; support R " <<
+  this->supp_R_size_ << std::endl;
     }
     return data;
   }
@@ -97,22 +101,25 @@ class GPAR {
     int index = 0;
     for(;index<2*m;index+=2){
       this->pattern.AddVertex(data[index], data[index+1]);
-      std::cout << "recv pattern support V " << data[index] << " : " << data[index+1] << std::endl;
+      std::cout << "recv pattern support V " << data[index] << " : " <<
+  data[index+1] << std::endl;
     }
     for(;index<2*m+4*n;index+=4){
-      this->pattern.AddEdge(data[index], data[index+1], data[index+2], data[index+3]);
-      std::cout << "recv pattern support E " << data[index] << " : " << data[index+1] << " : " << data[index+2] << " : " << data[index+3] << std::endl;
+      this->pattern.AddEdge(data[index], data[index+1], data[index+2],
+  data[index+3]); std::cout << "recv pattern support E " << data[index] << " : "
+  << data[index+1] << " : " << data[index+2] << " : " << data[index+3] <<
+  std::endl;
     }
-    
+
     //this->x_node_ptr_->id() = data[index++];
     //this->y_node_ptr_->id() = data[index++];
     //this->q_edge_label_ = data[index++];
-    
-    int source_id = data[index++]; 
-    int target_id = data[index++]; 
-    int edge_label = data[index++]; 
-    std::cout << "recv pattern source_id " << source_id << " :target_id " << target_id << " ;edge_label " << edge_label << std::endl;
-    if(flag){
+
+    int source_id = data[index++];
+    int target_id = data[index++];
+    int edge_label = data[index++];
+    std::cout << "recv pattern source_id " << source_id << " :target_id " <<
+  target_id << " ;edge_label " << edge_label << std::endl; if(flag){
       this->supp_Q_size_ = data[index++];
       this->supp_R_size_ = data[index++];
       if (!this->supp_Q_size_) {
@@ -120,10 +127,10 @@ class GPAR {
                      static_cast<double>(this->supp_Q_size_);
       }
     }
-    std::cout << "recv pattern support Q " << this->supp_Q_size_ << " ; support R " << this->supp_R_size_ << " ;conf = " << this->gpar_conf << std::endl;
-  }  
+    std::cout << "recv pattern support Q " << this->supp_Q_size_ << " ; support
+  R " << this->supp_R_size_ << " ;conf = " << this->gpar_conf << std::endl;
+  }
   */
-
 
  public:
   Pattern pattern;
@@ -215,17 +222,17 @@ class DiscoverdGPAR : public GPAR<Pattern> {
   void Setid(int id) { this->GPAR_id = id; }
 
   int* Serialization(int m, int n, bool flag, std::vector<int>& data) {
-    int N = m*2+n*4+3;
-    if(flag)
-      N+=2;
-    //data = new int[N];
+    int N = m * 2 + n * 4 + 3;
+    if (flag) N += 2;
+    // data = new int[N];
     data.resize(N);
     int index = 0;
     for (auto vertex_it = this->pattern.VertexCBegin(); !vertex_it.IsDone();
          vertex_it++) {
       data[index++] = vertex_it->id();
       data[index++] = vertex_it->label();
-      //std::cout << "send pattern support V " << vertex_it->id() << " : " << vertex_it->label() << std::endl;
+      // std::cout << "send pattern support V " << vertex_it->id() << " : " <<
+      // vertex_it->label() << std::endl;
     }
     for (auto vertex_it = this->pattern.VertexCBegin(); !vertex_it.IsDone();
          vertex_it++) {
@@ -235,19 +242,24 @@ class DiscoverdGPAR : public GPAR<Pattern> {
         data[index++] = edge_it->src_id();
         data[index++] = edge_it->dst_id();
         data[index++] = edge_it->label();
-        //std::cout << "send pattern support E " << edge_it->id() << " : " << edge_it->src_id() << " : " << edge_it->dst_id() << " : " << edge_it->label() << std::endl;
+        // std::cout << "send pattern support E " << edge_it->id() << " : " <<
+        // edge_it->src_id() << " : " << edge_it->dst_id() << " : " <<
+        // edge_it->label() << std::endl;
       }
     }
     data[index++] = this->x_node_ptr_->id();
     data[index++] = this->y_node_ptr_->id();
     data[index++] = this->q_edge_label_;
-    //std::cout << "send pattern source_id " << this->x_node_ptr_->id() << " :target_id " << this->y_node_ptr_->id() << " ;edge_label " << this->q_edge_label_ << std::endl;
-    if(flag){
+    // std::cout << "send pattern source_id " << this->x_node_ptr_->id() << "
+    // :target_id " << this->y_node_ptr_->id() << " ;edge_label " <<
+    // this->q_edge_label_ << std::endl;
+    if (flag) {
       data[index++] = this->supp_Q_.size();
       data[index++] = this->supp_R_.size();
-      //std::cout << "send pattern support Q " << this->supp_Q_.size() << " ; support R " << this->supp_R_.size() << std::endl;
+      // std::cout << "send pattern support Q " << this->supp_Q_.size() << " ;
+      // support R " << this->supp_R_.size() << std::endl;
     }
-    //std::cout << "ndata ";
+    // std::cout << "ndata ";
     //  for(int i=0;i<m*2+n*4;i++)
     //    std::cout << data[i] << "-";
     //  std::cout << std::endl;
@@ -255,33 +267,41 @@ class DiscoverdGPAR : public GPAR<Pattern> {
   }
 
   void Deserialization(int* data, int m, int n, bool flag) {
-    //std::cout << "ndata ";
+    // std::cout << "ndata ";
     //  for(int i=0;i<m*2+n*4;i++)
     //    std::cout << data[i] << "-";
     //  std::cout << std::endl;
     int index = 0;
-    for(index=0; index<m; index++){
-      this->pattern.AddVertex(data[2*index], data[2*index+1]);
-    //  std::cout << "recv pattern support V " << data[2*index] << " : " << data[2*index+1] << std::endl;
+    for (index = 0; index < m; index++) {
+      this->pattern.AddVertex(data[2 * index], data[2 * index + 1]);
+      //  std::cout << "recv pattern support V " << data[2*index] << " : " <<
+      //  data[2*index+1] << std::endl;
     }
-    for(index=0; index<n; index++){
-      this->pattern.AddEdge(data[2*m+4*index+1], data[2*m+4*index+2], data[2*m+4*index+3], data[2*m+4*index]);
-    // std::cout << "recv pattern support E " << data[2*m+4*index] << " : " << data[2*m+4*index+1] << " : " << data[2*m+4*index+2] << " : " << data[2*m+4*index+3] << std::endl;
+    for (index = 0; index < n; index++) {
+      this->pattern.AddEdge(
+          data[2 * m + 4 * index + 1], data[2 * m + 4 * index + 2],
+          data[2 * m + 4 * index + 3], data[2 * m + 4 * index]);
+      // std::cout << "recv pattern support E " << data[2*m+4*index] << " : " <<
+      // data[2*m+4*index+1] << " : " << data[2*m+4*index+2] << " : " <<
+      // data[2*m+4*index+3] << std::endl;
     }
-    
-    int source_id = data[2*m+4*n]; 
-    int target_id = data[2*m+4*n+1]; 
-    int edge_label = data[2*m+4*n+2]; 
-    //std::cout << "recv pattern source_id " << this->x_node_ptr_->id() << " :target_id " << this->y_node_ptr_->id() << " ;edge_label " << this->q_edge_label_ << std::endl;
-    if(flag){
-      this->supp_Q_size_ = data[2*m+4*n+3];
-      this->supp_R_size_ = data[2*m+4*n+4];
+
+    int source_id = data[2 * m + 4 * n];
+    int target_id = data[2 * m + 4 * n + 1];
+    int edge_label = data[2 * m + 4 * n + 2];
+    // std::cout << "recv pattern source_id " << this->x_node_ptr_->id() << "
+    // :target_id " << this->y_node_ptr_->id() << " ;edge_label " <<
+    // this->q_edge_label_ << std::endl;
+    if (flag) {
+      this->supp_Q_size_ = data[2 * m + 4 * n + 3];
+      this->supp_R_size_ = data[2 * m + 4 * n + 4];
       this->gpar_conf = static_cast<double>(this->supp_R_size_) /
-                     static_cast<double>(this->supp_Q_size_);
-    //  std::cout << "recv pattern support Q " << this->supp_Q_size_ << " ; support R " << this->supp_R_size_ << " ;conf = " << this->gpar_conf << std::endl;
+                        static_cast<double>(this->supp_Q_size_);
+      //  std::cout << "recv pattern support Q " << this->supp_Q_size_ << " ;
+      //  support R " << this->supp_R_size_ << " ;conf = " << this->gpar_conf <<
+      //  std::endl;
     }
   }
-
 };
 template <class GPAR>
 void WriteGPAR(const GPAR& gpar, uint32_t pattern_id,

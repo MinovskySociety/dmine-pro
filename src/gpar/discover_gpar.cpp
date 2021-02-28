@@ -1,8 +1,8 @@
 #include <ctime>
 #include <queue>
+
 #include "gpar.h"
-#include "gundam/vf2.h"
-#include "gundam/vf2_label_equal.h"
+#include "gundam/algorithm/vf2.h"
 ReturnType gmine_new::DiscoverGPAR::DminePro(IN const char *v_file,
                                              IN const char *e_file) {
   this->discovery_result_.clear();

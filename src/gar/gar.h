@@ -1,14 +1,10 @@
 #ifndef _GAR_H
 #define _GAR_H
-
-#include "gundam/container2.h"
-#include "gundam/geneator.h"
-//#include "gundam/graph.h"
-#include "gundam/rapidcsv.h"
-#include "gundam/vf2.h"
-
+#include "gundam/algorithm/vf2.h"
+#include "gundam/component/container2.h"
+#include "gundam/component/generator.h"
+#include "gundam/io/rapidcsv.h"
 #include "literal.h"
-//#include "literalset.h"
 
 namespace gmine_new {
 
@@ -41,8 +37,8 @@ class GraphAssociationRule {
  public:
   GraphAssociationRule(){};
 
-  //template <class UPattern>
-  //GraphAssociationRule(UPattern &&pattern)
+  // template <class UPattern>
+  // GraphAssociationRule(UPattern &&pattern)
   //    : pattern_(std::forward<UPattern>(pattern)){};
 
   GraphAssociationRule(const Pattern &pattern) : pattern_(pattern){};

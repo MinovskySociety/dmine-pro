@@ -18,8 +18,7 @@
 #include "gpar_match.h"
 #include "gpar_new.h"
 #include "gpar_unique.h"
-#include "gundam/boost_iso.h"
-#include "gundam/csvgraph.h"
+#include "gundam/io/csvgraph.h"
 #include "round_log.h"
 #include "top_k_container.h"
 namespace gmine_new {

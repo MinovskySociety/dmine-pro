@@ -5,10 +5,9 @@
 
 #include "gpar_template/gpar_discover.h"
 #include "gpar_template/gpar_new.h"
-#include "gundam/large_graph.h"
-#include "gundam/large_graph2.h"
-#include "gundam/simple_small_graph.h"
-#include "gundam/small_graph.h"
+#include "gundam/graph_type/large_graph.h"
+#include "gundam/graph_type/large_graph2.h"
+#include "gundam/graph_type/small_graph.h"
 #include "yaml-cpp/yaml.h"
 int main(int argc, char* argv[]) {
   if (argc > 2) {

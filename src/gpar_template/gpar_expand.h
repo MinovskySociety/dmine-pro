@@ -2,7 +2,7 @@
 #define _GPAREXPAND_H
 #include "gpar_config.h"
 #include "gpar_new.h"
-#include "gundam/vf2.h"
+#include "gundam/algorithm/vf2.h"
 namespace gmine_new {
 int not_match_num = 0;
 int total_num = 0;

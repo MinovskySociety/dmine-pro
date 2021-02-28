@@ -2,8 +2,8 @@
 
 #include <set>
 #include <vector>
-#include <gundam/attribute.h>
 
+#include "gundam/component/attribute.h"
 #include "select.h"
 
 namespace gptools {

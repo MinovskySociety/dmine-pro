@@ -2,7 +2,7 @@
 
 #include "../gpar/gpar.h"
 #include "gar/csv_gar.h"
-#include "gundam/large_graph.h"
+#include "gundam/graph_type/large_graph.h"
 void TestReadGAR() {
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,
                                        uint64_t, uint32_t, std::string>;

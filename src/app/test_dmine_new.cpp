@@ -5,7 +5,7 @@
 
 #include "gpar_template/gpar_discover.h"
 #include "gpar_template/gpar_new.h"
-#include "gundam/large_graph.h"
+#include "gundam/graph_type/large_graph.h"
 int main(int argc, char* argv[]) {
   if (argc > 2) {
     std::cout << "parameter num is not correct!(only 0 or 1)" << std::endl;

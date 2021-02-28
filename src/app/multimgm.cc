@@ -1,9 +1,10 @@
-#include <yaml-cpp/yaml.h>
-#include <mpi.h>
-
 #include "mcts/multimgm.h"
-#include "gundam/large_graph2.h"
-#include "gundam/small_graph.h"
+
+#include <mpi.h>
+#include <yaml-cpp/yaml.h>
+
+#include "gundam/graph_type/large_graph2.h"
+#include "gundam/graph_type/small_graph.h"
 
 int main(int argc, char* argv[]) {
   if (argc > 2) {
@@ -16,7 +17,7 @@ int main(int argc, char* argv[]) {
   }
   using Pattern = GUNDAM::SmallGraph<uint32_t, uint32_t, uint32_t, uint32_t>;
   using DataGraph = GUNDAM::LargeGraph2<uint64_t, uint32_t, std::string,
-                                       uint64_t, uint32_t, std::string>;
+                                        uint64_t, uint32_t, std::string>;
   using PatternVertexLabelType = Pattern::VertexType::LabelType;
   using PatternEdgeLabelType = Pattern::EdgeType::LabelType;
   std::ifstream config_file(config_file_path);
@@ -25,8 +26,8 @@ int main(int argc, char* argv[]) {
     return 0;
   }
   YAML::Node config = YAML::LoadFile(config_file_path);
-  
-  //Input Graph
+
+  // Input Graph
   if (!config["Graph"]["Name"]) {
     std::cout << "cannot get input graph name!" << std::endl;
     return 0;
@@ -43,15 +44,17 @@ int main(int argc, char* argv[]) {
     std::cout << "cannot get input graph vertex file!" << std::endl;
     return 0;
   }
-  std::string input_graph_vertex_file = config["Graph"]["VertexFile"].as<std::string>();
+  std::string input_graph_vertex_file =
+      config["Graph"]["VertexFile"].as<std::string>();
 
   if (!config["Graph"]["EdgeFile"]) {
     std::cout << "cannot get input graph edge file!" << std::endl;
     return 0;
   }
-  std::string input_graph_edge_file = config["Graph"]["EdgeFile"].as<std::string>();
+  std::string input_graph_edge_file =
+      config["Graph"]["EdgeFile"].as<std::string>();
 
-  //MGM
+  // MGM
   if (!config["MGM"]["Supp"]) {
     std::cout << "cannot get support!" << std::endl;
     return 0;
@@ -80,34 +83,37 @@ int main(int argc, char* argv[]) {
     std::cout << "cannot get the src node label!" << std::endl;
     return 0;
   }
-  PatternVertexLabelType srcnodelabel = config["MGM"]["SrcNodeLabel"].as<PatternVertexLabelType>();
+  PatternVertexLabelType srcnodelabel =
+      config["MGM"]["SrcNodeLabel"].as<PatternVertexLabelType>();
 
   if (!config["MGM"]["DstNodeLabel"]) {
     std::cout << "cannot get the dst node label!" << std::endl;
     return 0;
   }
-  PatternVertexLabelType dstnodelabel = config["MGM"]["DstNodeLabel"].as<PatternVertexLabelType>();
+  PatternVertexLabelType dstnodelabel =
+      config["MGM"]["DstNodeLabel"].as<PatternVertexLabelType>();
 
   if (!config["MGM"]["EdgeLabel"]) {
     std::cout << "cannot get the edge label!" << std::endl;
     return 0;
   }
-  PatternEdgeLabelType edgelabel = config["MGM"]["EdgeLabel"].as<PatternEdgeLabelType>();
+  PatternEdgeLabelType edgelabel =
+      config["MGM"]["EdgeLabel"].as<PatternEdgeLabelType>();
 
-  //Output Graph
+  // Output Graph
   if (!config["OutputGraph"]["Dir"]) {
     std::cout << "cannot get the dir of output graph!" << std::endl;
     return 0;
   }
   std::string output_graph_dir = config["OutputGraph"]["Dir"].as<std::string>();
-  
+
   std::cout << config << std::endl;
   std::string node_file = input_graph_dir + input_graph_vertex_file;
   std::string edge_file = input_graph_dir + input_graph_edge_file;
 
-  gmine_new::MultiMGM<Pattern, DataGraph>(argc, argv,
-      node_file.c_str(), edge_file.c_str(), srcnodelabel, dstnodelabel, edgelabel, 
-      supp, conf, topk,
-      edgesize, output_graph_dir.c_str());
+  gmine_new::MultiMGM<Pattern, DataGraph>(
+      argc, argv, node_file.c_str(), edge_file.c_str(), srcnodelabel,
+      dstnodelabel, edgelabel, supp, conf, topk, edgesize,
+      output_graph_dir.c_str());
   return 0;
 }

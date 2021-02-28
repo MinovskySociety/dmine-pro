@@ -1,7 +1,6 @@
-#include <graph_package/graph_package.h>
 #include <graph_package/csvgp.h>
-
-#include <gundam/large_graph2.h>
+#include <graph_package/graph_package.h>
+#include <gundam/graph_type/large_graph2.h>
 
 int main() {
   using namespace GUNDAM;
@@ -20,7 +19,7 @@ int main() {
   GraphPackage gp;
   res = ReadGraphPackage(info, gp);
   if (res < 0) return res;
-  
+
   info.dict_dir = info.graph_dir = "/share/work/cu/cu4999_0a";
   info.name = "liantong";
 

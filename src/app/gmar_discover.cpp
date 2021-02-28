@@ -8,9 +8,10 @@
 #include "gmar/user_phone_frquent_model.h"
 #include "gpar_template/gpar_discover.h"
 #include "gpar_template/gpar_new.h"
-#include "gundam/csvgraph.h"
-#include "gundam/large_graph.h"
-#include "gundam/small_graph.h"
+#include "gundam/graph_type/large_graph.h"
+#include "gundam/graph_type/large_graph2.h"
+#include "gundam/graph_type/small_graph.h"
+#include "gundam/io/csvgraph.h"
 int main(int argc, char* argv[]) {
   using Pattern = GUNDAM::SmallGraph<uint32_t, uint32_t, uint32_t, uint32_t>;
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,

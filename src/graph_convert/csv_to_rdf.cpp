@@ -1,9 +1,9 @@
 #include <fstream>
 #include <map>
 
-#include "gundam/csvgraph.h"
-#include "gundam/large_graph.h"
-#include "gundam/rapidcsv.h"
+#include "gundam/graph_type/large_graph.h"
+#include "gundam/io/csvgraph.h"
+#include "gundam/io/rapidcsv.h"
 #include "yaml-cpp/yaml.h"
 template <class Graph, class LabelDict>
 bool GetGraphAndDict(YAML::Node &config, Graph &graph, LabelDict &label_dict) {

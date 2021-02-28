@@ -3,9 +3,9 @@
 #endif  // _MSC_VER
 
 #include "ecs_api.h"
-#include "gundam/csvgraph.h"
-#include "gundam/graph.h"
-#include "gundam/rapidcsv.h"
+#include "gundam/graph_type/graph.h"
+#include "gundam/io/csvgraph.h"
+#include "gundam/io/rapidcsv.h"
 
 using namespace std;
 using namespace GUNDAM;

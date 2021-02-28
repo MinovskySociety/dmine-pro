@@ -3,8 +3,8 @@
 //#include <cstring>
 #include <iostream>
 
-#include "gundam/csvgraph.h"
-#include "gundam/graph.h"
+#include "gundam/graph_type/graph.h"
+#include "gundam/io/csvgraph.h"
 
 #ifndef IN
 #define IN

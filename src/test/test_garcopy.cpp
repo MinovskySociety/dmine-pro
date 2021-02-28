@@ -3,7 +3,7 @@
 #include "gar/gar.h"
 #include "gar/gar_chase.h"
 #include "gar/gar_match.h"
-#include "gundam/large_graph.h"
+#include "gundam/graph_type/large_graph.h"
 void TestGARMatch() {
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, uint32_t, uint64_t,
                                        uint32_t, uint32_t>;

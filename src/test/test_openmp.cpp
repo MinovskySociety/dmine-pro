@@ -1,12 +1,12 @@
 //#include "gundam/boost_iso.h"
-#include "gundam/csvgraph.h"
-#include "gundam/dp_iso.h"
+#include "gundam/algorithm/dp_iso.h"
+#include "gundam/io/csvgraph.h"
 //#include "gundam/graph.h"
 #include <map>
 #include <vector>
 
-#include "gundam/large_graph.h"
-#include "gundam/vf2_boost.h"
+#include "gundam/algorithm/vf2_boost.h"
+#include "gundam/graph_type/large_graph.h"
 
 int main() {
   using namespace GUNDAM;

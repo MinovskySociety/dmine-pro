@@ -11,11 +11,11 @@
 #include <string>
 #include <vector>
 
-#include "gundam/csvgraph.h"
+#include "gundam/io/csvgraph.h"
 //#include "stardand/paratype.h"
 //#include "gundam/graph.h"
-#include "gundam/large_graph.h"
-#include "gundam/vf2.h"
+#include "gundam/algorithm/vf2.h"
+#include "gundam/graph_type/large_graph.h"
 
 const double eps = 1e-6;
 using ReturnType = int;

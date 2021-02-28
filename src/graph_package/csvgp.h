@@ -1,9 +1,9 @@
 #ifndef _CSVGP_H
 #define _CSVGP_H
 
-#include <gundam/container2.h>
-#include <gundam/csvgraph.h>
-#include <gundam/rapidcsv.h>
+#include <gundam/component/container2.h>
+#include <gundam/io/csvgraph.h>
+#include <gundam/io/rapidcsv.h>
 
 #include <chrono>
 #include <filesystem>
@@ -82,7 +82,7 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
   }
   // for (auto e_iter = graph.EdgeCBegin(); !e_iter.IsDone(); ++e_iter) {
   // modified by wenzhi
-  for (auto v_iter = graph.VertexCBegin(); !v_iter.IsDone(); v_iter++){
+  for (auto v_iter = graph.VertexCBegin(); !v_iter.IsDone(); v_iter++) {
     for (auto e_iter = v_iter->OutEdgeCBegin(); !e_iter.IsDone(); ++e_iter) {
       all_label_set.insert(e_iter->label());
     }
@@ -237,8 +237,8 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
 
         type_value_iter->value_vertex_id = value_v_iter->id();
 
-        //std::cout << type_value_iter->value_str << std::endl;
-        //std::cout << type_value_iter->value_vertex_id << std::endl;
+        // std::cout << type_value_iter->value_str << std::endl;
+        // std::cout << type_value_iter->value_vertex_id << std::endl;
 
         ++value_v_iter;
       } while (!value_v_iter.IsDone());
@@ -272,7 +272,7 @@ int ReadGraph(const std::filesystem::path &dir,
 
   for (const auto &v_file : vertex_files) {
     res = ReadCSVVertexFileWithCallback<has_attr>((dir / v_file).string(),
-                                                        graph, rv_callback);
+                                                  graph, rv_callback);
     if (res < 0) return res;
   }
 
@@ -286,8 +286,8 @@ int ReadGraph(const std::filesystem::path &dir,
   };
 
   for (const auto &e_file : edge_files) {
-    res = ReadCSVEdgeFileWithCallback<has_attr>((dir / e_file).string(),
-                                                      graph, re_callback);
+    res = ReadCSVEdgeFileWithCallback<has_attr>((dir / e_file).string(), graph,
+                                                re_callback);
     if (res < 0) return res;
   }
 
@@ -299,10 +299,10 @@ int ReadGraph(const std::filesystem::path &dir,
 
 template <bool has_attr, class Graph>
 int WriteGraph(const Graph &graph, const std::filesystem::path &dir,
-                       const std::string &name, const GroupDict &vertex_groups,
-                       const GroupDict &edge_groups,
-                       std::vector<std::filesystem::path> &vertex_files,
-                       std::vector<std::filesystem::path> &edge_files) {
+               const std::string &name, const GroupDict &vertex_groups,
+               const GroupDict &edge_groups,
+               std::vector<std::filesystem::path> &vertex_files,
+               std::vector<std::filesystem::path> &edge_files) {
   using namespace GUNDAM;
 
   if (!std::filesystem::is_directory(dir)) return -1;
@@ -360,13 +360,12 @@ int WriteGraph(const Graph &graph, const std::filesystem::path &v_file,
 
   int res;
 
-  res = WriteCSVVertexFileWithCallback<has_attr>(graph, v_file.string(),
-                                                       nullptr);
+  res =
+      WriteCSVVertexFileWithCallback<has_attr>(graph, v_file.string(), nullptr);
   if (res < 0) return res;
   int count_v = res;
 
-  res = WriteCSVEdgeFileWithCallback<has_attr>(graph, e_file.string(),
-                                                     nullptr);
+  res = WriteCSVEdgeFileWithCallback<has_attr>(graph, e_file.string(), nullptr);
   if (res < 0) return res;
   int count_e = res;
 
@@ -432,18 +431,18 @@ int ReadGraph(GraphPackage<Graph> &gp) {
 
   if (gp.info().has_attr) {
     res = ReadGraph<true>(gp.info().graph_dir, gp.info().vertex_files,
-                                 gp.info().edge_files, gp.graph(),
-                                 gp.vertex_id_gen(), gp.edge_id_gen());
+                          gp.info().edge_files, gp.graph(), gp.vertex_id_gen(),
+                          gp.edge_id_gen());
   } else {
     res = ReadGraph<false>(gp.info().graph_dir, gp.info().vertex_files,
-                                  gp.info().edge_files, gp.graph(),
-                                  gp.vertex_id_gen(), gp.edge_id_gen());
+                           gp.info().edge_files, gp.graph(), gp.vertex_id_gen(),
+                           gp.edge_id_gen());
   }
   if (res < 0) return res;
 
   if (gp.info().check_graph) {
     if (!CheckGraph(gp.graph(), gp.label_dict(), gp.attr_dict(),
-                           gp.type_dict())) {
+                    gp.type_dict())) {
       return -1;
     }
   }
@@ -464,8 +463,8 @@ int ReadGraphPackage(const GraphPackageInfo &info, GraphPackage<Graph> &gp) {
   gp.info() = info;
   res = csvgp::CompleteReadGraphPackageInfo(gp.info());
   if (res < 0) return res;
-  
-  std::cout << "Name: " << gp.info().name << std::endl;  
+
+  std::cout << "Name: " << gp.info().name << std::endl;
   std::cout << "Read dictionary: " << (gp.info().has_dict ? "true" : "false")
             << std::endl;
   if (gp.info().has_dict) {
@@ -475,7 +474,8 @@ int ReadGraphPackage(const GraphPackageInfo &info, GraphPackage<Graph> &gp) {
   std::cout << "Read graph: " << (gp.info().has_graph ? "true" : "false")
             << std::endl;
   if (gp.info().has_graph) {
-    std::cout << "- Graph directory: " << gp.info().graph_dir.string() << std::endl;
+    std::cout << "- Graph directory: " << gp.info().graph_dir.string()
+              << std::endl;
     std::cout << "- Read attribute: " << (gp.info().has_attr ? "true" : "false")
               << std::endl;
     std::cout << "- Is grouping: " << (gp.info().is_grouping ? "true" : "false")
@@ -530,7 +530,7 @@ int WriteDict(GraphPackage<Graph> &gp) {
   if (info.attr_file.empty()) {
     if (info.name.empty() || info.dict_dir.empty()) return -1;
     info.attr_file = GetAttributeFilename(info.name);
-  }  
+  }
   res = WriteAttributeFile(gp.attr_dict(), info.dict_dir / info.attr_file);
   if (res < 0) return res;
 
@@ -553,11 +553,11 @@ int WriteGraph(GraphPackage<Graph> &gp) {
 
   if (gp.info().is_grouping) {
     GroupDict vertex_groups;
-    GroupDict edge_groups;    
+    GroupDict edge_groups;
 
     std::cout << "Build Vertex/Edge groups: ";
-    res = BuildVertexEdgeGroups(gp.label_dict(), gp.attr_dict(),
-                                    gp.type_dict(), vertex_groups, edge_groups);
+    res = BuildVertexEdgeGroups(gp.label_dict(), gp.attr_dict(), gp.type_dict(),
+                                vertex_groups, edge_groups);
     if (res < 0) {
       std::cout << "failed" << std::endl;
       return res;
@@ -578,7 +578,7 @@ int WriteGraph(GraphPackage<Graph> &gp) {
     if (gp.info().has_skeleton) {
       res = WriteGraph<false>(gp.graph(), gp.info().graph_dir, gp.info().name);
       if (res < 0) return res;
-    }    
+    }
 
   } else {
     if (gp.info().has_attr) {
@@ -618,8 +618,8 @@ int WriteGraphPackage(const GraphPackageInfo &info, GraphPackage<Graph> &gp) {
   if (gp.info().has_graph) {
     std::cout << "- Graph directory: " << gp.info().graph_dir.string()
               << std::endl;
-    std::cout << "- Write attribute: " << (gp.info().has_attr ? "true" : "false")
-              << std::endl;
+    std::cout << "- Write attribute: "
+              << (gp.info().has_attr ? "true" : "false") << std::endl;
     std::cout << "- Is grouping: " << (gp.info().is_grouping ? "true" : "false")
               << std::endl;
     std::cout << "- Write skeleton: "

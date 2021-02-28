@@ -8,9 +8,9 @@
 #include "../gpar/test.cpp"
 #include "get_datagraph_information.h"
 #include "gpar_new.h"
-#include "gundam/csvgraph.h"
-#include "gundam/dp_iso.h"
-#include "gundam/vf2.h"
+#include "gundam/algorithm/dp_iso.h"
+#include "gundam/algorithm/vf2.h"
+#include "gundam/io/csvgraph.h"
 namespace gmine_new {
 omp_lock_t expand_lock;
 omp_lock_t filter_lock;

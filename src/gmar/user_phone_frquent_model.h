@@ -2,7 +2,7 @@
 #define _USERPHONEFREQUENTMODEL_H
 #include <numeric>
 
-#include "gundam/dp_iso.h"
+#include "gundam/algorithm/dp_iso.h"
 #include "ml_model.h"
 namespace gmine_new {
 template <class Pattern, class DataGraph>

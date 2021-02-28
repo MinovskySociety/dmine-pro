@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "gar.h"
-#include "gundam/dp_iso.h"
+#include "gundam/algorithm/dp_iso.h"
 
 namespace gmine_new {
 template <bool check_y_flag, class QueryVertexPtr, class DataGraphVertexPtr,

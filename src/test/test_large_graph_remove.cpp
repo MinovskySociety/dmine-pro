@@ -1,7 +1,7 @@
-#include "gundam/dp_iso.h"
-#include "gundam/graph.h"
-#include "gundam/large_graph.h"
-#include "gundam/match.h"
+#include "gundam/algorithm/dp_iso.h"
+#include "gundam/graph_type/graph.h"
+#include "gundam/graph_type/large_graph.h"
+#include "gundam/match/match.h"
 int main() {
   std::cout << "111" << std::endl;
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,
