@@ -3,18 +3,41 @@
 
 #include <queue>
 #include <set>
+#include <type_traits>
 
 namespace GUNDAM {
 
+// legal callback forms:
+//    user_callback(vertex_ptr)
+//    user_callback(vertex_ptr, bfs_idx)
+//    user_callback(vertex_ptr, bfs_idx, distance)
 template <bool bidirectional = false,
           typename        GraphType,
           typename    VertexPtrType,
           typename UserCallBackType>
 inline size_t Bfs(GraphType&  graph,
      std::set<VertexPtrType>& src_vertex_ptr_set,
-           UserCallBackType&  user_callback) {
-  size_t counter = 0;
-  std::queue<std::pair<VertexPtrType, size_t>> vertex_ptr_queue;
+           UserCallBackType  user_callback) {
+  using VertexCounterType = typename GraphType::VertexCounterType;
+  static_assert(
+       // user_callback(vertex_ptr)
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType)> >
+    || // user_callback(vertex_ptr, bfs_idx)
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType, 
+                                   VertexCounterType)> >
+    || // user_callback(vertex_ptr, bfs_idx, distance)
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType, 
+                                   VertexCounterType, 
+                                   VertexCounterType)> >, 
+      "illegal callback type, only allows one of user_callback(vertex_ptr), user_callback(vertex_ptr, bfs_idx) and user_callback(vertex_ptr, bfs_idx, distance)");
+  VertexCounterType bfs_idx = 0;
+  std::queue<std::pair<VertexPtrType, VertexCounterType>> vertex_ptr_queue;
   std:: set <VertexPtrType> visited;
   for (const auto& src_vertex_ptr : src_vertex_ptr_set){
     vertex_ptr_queue.emplace(src_vertex_ptr, 0);
@@ -24,10 +47,35 @@ inline size_t Bfs(GraphType&  graph,
     auto [current_vertex_ptr, 
           current_distance] = vertex_ptr_queue.front();
     vertex_ptr_queue.pop();
-    counter++;
-    if (!user_callback(current_vertex_ptr, current_distance)){
+    bfs_idx++;
+    bool ret = false;
+    if constexpr (
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType)> >){
+      ret = user_callback(current_vertex_ptr);
+    }
+    if constexpr (
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType,
+                                   VertexCounterType)> >){
+      ret = user_callback(current_vertex_ptr,
+                          bfs_idx);
+    }
+    if constexpr (
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType,
+                                   VertexCounterType,
+                                   VertexCounterType)> >){
+      ret = user_callback(current_vertex_ptr,
+                          bfs_idx,
+                          current_distance);
+    }
+    if (!ret){
       // meets stopping condition, stop the matching process
-      return counter;
+      return bfs_idx;
     }
     for (auto edge_it = current_vertex_ptr->OutEdgeBegin();
              !edge_it.IsDone();
@@ -52,7 +100,7 @@ inline size_t Bfs(GraphType&  graph,
       }
     }
   }
-  return counter;
+  return bfs_idx;
 }
 
 template <bool bidirectional = false,
@@ -67,18 +115,17 @@ inline size_t Bfs(GraphType& graph,
 }
 
 template <bool bidirectional = false,
-          typename        GraphType,
-          typename    VertexPtrType>
+          typename     GraphType,
+          typename VertexPtrType>
 inline size_t Bfs(GraphType& graph,
               VertexPtrType& src_vertex_ptr) {
-  std::set<VertexPtrType> src_vertex_ptr_set = {src_vertex_ptr};
 
-  auto do_nothing_callback = [](const VertexPtrType& vertex_ptr, 
-                                const size_t& current_distance){
+  auto do_nothing_callback = [](VertexPtrType vertex_ptr, 
+                                typename GraphType::VertexCounterType current_distance){
     // do nothing, continue matching
     return true;
   };
-  return Bfs<bidirectional>(graph, src_vertex_ptr_set, do_nothing_callback);
+  return Bfs<bidirectional>(graph, src_vertex_ptr, do_nothing_callback);
 }
 
 }  // namespace GUNDAM

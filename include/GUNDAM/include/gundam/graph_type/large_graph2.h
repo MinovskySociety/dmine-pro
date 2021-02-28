@@ -780,6 +780,8 @@ class LargeGraph2 {
  public:
   using VertexType = VertexData;
 
+  using VertexCounterType = size_t;
+
   using EdgeType = EdgeData;
 
   using VertexPtr = VertexData *;

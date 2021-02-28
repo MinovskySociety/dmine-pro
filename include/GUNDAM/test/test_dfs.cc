@@ -131,9 +131,13 @@ void TestDfs() {
   using VertexPtrType      = typename GraphType::VertexPtr;
   using VertexConstPtrType = typename GraphType::VertexConstPtr;
 
+  auto my_callback0 = [](const VertexPtrType& vertex_ptr) -> bool{
+    // do nothing
+    return true;
+  };
 
   auto my_callback = [](const VertexPtrType& vertex_ptr, 
-                               const size_t& vertex_idx) -> bool{
+                               const size_t& dfs_idx) -> bool{
     // do nothing
     return true;
   };
@@ -146,68 +150,25 @@ void TestDfs() {
   ret = GUNDAM::Dfs(g, src_ptr, my_callback);
   ASSERT_EQ(ret, g.CountVertex());
 
-  // ret = GUNDAM::Dfs<false>(g, src_ptr, my_callback);
-  // ASSERT_EQ(ret, g.CountVertex());
+  ret = GUNDAM::Dfs<false>(g, src_ptr, my_callback);
+  ASSERT_EQ(ret, g.CountVertex());
 
-  // auto my_callback2 = [&distance_tested](
-  //                        const VertexPtrType& vertex_ptr, 
-  //                        const size_t& current_distance) -> bool{
-  //   if (vertex_ptr->label() != 4 - current_distance) {
-  //     distance_tested = false;
-  //   }
-  //   return true;
-  // };
+  auto src_ptr2 = g.FindVertex(9);
+  ret = GUNDAM::Dfs<false>(g, src_ptr2, my_callback);
+  ASSERT_EQ(ret, 1);
 
-  // distance_tested = true;
-  // auto src_ptr2 = g.FindVertex(9);
-  // ret = GUNDAM::Dfs<true>(g, src_ptr2, my_callback2);
-  // ASSERT_TRUE(distance_tested);
-  // ASSERT_EQ(ret, g.CountVertex());
+  const int kVertexLimit = 5;
 
-  // distance_tested = true;
-  // ret = GUNDAM::Dfs<false>(g, src_ptr2, my_callback2);
-  // ASSERT_TRUE(distance_tested);
-  // ASSERT_EQ(ret, 1);
-
-  // distance_tested = true;
-  // ret = GUNDAM::Dfs<false>(g, src_ptr2, my_callback);
-  // ASSERT_TRUE(!distance_tested);
-  // ASSERT_EQ(ret, 1);
-
-  // int counter = 0;
-  // const int kVertexLimit = 5;
-
-  // auto my_callback3 
-  //   = [&distance_tested,
-  //      &counter,
-  //      &kVertexLimit](const VertexPtrType& vertex_ptr, 
-  //                     const size_t& current_distance) -> bool{
-  //   if (vertex_ptr->label() != current_distance) {
-  //     distance_tested = false;
-  //   }
-  //   counter++;
-  //   if (counter == kVertexLimit)
-  //     return false;
-  //   return true;
-  // };
+  auto my_callback1 
+    = [&kVertexLimit](const VertexPtrType& vertex_ptr, 
+                             const size_t& dfs_idx) -> bool{
+    if (dfs_idx == kVertexLimit)
+      return false;
+    return true;
+  };
   
-  // distance_tested = true;
-  // ret = GUNDAM::Dfs(g, src_ptr, my_callback3);
-  // ASSERT_TRUE(distance_tested);
-  // ASSERT_EQ(ret, kVertexLimit);
-
-  // now_furthest = 0;
-
-  // auto my_const_ptr_callback = [&now_furthest](VertexConstPtrType& vertex_ptr){
-  //   ASSERT_TRUE(vertex_ptr->label() == now_furthest
-  //            || vertex_ptr->label() == now_furthest + 1);
-  //   now_furthest = vertex_ptr->label();
-  //   return;
-  // };
-  // const auto& const_ref_g = g;
-  // auto const_src_ptr = const_ref_g.FindVertex(1);
-  // ret = GUNDAM::Dfs(g, const_src_ptr, my_const_ptr_callback);
-  // assert(ret == g.CountVertex());
+  ret = GUNDAM::Dfs(g, src_ptr, my_callback1);
+  ASSERT_EQ(ret, kVertexLimit);
   return;
 }
 

@@ -200,6 +200,9 @@ class Graph {
                            VertexLabelType, 
                            VertexAttributeType>;
 
+  using VertexCounterType 
+      = typename InnerVertex_::VertexPtrContainerType::size_type;
+
   using   EdgeType = Type_<EdgeIDType, 
                            EdgeLabelType, 
                            EdgeAttributeType>;

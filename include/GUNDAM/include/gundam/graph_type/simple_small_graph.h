@@ -405,6 +405,8 @@ class SimpleSmallGraph {
  public:
   using VertexType = Vertex;
 
+  using VertexCounterType = size_t;
+
   using EdgeType = Edge;
 
   static constexpr bool vertex_has_attribute = false;

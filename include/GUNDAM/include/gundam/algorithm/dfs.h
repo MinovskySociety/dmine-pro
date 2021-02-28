@@ -3,9 +3,13 @@
 
 #include <stack>
 #include <set>
+#include <type_traits>
 
 namespace GUNDAM {
 
+// legal callback forms:
+//    user_callback(vertex_ptr)
+//    user_callback(vertex_ptr, dfs_idx)
 template <bool bidirectional = false,
           typename        GraphType,
           typename    VertexPtrType,
@@ -13,8 +17,20 @@ template <bool bidirectional = false,
 inline size_t Dfs(GraphType& graph,
               VertexPtrType& src_vertex_ptr,
            UserCallBackType& user_callback) {
+  using VertexCounterType = typename GraphType::VertexCounterType;
+  static_assert(
+       // user_callback(vertex_ptr)
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType)> >
+    || // user_callback(vertex_ptr, dfs_idx)
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType, 
+                                   VertexCounterType)> >,
+      "illegal callback type, only allows one of user_callback(vertex_ptr) and user_callback(vertex_ptr, bfs_idx)");
 
-  size_t counter = 0;
+  VertexCounterType dfs_idx = 0;
   std::stack<VertexPtrType> vertex_ptr_stack;
   std:: set <VertexPtrType> visited;
   vertex_ptr_stack.emplace(src_vertex_ptr);
@@ -22,12 +38,26 @@ inline size_t Dfs(GraphType& graph,
   while (!vertex_ptr_stack.empty()) {
     auto current_vertex_ptr = vertex_ptr_stack.top();
     vertex_ptr_stack.pop();
-    if (!user_callback(current_vertex_ptr, 
-                       counter)){
-      // meets stopping condition, stop the matching process
-      return counter;
+    dfs_idx++;
+    bool ret = false;
+    if constexpr (
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType)> >){
+      ret = user_callback(current_vertex_ptr);
     }
-    counter++;
+    if constexpr (
+      std::is_convertible_v<
+                UserCallBackType, 
+                std::function<bool(VertexPtrType,
+                                   VertexCounterType)> >){
+      ret = user_callback(current_vertex_ptr,
+                          dfs_idx);
+    }
+    if (!ret){
+      // meets stopping condition, stop the matching process
+      return dfs_idx;
+    }
     for (auto edge_it = current_vertex_ptr->OutEdgeBegin();
              !edge_it.IsDone();
               edge_it++) {
@@ -51,17 +81,17 @@ inline size_t Dfs(GraphType& graph,
       }
     }
   }
-  return counter;
+  return dfs_idx;
 }
 
 template <bool bidirectional = false,
-          typename        GraphType,
-          typename    VertexPtrType>
+          typename     GraphType,
+          typename VertexPtrType>
 inline size_t Dfs(GraphType& graph,
               VertexPtrType& src_vertex_ptr) {
 
   auto do_nothing_callback = [](const VertexPtrType& vertex_ptr, 
-                                const size_t&        vertex_idx){
+                                const size_t&           dfs_idx){
     // do nothing, continue matching
     return true;
   };
