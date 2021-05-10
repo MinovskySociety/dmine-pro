@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "gundam/io/csvgraph.h"
+#include "gundam/type_getter/edge_handle.h"
+#include "gundam/type_getter/vertex_handle.h"
 //#include "gundam/graph.h"
 namespace gmine_new {
 template <class Pattern>
@@ -17,10 +19,10 @@ class GPAR {
   using EdgeType = typename Pattern::EdgeType;
   using EdgeIDType = typename EdgeType::IDType;
   using EdgeLabelType = typename EdgeType::LabelType;
-  using VertexPtr = typename Pattern::VertexPtr;
-  using VertexConstPtr = typename Pattern::VertexConstPtr;
-  using EdgePtr = typename Pattern::EdgePtr;
-  using EdgeConstPtr = typename Pattern::EdgeConstPtr;
+  using VertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using EdgePtr = typename GUNDAM::EdgeHandle<Pattern>::type;
+  using EdgeConstPtr = typename GUNDAM::VertexHandle<Pattern>::type;
   using VertexSizeType = size_t;
 
   GPAR() = default;
@@ -29,23 +31,23 @@ class GPAR {
        const EdgeLabelType q) {
     this->pattern.AddVertex(1, x);
     this->pattern.AddVertex(2, y);
-    this->x_node_ptr_ = this->pattern.FindConstVertex(1);
-    this->y_node_ptr_ = this->pattern.FindConstVertex(2);
+    this->x_node_ptr_ = this->pattern.FindVertex(1);
+    this->y_node_ptr_ = this->pattern.FindVertex(2);
     this->q_edge_label_ = q;
   }
   // another constructor
   GPAR(Pattern pattern, const VertexIDType x_node_id,
        const VertexIDType y_node_id, const EdgeLabelType q) {
     this->pattern = pattern;
-    this->x_node_ptr_ = this->pattern.FindConstVertex(x_node_id);
-    this->y_node_ptr_ = this->pattern.FindConstVertex(y_node_id);
+    this->x_node_ptr_ = this->pattern.FindVertex(x_node_id);
+    this->y_node_ptr_ = this->pattern.FindVertex(y_node_id);
     this->q_edge_label_ = q;
   }
   // copy onstructor
   GPAR(const GPAR<Pattern>& b) {
     this->pattern = b.pattern;
-    this->x_node_ptr_ = this->pattern.FindConstVertex(b.x_node_ptr_->id());
-    this->y_node_ptr_ = this->pattern.FindConstVertex(b.y_node_ptr_->id());
+    this->x_node_ptr_ = this->pattern.FindVertex(b.x_node_ptr_->id());
+    this->y_node_ptr_ = this->pattern.FindVertex(b.y_node_ptr_->id());
     this->q_edge_label_ = b.q_edge_label_;
   }
   VertexConstPtr x_node_ptr() const { return this->x_node_ptr_; }
@@ -54,8 +56,8 @@ class GPAR {
   bool operator<(const GPAR<Pattern>& b) const { return 1; }
   GPAR& operator=(const GPAR<Pattern>& b) {
     this->pattern = b.pattern;
-    this->x_node_ptr_ = this->pattern.FindConstVertex(b.x_node_ptr_->id());
-    this->y_node_ptr_ = this->pattern.FindConstVertex(b.y_node_ptr_->id());
+    this->x_node_ptr_ = this->pattern.FindVertex(b.x_node_ptr_->id());
+    this->y_node_ptr_ = this->pattern.FindVertex(b.y_node_ptr_->id());
     this->q_edge_label_ = b.q_edge_label_;
     return *this;
   }
@@ -64,16 +66,16 @@ class GPAR {
   int* Serialization(int m, int n, bool flag) {
     int* data = new int[m*2+n*4+3];
     int index = 0;
-    for (auto vertex_it = this->pattern.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = this->pattern.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
       data[index++] = vertex_it->id();
       data[index++] = vertex_it->label();
       std::cout << "send pattern support V " << vertex_it->id() << " : " <<
   vertex_it->label() << std::endl;
     }
-    for (auto vertex_it = this->pattern.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = this->pattern.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
-      for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
         data[index++] = edge_it->id();
         data[index++] = edge_it->src_id();
@@ -150,12 +152,12 @@ class DiscoverdGPAR : public GPAR<Pattern> {
   using EdgeType = typename Pattern::EdgeType;
   using EdgeIDType = typename EdgeType::IDType;
   using EdgeLabelType = typename EdgeType::LabelType;
-  using VertexPtr = typename Pattern::VertexPtr;
-  using VertexConstPtr = typename Pattern::VertexConstPtr;
-  using EdgePtr = typename Pattern::EdgePtr;
-  using EdgeConstPtr = typename Pattern::EdgeConstPtr;
+  using VertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using EdgePtr = typename GUNDAM::EdgeHandle<Pattern>::type;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<Pattern>::type;
   using VertexSizeType = size_t;
-  using DataGraphVertexPtr = typename DataGraph::VertexConstPtr;
+  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using SuppType = std::vector<DataGraphVertexPtr>;
   using ConfType = double;
 
@@ -195,8 +197,8 @@ class DiscoverdGPAR : public GPAR<Pattern> {
   bool operator<(const DiscoverdGPAR<Pattern, DataGraph>& b) const { return 1; }
   DiscoverdGPAR& operator=(const DiscoverdGPAR<Pattern, DataGraph>& b) {
     this->pattern = b.pattern;
-    this->x_node_ptr_ = this->pattern.FindConstVertex(b.x_node_ptr()->id());
-    this->y_node_ptr_ = this->pattern.FindConstVertex(b.y_node_ptr()->id());
+    this->x_node_ptr_ = this->pattern.FindVertex(b.x_node_ptr()->id());
+    this->y_node_ptr_ = this->pattern.FindVertex(b.y_node_ptr()->id());
     this->q_edge_label_ = b.q_edge_label();
     this->supp_R_ = b.supp_R_;
     this->supp_Q_ = b.supp_Q_;
@@ -227,16 +229,16 @@ class DiscoverdGPAR : public GPAR<Pattern> {
     // data = new int[N];
     data.resize(N);
     int index = 0;
-    for (auto vertex_it = this->pattern.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = this->pattern.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
       data[index++] = vertex_it->id();
       data[index++] = vertex_it->label();
       // std::cout << "send pattern support V " << vertex_it->id() << " : " <<
       // vertex_it->label() << std::endl;
     }
-    for (auto vertex_it = this->pattern.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = this->pattern.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
-      for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
         data[index++] = edge_it->id();
         data[index++] = edge_it->src_id();

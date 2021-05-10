@@ -76,7 +76,7 @@ class TGraph {
   inline iterator Begin() { return graph_stream_.begin(); }
   inline iterator End() { return graph_stream_.end(); }
 
-  inline const_iterator CBegin() const { return graph_stream_.cbegin(); }
+  inline const_iterator Begin() const { return graph_stream_.Begin(); }
   inline const_iterator CEnd() const { return graph_stream_.cend(); }
   inline size_t Size() const { return graph_stream_.size(); }
   inline SIZE_T TimeWindowNumber() const { return time_window_number_; }
@@ -105,10 +105,10 @@ class TGraph {
 
   void CalEdgeStatics() {
     for (const auto &graph : graph_stream_) {
-      for (auto edge_iter = graph.EdgeCBegin(); !edge_iter.IsDone();
+      for (auto edge_iter = graph.EdgeBegin(); !edge_iter.IsDone();
            edge_iter++) {
-        const auto src_vertex_label = edge_iter->const_src_ptr()->label();
-        const auto dst_vertex_label = edge_iter->const_dst_ptr()->label();
+        const auto src_vertex_label = edge_iter->const_src_handle()->label();
+        const auto dst_vertex_label = edge_iter->const_dst_handle()->label();
         const auto edge_label = edge_iter->label();
         // std::cout << "TEST: " << src_vertex_label << "-" << dst_vertex_label
         // << "-" << edge_label << "\n";
@@ -135,7 +135,7 @@ class TGraph {
         vlabel2elabel_[v1v2hash].insert(edge_label);
         // set edge whether has order
         if (elabel2order_.find(edge_label) == elabel2order_.end()) {
-          auto attribute_ptr = edge_iter->FindConstAttributePtr(TIME_KEY);
+          auto attribute_ptr = edge_iter->FindAttribute(TIME_KEY);
           ATTRIBUTE_PTR_CHECK(attribute_ptr);
           const TIME_T timestamp = attribute_ptr->template const_value<int>();
           elabel2order_[edge_label] = timestamp ? true : false;

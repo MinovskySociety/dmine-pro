@@ -78,15 +78,15 @@ struct NewEdge {
 /* Some simplify */
 using DataGraph = GUNDAM::LargeGraph2<VID_T, VLABEL_T, std::string, EID_T,
                                       ELABEL_T, std::string>;
-using TargetVertex = typename DataGraph::VertexConstPtr;
+using TargetVertex = typename GUNDAM::VertexHandle<DataGraph>::type;
 using VertexIDType = typename DataGraph::VertexType::IDType;
 using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-using EdgePtr = typename DataGraph::EdgePtr;
-using EdgeConstPtr = typename DataGraph::EdgeConstPtr;
+using EdgePtr = typename GUNDAM::EdgeHandle<DataGraph>::type;
+using EdgeConstPtr = typename GUNDAM::EdgeHandle<DataGraph>::type;
 using Pattern = GUNDAM::LargeGraph2<VID_T, VLABEL_T, std::string, EID_T,
                                     ELABEL_T, std::string>;
 using Q = Pattern;
-using QueryVertex = typename Pattern::VertexConstPtr;
+using QueryVertex = typename GUNDAM::VertexHandle<Pattern>::type;
 using MatchMap = std::map<QueryVertex, TargetVertex>;
 using MatchResult = std::vector<MatchMap>;
 using CandidateSetContainer = std::map<QueryVertex, std::vector<TargetVertex>>;
@@ -362,12 +362,12 @@ void PrintLink(const LinkBase &link) {
 void PrintTGR(const Q &query) {
   std::cout << PLABEL << "TGR Detail  " << PLABEL << "\n";
   std::cout << PLABEL << "V\n";
-  for (auto v_iter = query.VertexCBegin(); !v_iter.IsDone(); v_iter++) {
+  for (auto v_iter = query.VertexBegin(); !v_iter.IsDone(); v_iter++) {
     std::cout << PLABEL << v_iter->id() << "," << v_iter->label() << "\n";
   }
   std::cout << PLABEL << "E\n";
-  for (auto e_iter = query.EdgeCBegin(); !e_iter.IsDone(); e_iter++) {
-    auto attribute_ptr = e_iter->FindAttributePtr(TIME_KEY);
+  for (auto e_iter = query.EdgeBegin(); !e_iter.IsDone(); e_iter++) {
+    auto attribute_ptr = e_iter->FindAttribute(TIME_KEY);
     ATTRIBUTE_PTR_CHECK(attribute_ptr);
     TIME_T timestamp = attribute_ptr->template value<int>();
     std::cout << PLABEL << e_iter->id() << "," << e_iter->src_id() << ","

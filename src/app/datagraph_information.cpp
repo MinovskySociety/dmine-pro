@@ -30,16 +30,16 @@ int main() {
       max_out_edge[i] = std::max(max_out_edge[i], it->CountOutEdge(i));
       min_visit = std::min(min_visit, it->CountOutEdge(2));
       int vertex_num = 0;
-      std::set<typename DataGraph::VertexConstPtr> unique_vertex;
+      std::set<typename GUNDAM::VertexHandle<DataGraph>::type> unique_vertex;
       for (auto edge_it = it->OutEdgeBegin(i); !edge_it.IsDone(); edge_it++) {
-        unique_vertex.insert(edge_it->const_dst_ptr());
+        unique_vertex.insert(edge_it->dst_handle());
       }
       total_out_vertex[i] += unique_vertex.size();
       std::cout << "label = " << i << " out edge = " << it->CountOutEdge(i)
                 << " vertex = " << unique_vertex.size() << std::endl;
       unique_vertex.clear();
       for (auto edge_it = it->InEdgeBegin(i); !edge_it.IsDone(); edge_it++) {
-        unique_vertex.insert(edge_it->const_src_ptr());
+        unique_vertex.insert(edge_it->src_handle());
       }
       std::cout << "label = " << i << " in edge = " << it->CountInEdge(i)
                 << " vertex = " << unique_vertex.size() << std::endl;
