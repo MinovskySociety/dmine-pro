@@ -1,5 +1,5 @@
-#ifndef _VERTEX_SET_H
-#define _VERTEX_SET_H
+#ifndef _GUNDAM_COMPONENT_VERTEX_SET_H
+#define _GUNDAM_COMPONENT_VERTEX_SET_H
 
 #include "gundam/component/"gundam/component/container2.h""
 #include "gundam/component/iterator2.h"

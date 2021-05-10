@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "gpar_config.h"
+#include "gundam/type_getter/vertex_handle.h"
 namespace gmine_new {
 template <class DataGraph, class VertexLabelSet, class EdgeLabelSet,
           class EdgeTypeSet>
@@ -12,21 +13,21 @@ inline void GetDataGraphInformation(const DataGraph &data_graph,
                                     EdgeTypeSet &edge_type_set) {
   using VertexLabelType = typename DataGraph::VertexType::LabelType;
   using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-  using VertexConstPtr = typename DataGraph::VertexConstPtr;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using EdgeTypeSetElementType = typename EdgeTypeSet::value_type;
-  for (auto node_iter = data_graph.VertexCBegin(); !node_iter.IsDone();
+  for (auto node_iter = data_graph.VertexBegin(); !node_iter.IsDone();
        node_iter++) {
     VertexLabelType src_node_label = node_iter->label();
     if (erase_vertex_label.count(src_node_label)) continue;
     vertex_label_set.insert(node_iter->label());
     VertexConstPtr node_ptr = node_iter;
-    for (auto edge_iter = node_ptr->OutEdgeCBegin(); !edge_iter.IsDone();
+    for (auto edge_iter = node_ptr->OutEdgeBegin(); !edge_iter.IsDone();
          edge_iter++) {
       if (erase_edge_label.count(edge_iter->label())) continue;
       EdgeLabelType edge_label = edge_iter->label();
       edge_label_set.insert(edge_label);
       edge_type_set.insert(EdgeTypeSetElementType(
-          src_node_label, edge_iter->const_dst_ptr()->label(), edge_label));
+          src_node_label, edge_iter->const_dst_handle()->label(), edge_label));
     }
   }
   std::cout << "node label set size = " << vertex_label_set.size() << std::endl;

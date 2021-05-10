@@ -141,8 +141,6 @@ void TestConnected(){
 
   ASSERT_TRUE(GUNDAM::Connected(g1));
 
-
-
   // 1 <- 2 -> 3     0
   // /\        /\
   // |         |

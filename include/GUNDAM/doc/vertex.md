@@ -23,7 +23,7 @@ VertexPtr及VertexIterator可调用接口表如下所示:
 |attribute<br>const_attribute|template\<ValueType\>attribute(key)<br>key:属性的键值<br>ValueType:value值的数据类型<br>返回值:返回key对应的value|得到该节点键值为key的value/常量value|
 |attribute_value_type|BasicDataType attribute_value_type(key)<br>key:属性的键值|得到该节点键值为key的value的类型的id|
 |attribute_value_type_name|string attribute_value_type(key)<br>key:属性的键值<br>返回值:若类型是整型(int,long long,unsigned int等等)，返回"int",若类型是浮点类型(float,double,long double),返回"double"，若是std::string类型，返回"string"，其他类型返回"unknown type"|得到该节点键值为key的value的类型的名字|
-|AttributeBegin<br>AttributeBegin|AttributeIterator AttributeBegin()<br>AttributeConstIterator AttributeCBegin()|得到这个节点属性的迭代器/常量迭代器|
+|AttributeBegin<br>AttributeBegin|AttributeIterator AttributeBegin()<br>AttributeConstIterator AttributeBegin()|得到这个节点属性的迭代器/常量迭代器|
 |CountInEdge|size_t CountInEdge()|得到指向这个节点的边的数量|
 |CountOutEdge|size_t CountOutEdge()|得到指出这个节点的边的数量|
 |CountInEdgeLabel|size_t CountInEdgeLabel()|得到指向该节点的所有边的不同Label数量|
@@ -32,7 +32,7 @@ VertexPtr及VertexIterator可调用接口表如下所示:
 |CountOutVertex|size_t CountOutVertex()<br>size_t CountOutVertex(vertex_label)<br>vertex_label:节点的label|得到指出该节点所有边的起点的数量/VertexLabel为vertex_label的起点的数量|
 |EraseAttribute|bool EraseAttribute(key)<br>key:属性的键值<br>返回值：是否成功删除<br><br>AttributeIterator EraseAttribute(attribute_iterator)<br>attribute_iterator:属性的迭代器<br>返回值：返回删除的迭代器的下一个迭代器|删除该节点键值为key的属性或删除属性迭代器为attribute_iterator的属性|
 |EraseEdge|bool EraseEdge(edge_id)<br>edge_id:边的id<br>返回值:返回是否成功被删除<br><br>EdgeIterator EraseEdge(edge_iterator)<br>edge_iterator:边的迭代器<br>返回值:若则返回被删除的边的下一条边的迭代器|删除EdgeID为edge_id的边或者删除迭代器为edge_iterator的边|
-|FindAttributePtr<br><br>FindConstAttributePtr|AttributePtr FindAttributePtr(key)<br><br>AttributeConstPtr FindConstAttributePtr(key)<br><br>key:属性的键值<br>返回值:若找到了该属性则返回该属性的指针/常量指针，否则返回Null指针|找到该节点键值为key对应的Attribute指针/常量指针|
+|FindAttribute<br><br>FindAttribute|AttributePtr FindAttribute(key)<br><br>AttributeConstPtr FindAttribute(key)<br><br>key:属性的键值<br>返回值:若找到了该属性则返回该属性的指针/常量指针，否则返回Null指针|找到该节点键值为key对应的Attribute指针/常量指针|
 |FindInEdge|EdgePtr FindInEdge(edge_id)<br><br>EdgePtr FindInEdge (edge_label,edge_id)<br><br>EdgePtr FindInEdge(edge_label,src_ptr,edge_id);<br><br>edge_id:边的id<br>edge_label:边的label<br>src_ptr:边的起点的指针<br>返回值:若存在则返回该边的指针、若不存在则返回Null指针。|找到该节点入边的id为edge_id的边<br><br>找到该节点的Label为edge_label的入边集中查找ID为edge_id的边<br><br>在该节点的Label为edge_label的入边集中查找指向src_ptr、ID为edge_id的边|
 |FindInVertex|VertexPtr FindInVertex(src_ptr)<br><br>VertexPtr FindInVertex(src_id)<br><br>VertexPtr FindInVertex(edge_label,src_ptr)<br><br>VertexPtr FindInVertex(edge_label,src_id)<br><br>src_ptr:边的起点对应的指针<br>src_id:边的起点对应的ID<br>edge_label:边的label<br>返回值：若该节点存在、则返回指向该节点的指针/常量指针，否则返回Null指针。|在该节点的入边指向的节点集合中查找指针src_ptr指向的vertex。<br><br>在该节点的入边指向的节点集合中查找ID为src_id的vertex。<br><br>在该节点Label为edge_label的入边指向的节点集合中查找ID为src_id的vertex。<br><br>在该节点Label为edge_label的入边指向的节点集合中查找ID为src_id的vertex。|
 |FindOutEdge<br>FindConstOutEdge|EdgePtr FindOutEdge/FindConstOutEdge(edge_id)<br><br>EdgePtr FindOutEdge/FindConstOutEdge(edge_label,edge_id)<br><br>EdgePtr FindOutEdge/FindConstOutEdge(edge_label,dst_ptr,edge_id);<br><br>edge_id:边的id<br>edge_label:边的label<br>dst_ptr:边的终点的指针<br>返回值:若存在则返回该边的指针、若不存在则返回Null指针。|找到该节点出边的id为edge_id的边<br><br>找到该节点的Label为edge_label的出边集中查找ID为edge_id的边<br><br>在该节点的Label为edge_label的出边集中查找指向dst_ptr、ID为edge_id的边|

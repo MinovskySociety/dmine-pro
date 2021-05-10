@@ -3,12 +3,13 @@
 #include <numeric>
 
 #include "gundam/algorithm/dp_iso.h"
+#include "gundam/type_getter/vertex_handle.h"
 #include "ml_model.h"
 namespace gmine_new {
 template <class Pattern, class DataGraph>
 class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
  public:
-  using DataGraphVertexPtr = typename DataGraph::VertexConstPtr;
+  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using DataGraphLabel = typename DataGraph::EdgeType::LabelType;
   UserPhoneFrquentModel(int frquent_bound)
       : frquent_bound_(frquent_bound), last_frquent_bound_(-1), ml_label_(-1) {}
@@ -34,9 +35,9 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
                const DataGraphVertexPtr predict_vertex_y) const override {
     // 1min send meggage num >= frquent_bound
     std::vector<int> send_begin_time;
-    for (auto edge_it = predict_vertex_x->OutEdgeCBegin(2002, predict_vertex_y);
+    for (auto edge_it = predict_vertex_x->OutEdgeBegin(2002, predict_vertex_y);
          !edge_it.IsDone(); edge_it++) {
-      auto attribute_ptr = edge_it->FindConstAttributePtr("start_time");
+      auto attribute_ptr = edge_it->FindAttribute("start_time");
       if (attribute_ptr.IsNull()) continue;
       std::string begin_time =
           attribute_ptr->template const_value<std::string>();
@@ -100,9 +101,9 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
     return (1.0 * correct_num) / tot_num;
   }
   bool CheckHasMLLiteral(gmine_new::DiscoverdGPAR<Pattern, DataGraph> &gmar) {
-    for (auto vertex_it = gmar.pattern.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = gmar.pattern.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
-      for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
         if (edge_it->label() == this->ml_label_) {
           return true;
@@ -116,10 +117,10 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
       DataGraph &data_graph,
       std::vector<std::pair<DataGraphVertexPtr, DataGraphVertexPtr>>
           &pivot_result) {
-    for (auto vertex_it = data_graph.VertexCBegin(1001); !vertex_it.IsDone();
+    for (auto vertex_it = data_graph.VertexBegin(1001); !vertex_it.IsDone();
          vertex_it++) {
       DataGraphVertexPtr src_ptr = vertex_it;
-      for (auto adj_it = vertex_it->OutVertexCBegin(2002); !adj_it.IsDone();
+      for (auto adj_it = vertex_it->OutVertexBegin(2002); !adj_it.IsDone();
            adj_it++) {
         DataGraphVertexPtr dst_ptr = adj_it;
         if (this->Satisfy(src_ptr, dst_ptr))
@@ -215,13 +216,13 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
   void GetTrainData(
       std::vector<gmine_new::DiscoverdGPAR<Pattern, DataGraph>> &discover_gmar,
       DataGraph &data_graph, std::vector<TrainDataType> &train_data) {
-    using DataGraphVertexPtr = typename DataGraph::VertexConstPtr;
+    using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
     using DataGraphVertexPair =
         std::pair<DataGraphVertexPtr, DataGraphVertexPtr>;
     using PivotResultContainer = std::vector<DataGraphVertexPair>;
     using PatternEdgeIDType = typename Pattern::EdgeType::IDType;
     using MLEdgeIDContainer = std::vector<PatternEdgeIDType>;
-    using PatternVertexPtr = typename Pattern::VertexConstPtr;
+    using PatternVertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
     using CandidateSet =
         std::map<PatternVertexPtr, std::vector<DataGraphVertexPtr>>;
     LOG(INFO) << "begin train data";
@@ -247,9 +248,9 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
         continue;
       }
 
-      for (auto vertex_it = single_gmar.pattern.VertexCBegin();
+      for (auto vertex_it = single_gmar.pattern.VertexBegin();
            !vertex_it.IsDone(); vertex_it++) {
-        for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+        for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
              edge_it++) {
           if (edge_it->label() != this->ml_label_) continue;
           PatternEdgeIDType ml_id = edge_it->id();
@@ -284,14 +285,12 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
             */
             auto [after_supp_q, after_supp_r] =
                 CalMLSupp(single_gmar, data_graph, single_gmar_candidate_set,
-                          edge_it->const_src_ptr(), user_ptr,
-                          edge_it->const_dst_ptr(), phone_ptr);
+                          edge_it->src_handle(), user_ptr,
+                          edge_it->dst_handle(), phone_ptr);
             auto [before_supp_q, before_supp_r] = CalMLSupp(
                 erase_ml_gmar, data_graph, erase_ml_gmar_candidate_set,
-                erase_ml_gmar.pattern.FindConstVertex(edge_it->src_id()),
-                user_ptr,
-                erase_ml_gmar.pattern.FindConstVertex(edge_it->dst_id()),
-                phone_ptr);
+                erase_ml_gmar.pattern.FindVertex(edge_it->src_id()), user_ptr,
+                erase_ml_gmar.pattern.FindVertex(edge_it->dst_id()), phone_ptr);
             int positive_num = after_supp_r + (before_supp_q - before_supp_r -
                                                (after_supp_q - after_supp_r));
             int negative_num =
@@ -347,7 +346,7 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
     using VertexIDType = typename DataGraph::VertexType::IDType;
     using VertexLabelType = typename DataGraph::VertexType::LabelType;
     using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-    using VertexConstPtr = typename DataGraph::VertexConstPtr;
+    using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
     using EdgeIDType = typename DataGraph::EdgeType::IDType;
     EdgeLabelType ml_edge_label = this->ml_label_;
     this->last_frquent_bound_ = this->frquent_bound_;
@@ -355,7 +354,7 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
     /*
     // test small conf
     std::reverse(discover_gmar.begin(), discover_gmar.end());
-    std::vector<gmine_new::DiscoverdGPAR<Pattern, DataGraph>> temp_gmar_list;
+    std::vector<gmine_new::DiscoverdGPAR<Pattern,DataGraph>> temp_gmar_list;
     for (int i = 0; i < 20; i++) temp_gmar_list.push_back(discover_gmar[i]);
     std::swap(discover_gmar, temp_gmar_list);
     */
@@ -407,24 +406,24 @@ class UserPhoneFrquentModel : public MLModelBase<Pattern, DataGraph> {
     using VertexIDType = typename DataGraph::VertexType::IDType;
     using VertexLabelType = typename DataGraph::VertexType::LabelType;
     using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-    using VertexConstPtr = typename DataGraph::VertexConstPtr;
+    using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
     using EdgeIDType = typename DataGraph::EdgeType::IDType;
     EdgeLabelType ml_edge_label = this->ml_label_;
     VertexIDType max_vertex_id = 0;
     EdgeIDType next_edge_id = 0;
-    for (auto vertex_it = ml_graph.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = ml_graph.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
       max_vertex_id = std::max(max_vertex_id, vertex_it->id());
-      for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
         next_edge_id = std::max(next_edge_id, edge_it->id());
       }
     }
     ++next_edge_id;
-    for (auto vertex_it = ml_graph.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = ml_graph.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
       VertexConstPtr vertex_ptr = vertex_it;
-      for (auto adj_it = vertex_it->OutVertexCBegin(2002); !adj_it.IsDone();
+      for (auto adj_it = vertex_it->OutVertexBegin(2002); !adj_it.IsDone();
            adj_it++) {
         VertexConstPtr adj_ptr = adj_it;
         if (adj_it->label() == 1002 && this->Satisfy(vertex_ptr, adj_ptr)) {

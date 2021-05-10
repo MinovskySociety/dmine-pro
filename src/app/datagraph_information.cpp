@@ -2,6 +2,7 @@
 
 #include "gundam/graph_type/large_graph.h"
 #include "gundam/io/csvgraph.h"
+#include "gundam/type_getter/vertex_handle.h"
 int main() {
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,
                                        uint64_t, uint32_t, std::string>;
@@ -17,7 +18,7 @@ int main() {
   size_t vertex_count = data_graph.CountVertex();
   double sum_in = 0, sum_out = 0;
   size_t min_visit = 1000000;
-  for (auto it = data_graph.VertexCBegin(); !it.IsDone(); it++) {
+  for (auto it = data_graph.VertexBegin(); !it.IsDone(); it++) {
     if (it->id() > 4999) continue;
     std::cout << "id = " << it->id() << std::endl;
     for (unsigned int i = 0; i <= 2; i++) {
@@ -30,14 +31,14 @@ int main() {
       min_visit = std::min(min_visit, it->CountOutEdge(2));
       int vertex_num = 0;
       std::set<typename DataGraph::VertexConstPtr> unique_vertex;
-      for (auto edge_it = it->OutEdgeCBegin(i); !edge_it.IsDone(); edge_it++) {
+      for (auto edge_it = it->OutEdgeBegin(i); !edge_it.IsDone(); edge_it++) {
         unique_vertex.insert(edge_it->const_dst_ptr());
       }
       total_out_vertex[i] += unique_vertex.size();
       std::cout << "label = " << i << " out edge = " << it->CountOutEdge(i)
                 << " vertex = " << unique_vertex.size() << std::endl;
       unique_vertex.clear();
-      for (auto edge_it = it->InEdgeCBegin(i); !edge_it.IsDone(); edge_it++) {
+      for (auto edge_it = it->InEdgeBegin(i); !edge_it.IsDone(); edge_it++) {
         unique_vertex.insert(edge_it->const_src_ptr());
       }
       std::cout << "label = " << i << " in edge = " << it->CountInEdge(i)

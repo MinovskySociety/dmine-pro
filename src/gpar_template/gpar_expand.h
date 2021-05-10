@@ -9,11 +9,10 @@ int total_num = 0;
 template <class GPAR, class VertexLabelSet, class EdgeLabelSet,
           class EdgeTypeSet, class ExpandGPARList, class GPARList,
           class ManualCheck>
-inline void GPARExpand(const GPAR &root, const VertexLabelSet &vertex_label_set,
+inline void GPARExpand(GPAR &root, const VertexLabelSet &vertex_label_set,
                        const EdgeLabelSet &edge_label_set,
                        const EdgeTypeSet &edge_type_set,
-                       const GPARList &no_match_gpar,
-                       const GPARList &less_supp_r_gpar,
+                       GPARList &no_match_gpar, GPARList &less_supp_r_gpar,
                        const typename GPAR::EdgeIDType new_edge_id,
                        ExpandGPARList &expand_gpars, ManualCheck manual_check) {
   AddNewEdgeInPattern(root, edge_label_set, edge_type_set, no_match_gpar,
@@ -25,19 +24,18 @@ inline void GPARExpand(const GPAR &root, const VertexLabelSet &vertex_label_set,
 }
 template <class GPAR, class GPARList>
 inline bool CheckIsLessSuppR(GPAR &gpar, GPARList &gpar_list) {
-  using VertexConstPtr = typename GPAR::VertexConstPtr;
-  using EdgeConstPtr = typename GPAR::EdgeConstPtr;
+  using VertexPtr = typename GPAR::VertexPtr;
+  using EdgePtr = typename GPAR::EdgePtr;
   using VertexIDType = typename GPAR::VertexIDType;
-  using MatchMap = std::map<VertexConstPtr, VertexConstPtr>;
+  using MatchMap = std::map<VertexPtr, VertexPtr>;
   using MatchResultList = std::vector<MatchMap>;
-  for (const auto &no_match_gpar : gpar_list) {
+  for (auto &no_match_gpar : gpar_list) {
     MatchResultList match_result;
     GUNDAM::VF2<GUNDAM::MatchSemantics::kIsomorphism>(
         no_match_gpar.pattern, gpar.pattern, no_match_gpar.x_node_ptr()->id(),
         gpar.x_node_ptr()->id(),
-        GUNDAM::_vf2::LabelEqual<VertexConstPtr, VertexConstPtr>(),
-        GUNDAM::_vf2::LabelEqual<EdgeConstPtr, EdgeConstPtr>(), 1,
-        match_result);
+        GUNDAM::_vf2::LabelEqual<VertexPtr, VertexPtr>(),
+        GUNDAM::_vf2::LabelEqual<EdgePtr, EdgePtr>(), 1, match_result);
     if (match_result.size() >= 1) {
       return true;
     }
@@ -57,9 +55,8 @@ inline bool CheckHasMatch(GPAR &gpar, GPARList &gpar_list) {
 }
 static omp_lock_t cal_lock;
 template <class GPAR, class GPARList, class ManualCheck>
-inline bool SatiSfyRules(const GPAR &gpar, const GPARList &no_match_gpar,
-                         const GPARList &less_supp_r_gpar,
-                         ManualCheck manual_check) {
+inline bool SatiSfyRules(GPAR &gpar, GPARList &no_match_gpar,
+                         GPARList &less_supp_r_gpar, ManualCheck manual_check) {
   if constexpr (using_manual_check)
     if (!manual_check(gpar)) return false;
   omp_set_lock(&cal_lock);
@@ -86,11 +83,10 @@ inline bool SatiSfyRules(const GPAR &gpar, const GPARList &no_match_gpar,
 
 template <class GPAR, class EdgeLabelSet, class EdgeTypeSet,
           class ExpandGPARList, class GPARList, class ManualCheck>
-inline void AddNewEdgeInPattern(const GPAR &root,
-                                const EdgeLabelSet &edge_label_set,
+inline void AddNewEdgeInPattern(GPAR &root, const EdgeLabelSet &edge_label_set,
                                 const EdgeTypeSet &edge_type_set,
-                                const GPARList &no_match_gpar,
-                                const GPARList &less_supp_r_gpar,
+                                GPARList &no_match_gpar,
+                                GPARList &less_supp_r_gpar,
                                 const typename GPAR::EdgeIDType new_edge_id,
                                 ExpandGPARList &expand_gpars,
                                 ManualCheck manual_check) {
@@ -98,9 +94,9 @@ inline void AddNewEdgeInPattern(const GPAR &root,
   typename GPAR::VertexIDType x_node_id = root.x_node_ptr()->id();
   typename GPAR::VertexIDType y_node_id = root.y_node_ptr()->id();
   typename GPAR::EdgeLabelType q_edge_label = root.q_edge_label();
-  for (auto src_node_iter = root.pattern.VertexCBegin();
-       !src_node_iter.IsDone(); src_node_iter++) {
-    for (auto dst_node_iter = root.pattern.VertexCBegin();
+  for (auto src_node_iter = root.pattern.VertexBegin(); !src_node_iter.IsDone();
+       src_node_iter++) {
+    for (auto dst_node_iter = root.pattern.VertexBegin();
          !dst_node_iter.IsDone(); dst_node_iter++) {
       // not add self loop
       if (src_node_iter->id() == dst_node_iter->id()) continue;
@@ -131,9 +127,9 @@ template <class GPAR, class VertexLabelSet, class EdgeLabelSet,
           class EdgeTypeSet, class ExpandGPARList, class GPARList,
           class ManualCheck>
 inline void AddNewEdgeOutPattern(
-    const GPAR &root, const VertexLabelSet &vertex_label_set,
+    GPAR &root, const VertexLabelSet &vertex_label_set,
     const EdgeLabelSet &edge_label_set, const EdgeTypeSet &edge_type_set,
-    const GPARList &no_match_gpar, const GPARList &less_supp_r_gpar,
+    GPARList &no_match_gpar, GPARList &less_supp_r_gpar,
     const typename GPAR::EdgeIDType new_edge_id, ExpandGPARList &expand_gpars,
     ManualCheck manual_check) {
   typename GPAR::VertexSizeType pattern_size = root.pattern.CountVertex();
@@ -143,7 +139,7 @@ inline void AddNewEdgeOutPattern(
   typename GPAR::VertexIDType new_vertex_id =
       static_cast<typename GPAR::VertexIDType>(pattern_size + 1);
 
-  for (auto node_iter = root.pattern.VertexCBegin(); !node_iter.IsDone();
+  for (auto node_iter = root.pattern.VertexBegin(); !node_iter.IsDone();
        node_iter++) {
     if (node_iter->label() == root.y_node_ptr()->label()) continue;
     for (const auto &possible_vertex_label : vertex_label_set) {

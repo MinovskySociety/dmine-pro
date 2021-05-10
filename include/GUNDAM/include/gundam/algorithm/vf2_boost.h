@@ -1,5 +1,5 @@
-#ifndef _VF2BOOST_H
-#define _VF2BOOST_H
+#ifdef _GUNDAM_ALGORITHM_VF2BOOST_H
+#define _GUNDAM_ALGORITHM_VF2BOOST_H
 
 #include <iterator>
 
@@ -110,7 +110,7 @@ inline QueryVertexPtr DetermineMatchOrder(
 
     for (auto edge_iter = query_vertex_ptr->OutEdgeCBegin();
          !edge_iter.IsDone(); edge_iter++) {
-      auto query_opp_vertex_ptr = edge_iter->const_dst_ptr();
+      auto query_opp_vertex_ptr = edge_iter->const_dst_handle();
       if (match_state.count(query_opp_vertex_ptr) == 0) {
         next_query_set.emplace(query_opp_vertex_ptr);
       }
@@ -118,7 +118,7 @@ inline QueryVertexPtr DetermineMatchOrder(
 
     for (auto edge_iter = query_vertex_ptr->InEdgeCBegin(); !edge_iter.IsDone();
          edge_iter++) {
-      auto query_opp_vertex_ptr = edge_iter->const_src_ptr();
+      auto query_opp_vertex_ptr = edge_iter->const_src_handle();
       if (match_state.count(query_opp_vertex_ptr) == 0) {
         next_query_set.emplace(query_opp_vertex_ptr);
       }
@@ -169,8 +169,8 @@ inline void UpdateCandidateSetOneDirection(
                               *label_it /*label_it->label()*/));
          !it.IsDone(); it++) {
       TargetVertexPtr temp_target_ptr = (edge_state == EdgeState::kIn)
-                                            ? it->const_src_ptr()
-                                            : it->const_dst_ptr();
+                                            ? it->const_src_handle()
+                                            : it->const_dst_handle();
       // if (target_matched.count(temp_target_ptr)) continue;
       temp_adj_vertex[temp_target_ptr->label()].insert(temp_target_ptr);
     }
@@ -226,8 +226,8 @@ inline bool JoinableCheck(const QueryVertexPtr &query_vertex_ptr,
        !query_edge_iter.IsDone(); query_edge_iter++) {
     QueryEdgePtr query_edge_ptr = query_edge_iter;
     QueryVertexPtr query_opp_vertex_ptr = (edge_state == EdgeState::kIn)
-                                              ? query_edge_ptr->const_src_ptr()
-                                              : query_edge_ptr->const_dst_ptr();
+                                              ? query_edge_ptr->const_src_handle()
+                                              : query_edge_ptr->const_dst_handle();
     auto match_iter = match_state.find(query_opp_vertex_ptr);
     if (match_iter == match_state.end()) continue;
 
@@ -246,8 +246,8 @@ inline bool JoinableCheck(const QueryVertexPtr &query_vertex_ptr,
       if (used_edge.count(target_edge_iter->id())) continue;
       TargetEdgePtr target_edge_ptr = target_edge_iter;
       TargetVertexPtr target_opp_vertex_ptr =
-          (edge_state == EdgeState::kIn) ? target_edge_iter->const_src_ptr()
-                                         : target_edge_iter->const_dst_ptr();
+          (edge_state == EdgeState::kIn) ? target_edge_iter->const_src_handle()
+                                         : target_edge_iter->const_dst_handle();
       if (target_opp_vertex_ptr != query_opp_match_vertex_ptr) continue;
       find_target_flag = true;
       used_edge.insert(target_edge_ptr->id());

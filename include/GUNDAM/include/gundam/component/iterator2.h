@@ -1,5 +1,5 @@
-#ifndef _ITERATOR2_H
-#define _ITERATOR2_H
+#ifndef _GUNDAM_COMPONENT_ITERATOR2_H
+#define _GUNDAM_COMPONENT_ITERATOR2_H
 
 #include <cassert>
 #include <iostream>

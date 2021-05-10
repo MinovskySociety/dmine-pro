@@ -1,5 +1,5 @@
-#ifndef _TIMER_H
-#define _TIMER_H
+#ifndef _GUNDAM_COMPONENT_TIMER_H
+#define _GUNDAM_COMPONENT_TIMER_H
 
 #include <ctime>
 

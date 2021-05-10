@@ -1,5 +1,5 @@
-#ifndef _CONTAINER_H
-#define _CONTAINER_H
+#ifndef _GUNDAM_COMPONENT_CONTAINER_H
+#define _GUNDAM_COMPONENT_CONTAINER_H
 
 #include <assert.h>
 

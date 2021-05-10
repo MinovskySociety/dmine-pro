@@ -1,5 +1,5 @@
-#ifndef _GRAPH_CONFIGURE_H
-#define _GRAPH_CONFIGURE_H
+#ifndef _GUNDAM_GRAPH_TYPE_GRAPH_CONFIGURE_H
+#define _GUNDAM_GRAPH_TYPE_GRAPH_CONFIGURE_H
 
 #include "gundam/component/container.h"
 #include "gundam/data_type/label.h"

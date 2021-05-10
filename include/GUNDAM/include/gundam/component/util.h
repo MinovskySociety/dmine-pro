@@ -1,8 +1,9 @@
-#ifndef _UTIL_H
-#define _UTIL_H
+#ifndef _GUNDAM_COMPONENT_UTIL_H
+#define _GUNDAM_COMPONENT_UTIL_H
+
+#include <gundam/data_type/datatype.h>
 
 #include <iostream>
-
 namespace GUNDAM {
 
 template <class GraphType>
@@ -23,9 +24,10 @@ void PrintGraph(const GraphType& graph) {
     std::cout << it->id() << " " << it->label() << " ";
     VertexConstPtr node_ptr = it;
     if (graph.vertex_has_attribute) {
-      for (auto attr_it = node_ptr->AttributeCBegin(); !attr_it.IsDone();
+      for (auto attr_it = node_ptr->AttributeBegin(); !attr_it.IsDone();
            attr_it++) {
-        enum BasicDataType value_type = it->attribute_value_type(attr_it->key());
+        enum BasicDataType value_type =
+            it->attribute_value_type(attr_it->key());
         std::cout << attr_it->key() << ":";
         switch (value_type) {
           case BasicDataType::kTypeInt:
@@ -33,7 +35,7 @@ void PrintGraph(const GraphType& graph) {
             break;
           case BasicDataType::kTypeDouble:
             std::cout << attr_it->template const_value<double>();
-            break;          
+            break;
           case BasicDataType::kTypeString:
             std::cout << attr_it->template const_value<std::string>();
             break;
@@ -54,12 +56,12 @@ void PrintGraph(const GraphType& graph) {
   for (auto it = graph.VertexCBegin(); !it.IsDone(); it++) {
     for (auto edge_it = graph.FindConstVertex(it->id())->OutEdgeCBegin();
          !edge_it.IsDone(); edge_it++) {
-      std::cout << edge_it->const_src_ptr()->id() << " "
-                << edge_it->const_dst_ptr()->id() << " " << edge_it->label()
+      std::cout << edge_it->const_src_handle()->id() << " "
+                << edge_it->const_dst_handle()->id() << " " << edge_it->label()
                 << " ";
       if (graph.edge_has_attribute) {
         EdgeConstPtr edge_ptr = edge_it;
-        for (auto attr_it = edge_ptr->AttributeCBegin(); !attr_it.IsDone();
+        for (auto attr_it = edge_ptr->AttributeBegin(); !attr_it.IsDone();
              attr_it++) {
           enum BasicDataType value_type =
               edge_it->attribute_value_type(attr_it->key());

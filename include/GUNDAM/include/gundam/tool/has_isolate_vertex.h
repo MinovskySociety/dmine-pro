@@ -1,5 +1,5 @@
-#ifndef _HAS_ISOLATE_VERTEX_H
-#define _HAS_ISOLATE_VERTEX_H
+#ifndef _GUNDAM_TOOL_HAS_ISOLATE_VERTEX_H
+#define _GUNDAM_TOOL_HAS_ISOLATE_VERTEX_H
 
 namespace GUNDAM {
 
@@ -21,4 +21,4 @@ inline bool HasIsolateVertex(GraphType& graph) {
 
 }  // namespace GUNDAM
 
-#endif // _HAS_ISOLATE_VERTEX_H
+#endif // _GUNDAM_TOOL_HAS_ISOLATE_VERTEX_H

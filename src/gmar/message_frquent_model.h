@@ -7,7 +7,7 @@ namespace gmine_new {
 template <class Pattern, class DataGraph>
 class MessageFrquentModel : public MLModelBase<Pattern, DataGraph> {
  public:
-  using DataGraphVertexPtr = typename DataGraph::VertexConstPtr;
+  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   MessageFrquentModel(int frquent_bound) {
     this->frquent_bound_ = frquent_bound;
     this->last_frquent_bound_ = -1;
@@ -148,7 +148,7 @@ class MessageFrquentModel : public MLModelBase<Pattern, DataGraph> {
     using VertexIDType = typename DataGraph::VertexType::IDType;
     using VertexLabelType = typename DataGraph::VertexType::LabelType;
     using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-    using VertexConstPtr = typename DataGraph::VertexConstPtr;
+    using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
     using EdgeIDType = typename DataGraph::EdgeType::IDType;
     /*
     constexpr VertexLabelType ml_label = -1;

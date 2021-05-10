@@ -25,14 +25,15 @@ template <class  QueryGraph,
 void TestDPISOUsingMatch_1() {
   using namespace GUNDAM;
 
+
   using VertexLabelType = typename  QueryGraph::VertexType::LabelType;
   using   EdgeLabelType = typename TargetGraph::  EdgeType::LabelType;
 
-  using  QueryVertexConstPtr = typename  QueryGraph::VertexConstPtr;
-  using TargetVertexConstPtr = typename TargetGraph::VertexConstPtr;
-
    QueryGraph  query;
   TargetGraph target;
+
+  std::cout << " QueryGraphType: " << typeid( query).name() << std::endl
+            << "TargetGraphType: " << typeid(target).name() << std::endl;
 
   // query
   query.AddVertex(1, VertexLabelType(0));
@@ -50,34 +51,106 @@ void TestDPISOUsingMatch_1() {
   target.AddEdge(3, 2, EdgeLabelType(1), 2);
   target.AddEdge(3, 1, EdgeLabelType(1), 3);
 
-  GUNDAM::MatchSet<const  QueryGraph, 
-                   const TargetGraph> match_result;
-  const auto&  query_const_ref = query;
-  const auto& target_const_ref = target;
+  GUNDAM::MatchSet<QueryGraph, 
+                  TargetGraph> match_result1;
   int count = GUNDAM::DpisoUsingMatch<MatchSemantics::kIsomorphism>(
-               query_const_ref, 
-              target_const_ref, 
-                  match_result);
+               query, target, match_result1);
                   
   ASSERT_EQ(count, 2);
-  ASSERT_EQ(count, match_result.size());
+  ASSERT_EQ(count, match_result1.size());
 
   int match_counter = 0;
-  for (auto match_it = match_result.MatchBegin();
+  for (auto match_it = match_result1.MatchBegin();
            !match_it.IsDone();
             match_it++) {
     std::cout << "match: " << match_counter << std::endl;
     for (auto map_it = match_it->MapBegin();
              !map_it.IsDone();
               map_it++) {
-      std::cout << " " << map_it->src_ptr()->id()
-                << " " << map_it->dst_ptr()->id()
+      std::cout << " " << map_it->src_handle()->id()
+                << " " << map_it->dst_handle()->id()
                 << std::endl;
     }
     match_counter++;
   }
 
-  std::cout << "count: " << match_result.size() << std::endl;
+  std::cout << "count: " << match_result1.size() << std::endl;
+  const auto&  query2 = query;
+  const auto& target2 = target;
+  GUNDAM::MatchSet match_result2(query2, target2);
+  count = GUNDAM::DpisoUsingMatch<MatchSemantics::kIsomorphism>(
+               query2, target2, match_result2);
+  ASSERT_EQ(count, 2);
+  ASSERT_EQ(count, match_result2.size());
+
+  match_counter = 0;
+  for (auto match_it = match_result2.MatchBegin();
+           !match_it.IsDone();
+            match_it++) {
+    std::cout << "match: " << match_counter << std::endl;
+    for (auto map_it = match_it->MapBegin();
+             !map_it.IsDone();
+              map_it++) {
+      std::cout << " " << map_it->src_handle()->id()
+                << " " << map_it->dst_handle()->id()
+                << std::endl;
+    }
+    match_counter++;
+  }
+
+  std::cout << "count: " << match_result2.size() << std::endl;
+
+  const auto& query3 = query;
+  auto& target3 = target;
+  GUNDAM::MatchSet match_result3(query3, target3);
+  count = GUNDAM::DpisoUsingMatch<MatchSemantics::kIsomorphism>(
+               query3, target3, match_result3);
+                  
+  ASSERT_EQ(count, 2);
+  ASSERT_EQ(count, match_result3.size());
+
+  match_counter = 0;
+  for (auto match_it = match_result3.MatchBegin();
+           !match_it.IsDone();
+            match_it++) {
+    std::cout << "match: " << match_counter << std::endl;
+    for (auto map_it = match_it->MapBegin();
+             !map_it.IsDone();
+              map_it++) {
+      std::cout << " " << map_it->src_handle()->id()
+                << " " << map_it->dst_handle()->id()
+                << std::endl;
+    }
+    match_counter++;
+  }
+
+  std::cout << "count: " << match_result3.size() << std::endl;
+
+  auto& query4 = query;
+  const auto& target4 = target;
+  GUNDAM::MatchSet match_result4(query4, target4);
+  count = GUNDAM::DpisoUsingMatch<MatchSemantics::kIsomorphism>(
+               query4, target4, match_result4);
+                  
+  ASSERT_EQ(count, 2);
+  ASSERT_EQ(count, match_result4.size());
+
+  match_counter = 0;
+  for (auto match_it = match_result4.MatchBegin();
+           !match_it.IsDone();
+            match_it++) {
+    std::cout << "match: " << match_counter << std::endl;
+    for (auto map_it = match_it->MapBegin();
+             !map_it.IsDone();
+              map_it++) {
+      std::cout << " " << map_it->src_handle()->id()
+                << " " << map_it->dst_handle()->id()
+                << std::endl;
+    }
+    match_counter++;
+  }
+
+  std::cout << "count: " << match_result4.size() << std::endl;
 }
 
 TEST(TestGUNDAM, DPISOUsingMatch_1) {
@@ -125,24 +198,38 @@ TEST(TestGUNDAM, DPISOUsingMatch_1) {
   TestDPISOUsingMatch_1<G1, G1>();
   TestDPISOUsingMatch_1<G1, G2>();
   TestDPISOUsingMatch_1<G1, G3>();
+  TestDPISOUsingMatch_1<G1, SG>();
+  TestDPISOUsingMatch_1<G1, LG>();
+
   TestDPISOUsingMatch_1<G2, G1>();
   TestDPISOUsingMatch_1<G2, G2>();
   TestDPISOUsingMatch_1<G2, G3>();
+  TestDPISOUsingMatch_1<G2, SG>();
+  TestDPISOUsingMatch_1<G2, LG>();
+
   TestDPISOUsingMatch_1<G3, G1>();
   TestDPISOUsingMatch_1<G3, G2>();
   TestDPISOUsingMatch_1<G3, G3>();
+  TestDPISOUsingMatch_1<G3, SG>();
+  TestDPISOUsingMatch_1<G3, LG>();
+  
   TestDPISOUsingMatch_1<LG, G1>();
   TestDPISOUsingMatch_1<LG, G2>();
   TestDPISOUsingMatch_1<LG, G3>();
+  TestDPISOUsingMatch_1<LG, SG>();
   TestDPISOUsingMatch_1<LG, LG>();
+
   TestDPISOUsingMatch_1<SG, G1>();
   TestDPISOUsingMatch_1<SG, G2>();
   TestDPISOUsingMatch_1<SG, G3>();
   TestDPISOUsingMatch_1<SG, LG>();
+  TestDPISOUsingMatch_1<SG, SG>();
+
   TestDPISOUsingMatch_1<SSG, G1>();
   TestDPISOUsingMatch_1<SSG, G2>();
   TestDPISOUsingMatch_1<SSG, G3>();
   TestDPISOUsingMatch_1<SSG, LG>();
+  TestDPISOUsingMatch_1<SSG, SG>();
 }
 
 template <class QueryGraph, class TargetGraph>
@@ -184,8 +271,8 @@ void TestDPISOUsingMatch_2() {
     for (auto map_it = match_it->MapBegin();
              !map_it.IsDone();
               map_it++) {
-      std::cout << " " << map_it.src_ptr()->id()
-                << " " << map_it.dst_ptr()->id()
+      std::cout << " " << map_it.src_handle()->id()
+                << " " << map_it.dst_handle()->id()
                 << std::endl;
     }
     match_counter++;
@@ -319,312 +406,3 @@ void TestDPISOUsingMatch_3() {
   }
   std::cout << "count: " << match_result.size() << std::endl;
 }
-
-// TEST(TestGUNDAM, DPISOUsingMatch_3) {
-//   using namespace GUNDAM;
-
-//   using QG1 =
-//     Graph<SetVertexIDType<uint32_t>, 
-//           SetVertexLabelType<Label<uint32_t>>,
-//           SetEdgeIDType<uint32_t>, 
-//           SetEdgeLabelType<Label<uint32_t>>>;
-
-//   using TG1 =
-//     Graph<SetVertexIDType<uint64_t>, 
-//           SetVertexLabelType<std::string>,
-//           SetEdgeIDType<uint64_t>, 
-//           SetEdgeLabelType<std::string>>;
-
-//   using QG2
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<Label<uint32_t>>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Map>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<Label<uint32_t>>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using TG2
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<std::string>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Map>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<std::string>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using QG3
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<Label<uint32_t>>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Vector>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<Label<uint32_t>>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using TG3
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<std::string>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Vector>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<std::string>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using QueryGraph = LargeGraph<uint32_t, Label<uint32_t>, std::string,
-//                                 uint32_t, Label<uint32_t>, std::string>;
-
-//   using TargetGraph = LargeGraph<uint64_t, std::string, std::string, 
-//                                  uint64_t, std::string, std::string>;
-
-//   // TestDPISOUsingMatch_3<QG1, TG1>();
-//   // TestDPISOUsingMatch_3<QG2, TG2>();
-//   // TestDPISOUsingMatch_3<QG3, TG3>();
-//   TestDPISOUsingMatch_3<QueryGraph, TargetGraph>();
-// }
-
-// template <class QueryGraph, class TargetGraph>
-// void TestDPISOUsingMatchSpeed1(int times_outer, int times_inner) {
-//   using namespace GUNDAM;
-
-//    QueryGraph  query;
-//   TargetGraph target;
-
-//   // query
-//   ASSERT_TRUE(query.AddVertex(1, 0).second);
-//   ASSERT_TRUE(query.AddVertex(2, 2).second);
-//   ASSERT_TRUE(query.AddVertex(3, 3).second);
-//   ASSERT_TRUE(query.AddVertex(4, 2).second);
-//   ASSERT_TRUE(query.AddVertex(5, 3).second);
-//   ASSERT_TRUE(query.AddEdge(1, 2, 1, 1).second);
-//   ASSERT_TRUE(query.AddEdge(1, 4, 1, 2).second);
-//   ASSERT_TRUE(query.AddEdge(3, 2, 2, 3).second);
-//   ASSERT_TRUE(query.AddEdge(5, 4, 2, 4).second);
-
-//   // target
-//   ASSERT_TRUE(target.AddVertex(1, 0).second);
-//   ASSERT_TRUE(target.AddVertex(2, 2).second);
-//   ASSERT_TRUE(target.AddVertex(3, 3).second);
-//   ASSERT_TRUE(target.AddVertex(4, 2).second);
-//   ASSERT_TRUE(target.AddVertex(5, 3).second);
-//   ASSERT_TRUE(target.AddVertex(6, 0).second);
-//   ASSERT_TRUE(target.AddVertex(7, 2).second);
-//   ASSERT_TRUE(target.AddVertex(8, 3).second);
-//   ASSERT_TRUE(target.AddVertex(9, 2).second);
-//   ASSERT_TRUE(target.AddVertex(10, 3).second);
-//   uint64_t eid = 0;
-//   ASSERT_TRUE(target.AddEdge(1, 2, 1, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(1, 4, 1, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(1, 7, 1, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(1, 9, 1, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(3, 2, 2, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(5, 4, 2, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(3, 4, 2, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(5, 2, 2, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(8, 7, 2, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(10, 9, 2, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(8, 9, 2, ++eid).second);
-//   ASSERT_TRUE(target.AddEdge(10, 7, 2, ++eid).second);
-
-//   GUNDAM::MatchSet<const  QueryGraph, 
-//                    const TargetGraph> match_result1;
-
-//   std::vector<std::vector<std::pair<typename  QueryGraph::VertexConstPtr,
-//                                     typename TargetGraph::VertexConstPtr>>>
-//       match_result2;
-
-//   uint64_t start, end;
-
-//   for (int j = 0; j < times_outer; j++) {
-//     std::cout << "         Default: ";
-//     start = GetTime();
-//     for (int i = 0; i < times_inner; i++) {
-//       int count = DpisoUsingMatch(query, target, match_result1);
-
-//       ASSERT_EQ(40, count);
-//     }
-//     end = GetTime();
-//     std::cout << end - start << " ms" << std::endl;
-
-//     start = GetTime();
-//     for (int i = 0; i < times_inner; i++) {
-//       int count = DpisoUsingMatch<MatchSemantics::kIsomorphism>(query, target, 20);
-
-//       ASSERT_EQ(20, count);
-//     }
-//     end = GetTime();
-//     std::cout << "           Limit: " << end - start << " ms" << std::endl;
-
-//     start = GetTime();
-//     for (int i = 0; i < times_inner; i++) {
-//       int count =
-//           DpisoUsingMatch<MatchSemantics::kIsomorphism>(query, target, -1, match_result2);
-
-//       ASSERT_EQ(40, count);
-//     }
-//     end = GetTime();
-//     std::cout << "   Vector Result: " << end - start << " ms" << std::endl;
-
-//     start = GetTime();
-//     for (int i = 0; i < times_inner; i++) {
-//       int max_result = -1;
-//       match_result1.clear();
-
-//       int count = DpisoUsingMatch<MatchSemantics::kIsomorphism>(
-//           query, target,
-//           std::bind(
-//               _dp_iso::MatchCallbackSaveResult1<
-//                   typename  QueryGraph::VertexConstPtr,
-//                   typename TargetGraph::VertexConstPtr,
-//                   std::vector<std::map<typename  QueryGraph::VertexConstPtr,
-//                                        typename TargetGraph::VertexConstPtr>>>,
-//               std::placeholders::_1, &max_result, &match_result1));
-
-//       ASSERT_EQ(40, count);
-//     }
-//     end = GetTime();
-//     std::cout << "Custom Callback1: " << end - start << " ms" << std::endl;
-
-//     start = GetTime();
-//     for (int i = 0; i < times_inner; i++) {
-//       int max_result = -1;
-//       match_result1.clear();
-
-//       int count = DpisoUsingMatch<MatchSemantics::kIsomorphism>(
-//           query, target,
-//           std::bind(_dp_iso::MatchCallbackSaveResult2<
-//                         typename QueryGraph::VertexConstPtr,
-//                         typename TargetGraph::VertexConstPtr,
-//                         std::vector<std::vector<
-//                             std::pair<typename QueryGraph::VertexConstPtr,
-//                                       typename TargetGraph::VertexConstPtr>>>>,
-//                     std::placeholders::_1, &max_result, &match_result2));
-
-//       ASSERT_EQ(40, count);
-//     }
-//     end = GetTime();
-//     std::cout << "Custom Callback2: " << end - start << " ms" << std::endl;
-
-//     start = GetTime();
-//     for (int i = 0; i < times_inner; i++) {
-//       int count = DpisoUsingMatch<MatchSemantics::kIsomorphism>(
-//           query, target,
-//           -1, match_result1);
-
-//       ASSERT_EQ(40, count);
-//     }
-//     end = GetTime();
-//     std::cout << "  Custom Compare: " << end - start << " ms" << std::endl;
-
-//     std::cout << std::endl;
-//   }
-// }
-
-// TEST(TestGUNDAM, DPISOUsingMatch_Speed_1) {
-//   using namespace GUNDAM;
-
-//   using QG1 =
-//     Graph<SetVertexIDType<uint32_t>, 
-//           SetVertexLabelType<uint32_t>,
-//           SetEdgeIDType<uint32_t>, 
-//           SetEdgeLabelType<uint32_t>>;
-
-//   using TG1 =
-//     Graph<SetVertexIDType<uint64_t>, 
-//           SetVertexLabelType<uint32_t>,
-//           SetEdgeIDType<uint64_t>, 
-//           SetEdgeLabelType<uint32_t>>;
-
-//   using QG2
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<uint32_t>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Map>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<uint32_t>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using TG2
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<uint32_t>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Map>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<uint32_t>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using QG3
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<uint32_t>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Vector>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<uint32_t>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using TG3
-//    = Graph<SetVertexIDType<uint64_t>,
-//            SetVertexAttributeStoreType<AttributeType::kGrouped>,
-//            SetVertexLabelType<uint32_t>,
-//            SetVertexLabelContainerType<ContainerType::Vector>,
-//            SetVertexIDContainerType<ContainerType::Vector>,
-//            SetVertexPtrContainerType<ContainerType::Vector>,
-//            SetEdgeLabelContainerType<ContainerType::Vector>,
-//            SetVertexAttributeKeyType<std::string>,
-//            SetEdgeIDType<uint64_t>,
-//            SetEdgeAttributeStoreType<AttributeType::kGrouped>,
-//            SetEdgeLabelType<uint32_t>,
-//            SetEdgeAttributeKeyType<std::string>>;
-
-//   using QLG = LargeGraph<uint32_t, uint32_t, std::string, 
-//                          uint32_t, uint32_t, std::string>;
-
-//   using QSG = SmallGraph<uint32_t, uint32_t, uint32_t, uint32_t>;
-
-//   using QSSG = SimpleSmallGraph<uint32_t, uint32_t, uint32_t, uint32_t>;
-
-//   using TLG = LargeGraph<uint64_t, uint32_t, std::string, uint64_t, uint32_t,
-//                          std::string>;
-
-//   TestDPISOUsingMatchSpeed1<QG1, TG1>(1, 10000);
-//   TestDPISOUsingMatchSpeed1<QG2, TG2>(1, 10000);
-//   TestDPISOUsingMatchSpeed1<QG3, TG3>(1, 10000);
-//   TestDPISOUsingMatchSpeed1<QLG, TLG>(1, 10000);
-//   TestDPISOUsingMatchSpeed1<QSG, TLG>(1, 10000);
-//   TestDPISOUsingMatchSpeed1<QSSG, TLG>(1, 10000);
-// }

@@ -379,8 +379,8 @@ TEST(TestGUNDAM, TestSamePattern) {
   using G2 = LargeGraph2<uint32_t, uint32_t, std::string, 
                          uint64_t, uint32_t, std::string>;  
 
-  // using G3 = SmallGraph<uint32_t, uint32_t, 
-  //                       uint64_t, uint32_t>;
+  using G3 = SmallGraph<uint32_t, uint32_t, 
+                        uint64_t, uint32_t>;
 
   using G4 = Graph<SetVertexIDType<uint32_t>, 
                    SetVertexLabelType<uint32_t>,
@@ -420,7 +420,7 @@ TEST(TestGUNDAM, TestSamePattern) {
 
   TestSamePattern<G1, G1>();
   TestSamePattern<G1, G2>();
-  // TestSamePattern<G1, G3>();
+  TestSamePattern<G1, G3>();
   TestSamePattern<G1, G4>();
   TestSamePattern<G1, G5>();
   TestSamePattern<G1, G6>();
@@ -428,23 +428,23 @@ TEST(TestGUNDAM, TestSamePattern) {
 
   TestSamePattern<G2, G1>();
   TestSamePattern<G2, G2>();
-  // TestSamePattern<G2, G3>();
+  TestSamePattern<G2, G3>();
   TestSamePattern<G2, G4>();
   TestSamePattern<G2, G5>();
   TestSamePattern<G2, G6>();
   TestSamePattern<G2, G7>();
 
-  // TestSamePattern<G3, G1>();
-  // TestSamePattern<G3, G2>();
-  // TestSamePattern<G3, G3>();
-  // TestSamePattern<G3, G4>();
-  // TestSamePattern<G3, G5>();
-  // TestSamePattern<G3, G6>();
-  // TestSamePattern<G3, G7>();
+  TestSamePattern<G3, G1>();
+  TestSamePattern<G3, G2>();
+  TestSamePattern<G3, G3>();
+  TestSamePattern<G3, G4>();
+  TestSamePattern<G3, G5>();
+  TestSamePattern<G3, G6>();
+  TestSamePattern<G3, G7>();
 
   TestSamePattern<G4, G1>();
   TestSamePattern<G4, G2>();
-  // TestSamePattern<G4, G3>();
+  TestSamePattern<G4, G3>();
   TestSamePattern<G4, G4>();
   TestSamePattern<G4, G5>();
   TestSamePattern<G4, G6>();
@@ -452,7 +452,7 @@ TEST(TestGUNDAM, TestSamePattern) {
 
   TestSamePattern<G5, G1>();
   TestSamePattern<G5, G2>();
-  // TestSamePattern<G5, G3>();
+  TestSamePattern<G5, G3>();
   TestSamePattern<G5, G4>();
   TestSamePattern<G5, G5>();
   TestSamePattern<G5, G6>();
@@ -460,7 +460,7 @@ TEST(TestGUNDAM, TestSamePattern) {
 
   TestSamePattern<G6, G1>();
   TestSamePattern<G6, G2>();
-  // TestSamePattern<G6, G3>();
+  TestSamePattern<G6, G3>();
   TestSamePattern<G6, G4>();
   TestSamePattern<G6, G5>();
   TestSamePattern<G6, G6>();

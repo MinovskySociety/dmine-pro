@@ -10,6 +10,8 @@
 #include "gundam/graph_type/large_graph2.h"
 #include "gundam/graph_type/graph.h"
 
+#include "gundam/type_getter/vertex_handle.h"
+
 template <class GraphType>
 void TestDfs() {
   GraphType g;
@@ -128,46 +130,43 @@ void TestDfs() {
   ASSERT_TRUE(res2.first);
   ASSERT_TRUE(res2.second);
 
-  using VertexPtrType      = typename GraphType::VertexPtr;
-  using VertexConstPtrType = typename GraphType::VertexConstPtr;
-
-  auto my_callback0 = [](const VertexPtrType& vertex_ptr) -> bool{
+  auto my_callback0 = [](typename GUNDAM::VertexHandle<GraphType>::type& vertex_handle) -> bool{
     // do nothing
     return true;
   };
 
-  auto my_callback = [](const VertexPtrType& vertex_ptr, 
+  auto my_callback = [](const typename GUNDAM::VertexHandle<GraphType>::type& vertex_handle, 
                                const size_t& dfs_idx) -> bool{
     // do nothing
     return true;
   };
   
-  auto src_ptr = g.FindVertex(1);
+  auto src_handle = g.FindVertex(1);
 
-  auto ret = GUNDAM::Dfs(g, src_ptr);
+  auto ret = GUNDAM::Dfs(g, src_handle);
   ASSERT_EQ(ret, g.CountVertex());
 
-  ret = GUNDAM::Dfs(g, src_ptr, my_callback);
+  ret = GUNDAM::Dfs(g, src_handle, my_callback);
   ASSERT_EQ(ret, g.CountVertex());
 
-  ret = GUNDAM::Dfs<false>(g, src_ptr, my_callback);
+  ret = GUNDAM::Dfs<false>(g, src_handle, my_callback);
   ASSERT_EQ(ret, g.CountVertex());
 
-  auto src_ptr2 = g.FindVertex(9);
-  ret = GUNDAM::Dfs<false>(g, src_ptr2, my_callback);
+  auto src_handle2 = g.FindVertex(9);
+  ret = GUNDAM::Dfs<false>(g, src_handle2, my_callback);
   ASSERT_EQ(ret, 1);
 
   const int kVertexLimit = 5;
 
   auto my_callback1 
-    = [&kVertexLimit](const VertexPtrType& vertex_ptr, 
+    = [&kVertexLimit](const typename GUNDAM::VertexHandle<GraphType>::type& vertex_handle, 
                              const size_t& dfs_idx) -> bool{
-    if (dfs_idx == kVertexLimit)
+    if (dfs_idx == kVertexLimit - 1)
       return false;
     return true;
   };
   
-  ret = GUNDAM::Dfs(g, src_ptr, my_callback1);
+  ret = GUNDAM::Dfs(g, src_handle, my_callback1);
   ASSERT_EQ(ret, kVertexLimit);
   return;
 }

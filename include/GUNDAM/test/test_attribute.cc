@@ -3,6 +3,9 @@
 
 #include "gtest/gtest.h"
 
+#include "gundam/type_getter/vertex_handle.h"
+#include "gundam/type_getter/edge_handle.h"
+
 #include "gundam/graph_type/graph.h"
 #include "gundam/graph_type/large_graph.h"
 #include "gundam/graph_type/large_graph2.h"
@@ -29,7 +32,7 @@ void TestAttribute(TestAttributeHandleType& has_attr_handle) {
 //   delete v1;
 //   delete v2;
 
-  auto ret_ptr = has_attr_handle->FindAttributePtr("a");
+  auto ret_ptr = has_attr_handle->FindAttribute("a");
   ASSERT_TRUE(ret_ptr.IsNull());
 
   auto ret = has_attr_handle->AddAttribute("a", 1);
@@ -53,7 +56,7 @@ void TestAttribute(TestAttributeHandleType& has_attr_handle) {
   ASSERT_EQ(ret.first->template value<int>(), 2);
 
   int count = 0;
-  for (auto iter = has_attr_handle->AttributeCBegin(); !iter.IsDone(); iter++) {
+  for (auto iter = has_attr_handle->AttributeBegin(); !iter.IsDone(); iter++) {
     std::cout << iter->key() << " " << iter->value_str() << std::endl;
     count++;
   }
@@ -94,7 +97,7 @@ void TestAttribute(TestAttributeHandleType& has_attr_handle) {
 
   ASSERT_EQ(BasicDataType::kTypeUnknown, has_attr_handle->attribute_value_type("XXX7"));
   
-  ASSERT_EQ("unknown value type", has_attr_handle->FindAttributePtr("XXX7")->value_str());
+  ASSERT_EQ("unknown value type", has_attr_handle->FindAttribute("XXX7")->value_str());
 }
 
 
@@ -161,7 +164,7 @@ void TestGraphAttribute() {
   GraphType g;
   bool res;
 
-  typename GraphType::VertexPtr v1, v2;
+  typename GUNDAM::VertexHandle<GraphType>::type v1, v2;
   std::tie(v1, res) = g.AddVertex(1, "1");
   ASSERT_TRUE(res);
   ASSERT_TRUE(v1);
@@ -170,7 +173,7 @@ void TestGraphAttribute() {
   ASSERT_TRUE(res);
   ASSERT_TRUE(v2);
 
-  typename GraphType::EdgePtr e1, e2;
+  typename GUNDAM::EdgeHandle<GraphType>::type e1, e2;
   std::tie(e1, res) = g.AddEdge(1, 2, "a", 1);
   ASSERT_TRUE(res);
   ASSERT_TRUE(e1);
@@ -214,7 +217,7 @@ void TestGraphAttribute() {
   ASSERT_EQ(4, count);
 
   for (const auto &key : {"1", "2", "3"}) {
-    typename GraphType::VertexType::AttributePtr va = v1->FindAttributePtr(key);
+    typename GraphType::VertexType::AttributePtr va = v1->FindAttribute(key);
 
     std::cout << "key = " << va->key() << std::endl
               << "value type = " << EnumToString(va->value_type()) << std::endl;
@@ -223,7 +226,7 @@ void TestGraphAttribute() {
   // Attributes
   ASSERT_TRUE(v1->AddAttribute("5", std::string("abc")).second);
 
-  auto v_attr = v1->FindAttributePtr("5");
+  auto v_attr = v1->FindAttribute("5");
   ASSERT_FALSE(v_attr.IsNull());
   ASSERT_EQ(v_attr->template value<std::string>(), "abc");
 
@@ -231,7 +234,7 @@ void TestGraphAttribute() {
 
   ASSERT_TRUE(v1->template SetAttribute<std::string>("5", "abcd").second);
 
-  auto v_cattr = v1->FindConstAttributePtr("5");
+  auto v_cattr = v1->FindAttribute("5");
   ASSERT_FALSE(v_cattr.IsNull());
   ASSERT_EQ(v_cattr->template const_value<std::string>(), "abcd");
 
@@ -239,7 +242,7 @@ void TestGraphAttribute() {
 
   ASSERT_TRUE(e1->template AddAttribute<std::string>("5", "abc").second);
 
-  auto e_attr = e1->FindAttributePtr("5");
+  auto e_attr = e1->FindAttribute("5");
   ASSERT_FALSE(e_attr.IsNull());
   ASSERT_EQ(e_attr->template value<std::string>(), "abc");
 
@@ -247,7 +250,7 @@ void TestGraphAttribute() {
 
   ASSERT_TRUE(e1->template SetAttribute<std::string>("5", "abcd").second);
 
-  auto e_cattr = e1->FindConstAttributePtr("5");
+  auto e_cattr = e1->FindAttribute("5");
   ASSERT_FALSE(e_cattr.IsNull());
   ASSERT_EQ(e_cattr->template const_value<std::string>(), "abcd");
 

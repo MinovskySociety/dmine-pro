@@ -1,5 +1,5 @@
-#ifndef _GENERATOR_H
-#define _GENERATOR_H
+#ifndef _GUNDAM_COMPONENT_GENERATOR_H
+#define _GUNDAM_COMPONENT_GENERATOR_H
 
 #include <type_traits>
 

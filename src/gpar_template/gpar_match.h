@@ -13,13 +13,12 @@
 #include "gundam/algorithm/vf2_boost.h"
 namespace gmine_new {
 template <class GPAR, class DataGraph>
-inline void GPARMatch(GPAR &gpar, const DataGraph &data_graph) {
-  using VertexConstPtr = typename GPAR::VertexConstPtr;
+inline void GPARMatch(GPAR &gpar, DataGraph &data_graph) {
   using VertexIDType = typename GPAR::VertexIDType;
-  using QueryVertexPtr = typename GPAR::VertexConstPtr;
-  using TargetVertexPtr = typename DataGraph::VertexConstPtr;
+  using QueryVertexPtr = typename GPAR::VertexPtr;
+  using TargetVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using SuppType = typename GPAR::SuppType;
-  VertexConstPtr x_node_ptr = gpar.x_node_ptr();
+  QueryVertexPtr x_node_ptr = gpar.x_node_ptr();
   VertexIDType x_node_id = x_node_ptr->id();
   SuppType possible_supp_q = gpar.supp_Q();
   QueryVertexPtr query_vertex_ptr = gpar.x_node_ptr();
@@ -68,9 +67,9 @@ inline int CalSuppR(GPAR &gpar, const DataGraph &data_graph) {
       int32_t supp_r = 0;
       VertexLabelType y_node_label = gpar.y_node_ptr()->label();
       for (const auto &single_ptr : supp_list) {
-        for (auto edge_it = single_ptr->OutEdgeCBegin(gpar.q_edge_label());
+        for (auto edge_it = single_ptr->OutEdgeBegin(gpar.q_edge_label());
              !edge_it.IsDone(); edge_it++) {
-          if (edge_it->const_dst_ptr()->label() == y_node_label) {
+          if (edge_it->const_dst_handle()->label() == y_node_label) {
             supp_r++;
             supp_r_list.push_back(single_ptr);
             break;

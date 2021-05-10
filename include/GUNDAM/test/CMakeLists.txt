@@ -19,7 +19,7 @@ gtest_add_tests(TARGET test2)
 
 add_executable (test_csvgraph "test_csvgraph.cc")
 target_link_libraries(test_csvgraph GTest::GTest GTest::Main)
-#gtest_add_tests(TARGET test_csvgraph)
+gtest_add_tests(TARGET test_csvgraph)
 
 add_executable (test_vf2 "test_vf2.cc")
 target_link_libraries(test_vf2 GTest::GTest GTest::Main)
@@ -33,13 +33,25 @@ add_executable (test_dp_iso_using_match "test_dp_iso_using_match.cc")
 target_link_libraries(test_dp_iso_using_match GTest::GTest GTest::Main)
 gtest_add_tests(TARGET test_dp_iso_using_match)
 
+add_executable (test_multi_query_dp_iso_using_match "test_multi_query_dp_iso_using_match.cc")
+target_link_libraries(test_multi_query_dp_iso_using_match GTest::GTest GTest::Main)
+gtest_add_tests(TARGET test_multi_query_dp_iso_using_match)
+
 add_executable (test_bfs "test_bfs.cc")
 target_link_libraries(test_bfs GTest::GTest GTest::Main)
 gtest_add_tests(TARGET test_bfs)
 
+add_executable (test_bfs_limit_width "test_bfs_limit_width.cc")
+target_link_libraries(test_bfs_limit_width GTest::GTest GTest::Main)
+gtest_add_tests(TARGET test_bfs_limit_width)
+
 add_executable (test_dfs "test_dfs.cc")
 target_link_libraries(test_dfs GTest::GTest GTest::Main)
 gtest_add_tests(TARGET test_dfs)
+
+add_executable (test_random_walk "test_random_walk.cc")
+target_link_libraries(test_random_walk GTest::GTest GTest::Main)
+gtest_add_tests(TARGET test_random_walk)
 
 add_executable (test_connected "test_connected.cc")
 target_link_libraries(test_connected GTest::GTest GTest::Main)
@@ -53,16 +65,16 @@ add_executable (test_same_pattern "test_same_pattern.cc")
 target_link_libraries(test_same_pattern GTest::GTest GTest::Main)
 gtest_add_tests(TARGET test_same_pattern)
 
-add_executable (test_multi_vf2 "test_multi_vf2.cc")
-target_link_libraries(test_multi_vf2 GTest::GTest GTest::Main)
-gtest_add_tests(TARGET test_multi_vf2)
+# add_executable (test_multi_vf2 "test_multi_vf2.cc")
+# target_link_libraries(test_multi_vf2 GTest::GTest GTest::Main)
+# gtest_add_tests(TARGET test_multi_vf2)
 
 add_executable (test_idgen "test_idgen.cc")
 target_link_libraries(test_idgen GTest::GTest GTest::Main)
 gtest_add_tests(TARGET test_idgen)
 
-add_executable (test_matchresult "test_writematchresult.cc")
-target_link_libraries(test_matchresult GTest::GTest GTest::Main)
+# add_executable (test_matchresult "test_writematchresult.cc")
+# target_link_libraries(test_matchresult GTest::GTest GTest::Main)
 #gtest_add_tests(TARGET test_matchresult)
 
 add_executable (test_datatype "test_datatype.cc")

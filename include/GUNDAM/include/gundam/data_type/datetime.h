@@ -1,5 +1,5 @@
-#ifndef _DATETIME_H
-#define _DATETIME_H
+#ifndef _GUNDAM_DATA_TYPE_DATETIME_H
+#define _GUNDAM_DATA_TYPE_DATETIME_H
 
 #include <cstdio>
 #include <cstring>
@@ -46,6 +46,12 @@ class DateTime {
   }
 
   friend std::ostream& operator<<(std::ostream& out, const DateTime& b) {
+    out << b.to_string();
+    return out;
+  }
+
+  friend std::stringstream& operator<<(std::stringstream& out,
+                                       const DateTime& b) {
     out << b.to_string();
     return out;
   }

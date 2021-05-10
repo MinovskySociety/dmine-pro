@@ -1,5 +1,5 @@
-#ifndef _POINTER_H
-#define _POINTER_H
+#ifndef _GUNDAM_COMPONENT_POINTER_H
+#define _GUNDAM_COMPONENT_POINTER_H
 
 #include <type_traits>
 
@@ -74,7 +74,13 @@ class GPointer {
     return &v_;
   }
 
-  bool operator==(const GPointer &b) const { return v_ == b.v_; }
+  bool operator==(const GPointer &b) const { 
+    return v_ == b.v_; 
+  }
+
+  bool operator!=(const GPointer &b) const { 
+    return !(*this == b); 
+  }
 
   bool operator<(const GPointer &b) const { return v_ < b.v_; }
 

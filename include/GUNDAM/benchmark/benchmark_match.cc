@@ -25,8 +25,8 @@ inline uint64_t GetTime() { return clock() * 1000 / CLOCKS_PER_SEC; }
 template <class QueryGraph, class TargetGraph>
 int VF2_Run(const QueryGraph &query_graph, const TargetGraph &target_graph) {
   using namespace GUNDAM;
-  using MatchMap = std::map<typename QueryGraph::VertexConstPtr,
-                            typename TargetGraph::VertexConstPtr>;
+  using MatchMap = std::map<typename VertexHandle<QueryGraph>::type,
+                            typename VertexHandle<TargetGraph>::type>;
   using MatchResult = std::vector<MatchMap>;
 
   MatchResult match_result;
@@ -36,11 +36,11 @@ int VF2_Run(const QueryGraph &query_graph, const TargetGraph &target_graph) {
 }
 
 template <class QueryGraph, class TargetGraph>
-int DPISO_Run(const QueryGraph &query_graph, const TargetGraph &target_graph) {
+int DPISO_Run(QueryGraph &query_graph, TargetGraph &target_graph) {
   using namespace GUNDAM;
-  using QueryVertex = typename QueryGraph::VertexConstPtr;
-  using TargetVertex = typename TargetGraph::VertexConstPtr;
-  using MatchMap = std::map<QueryVertex, TargetVertex>;
+  using  QueryVertexHandle = typename VertexHandle<QueryGraph>::type;
+  using TargetVertexHandle = typename VertexHandle<TargetGraph>::type;
+  using MatchMap = std::map<QueryVertexHandle, TargetVertexHandle>;
   using MatchResult = std::vector<MatchMap>;
 
   MatchResult match_result;
@@ -50,7 +50,7 @@ int DPISO_Run(const QueryGraph &query_graph, const TargetGraph &target_graph) {
   //int result = DPISO(query_graph, target_graph, max_result, match_result);
  
   // group by supp
-  std::vector<QueryVertex> supp_list { query_graph.FindConstVertex(1) };
+  std::vector<QueryVertexHandle> supp_list { query_graph.FindVertex(1) };
   auto match_callback = [&match_result](const MatchMap &match_map) {
     match_result.emplace_back(match_map);
   };

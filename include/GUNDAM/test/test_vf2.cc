@@ -15,10 +15,15 @@
 #include "gundam/graph_type/small_graph.h"
 #include "gundam/algorithm/vf2.h"
 
+#include "gundam/type_getter/vertex_handle.h"
+#include "gundam/type_getter/edge_handle.h"
+
 inline uint64_t GetTime() { return clock() * 1000 / CLOCKS_PER_SEC; }
 
-template <typename Ptr1, typename Ptr2>
-bool LabelEqual2(const Ptr1& a, const Ptr2& b) {
+template <typename Handle1, 
+          typename Handle2>
+bool LabelEqual2(const Handle1& a, 
+                 const Handle2& b) {
   return a->label() == b->label();
 }
 
@@ -27,11 +32,11 @@ void TestVF2_1() {
   using VertexLabelType = typename  QueryGraph::VertexType::LabelType;
   using   EdgeLabelType = typename TargetGraph::  EdgeType::LabelType;
 
-  using  QueryVertexConstPtr = typename  QueryGraph::VertexConstPtr;
-  using TargetVertexConstPtr = typename TargetGraph::VertexConstPtr;
+  using  QueryVertexHandle = typename GUNDAM::VertexHandle< QueryGraph>::type;
+  using TargetVertexHandle = typename GUNDAM::VertexHandle<TargetGraph>::type;
 
-  using  QueryEdgeConstPtr = typename  QueryGraph::EdgeConstPtr;
-  using TargetEdgeConstPtr = typename TargetGraph::EdgeConstPtr;
+  using  QueryEdgeHandle = typename GUNDAM::EdgeHandle< QueryGraph>::type;
+  using TargetEdgeHandle = typename GUNDAM::EdgeHandle<TargetGraph>::type;
 
    QueryGraph query;
   TargetGraph target;
@@ -52,15 +57,16 @@ void TestVF2_1() {
   target.AddEdge(3, 2, EdgeLabelType(1), 2);
   target.AddEdge(3, 1, EdgeLabelType(1), 3);
 
-  std::vector<std::map<QueryVertexConstPtr, 
-                      TargetVertexConstPtr>> match_result;
+  std::vector<std::map<QueryVertexHandle, 
+                      TargetVertexHandle>> match_result;
   int count = GUNDAM::VF2<GUNDAM::MatchSemantics::kIsomorphism>(
       query, target, -1, match_result);
 
   for (size_t i = 0; i < match_result.size(); i++) {
     std::cout << "match " << i << std::endl;
     for (const auto& mapping : match_result[i]) {
-      std::cout << " " << mapping.first->id() << " " << mapping.second->id()
+      std::cout << " " << mapping.first ->id() 
+                << " " << mapping.second->id()
                 << std::endl;
     }
   }
@@ -68,8 +74,10 @@ void TestVF2_1() {
   ASSERT_EQ(count, 2);
 
   count = GUNDAM::VF2<GUNDAM::MatchSemantics::kIsomorphism>(
-      query, target, LabelEqual2<QueryVertexConstPtr, TargetVertexConstPtr>,
-      LabelEqual2<QueryEdgeConstPtr, TargetEdgeConstPtr>, -1, match_result);
+      query, target, LabelEqual2<QueryVertexHandle, 
+                                TargetVertexHandle>,
+                     LabelEqual2<  QueryEdgeHandle, 
+                                  TargetEdgeHandle>, -1, match_result);
 
   for (size_t i = 0; i < match_result.size(); i++) {
     std::cout << "match " << i << std::endl;
@@ -147,8 +155,9 @@ TEST(TestGUNDAM, VF2_1) {
   TestVF2_1<SSG, LG>();
 }
 
-template <typename Ptr1, typename Ptr2>
-bool LabelEqualCustom(const Ptr1& a, const Ptr2& b) {
+template <typename Handle1, typename Handle2>
+bool LabelEqualCustom(const Handle1& a, 
+                      const Handle2& b) {
   return *(uint32_t*)&a->label() == static_cast<uint32_t>(stoi(b->label()));
 }
 
@@ -156,7 +165,7 @@ template <class QueryGraph, class TargetGraph>
 void TestVF2_2() {
   using namespace GUNDAM;
 
-  QueryGraph query;
+   QueryGraph query;
   TargetGraph target;
 
   // query
@@ -174,15 +183,15 @@ void TestVF2_2() {
   ASSERT_TRUE(target.AddEdge(3, 2, std::string("1"), 2).second);
   ASSERT_TRUE(target.AddEdge(3, 1, std::string("1"), 3).second);
 
-  std::vector<std::map<typename QueryGraph::VertexConstPtr,
-                       typename TargetGraph::VertexConstPtr>>
+  std::vector<std::map<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                       typename GUNDAM::VertexHandle<TargetGraph>::type>>
       match_result;
   int count = VF2<MatchSemantics::kIsomorphism>(
       query, target,
-      LabelEqualCustom<typename QueryGraph::VertexConstPtr,
-                       typename TargetGraph::VertexConstPtr>,
-      LabelEqualCustom<typename QueryGraph::EdgeConstPtr,
-                       typename TargetGraph::EdgeConstPtr>,
+      LabelEqualCustom<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                       typename GUNDAM::VertexHandle<TargetGraph>::type>,
+      LabelEqualCustom<typename GUNDAM::  EdgeHandle< QueryGraph>::type,
+                       typename GUNDAM::  EdgeHandle<TargetGraph>::type>,
       -1, match_result);
 
   ASSERT_EQ(count, 2);
@@ -279,11 +288,12 @@ TEST(TestGUNDAM, VF2_2) {
   TestVF2_2<QueryGraph, TargetGraph>();
 }
 
-template <class QueryGraph, class TargetGraph>
+template <class  QueryGraph, 
+          class TargetGraph>
 void TestVF2_3() {
   using namespace GUNDAM;
 
-  QueryGraph query;
+   QueryGraph query;
   TargetGraph target;
 
   // query
@@ -301,15 +311,15 @@ void TestVF2_3() {
   ASSERT_TRUE(target.AddEdge(1, 3, std::string("1"), 2).second);
   // ASSERT_TRUE(target.AddEdge(1, 2, std::string("1"), 3).second);
 
-  std::vector<std::map<typename QueryGraph::VertexConstPtr,
-                       typename TargetGraph::VertexConstPtr>>
+  std::vector<std::map<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                       typename GUNDAM::VertexHandle<TargetGraph>::type>>
       match_result;
   int count = VF2<MatchSemantics::kIsomorphism>(
       query, target,
-      LabelEqualCustom<typename QueryGraph::VertexConstPtr,
-                       typename TargetGraph::VertexConstPtr>,
-      LabelEqualCustom<typename QueryGraph::EdgeConstPtr,
-                       typename TargetGraph::EdgeConstPtr>,
+      LabelEqualCustom<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                       typename GUNDAM::VertexHandle<TargetGraph>::type>,
+      LabelEqualCustom<typename GUNDAM::  EdgeHandle< QueryGraph>::type,
+                       typename GUNDAM::  EdgeHandle<TargetGraph>::type>,
       -1, match_result);
 
   ASSERT_EQ(count, 2);
@@ -407,7 +417,8 @@ TEST(TestGUNDAM, VF2_3) {
   TestVF2_3<QueryGraph, TargetGraph>();
 }
 
-template <class QueryGraph, class TargetGraph>
+template <class QueryGraph, 
+          class TargetGraph>
 void TestVF2Speed1(int times_outer, int times_inner) {
   using namespace GUNDAM;
 
@@ -450,12 +461,12 @@ void TestVF2Speed1(int times_outer, int times_inner) {
   ASSERT_TRUE(target.AddEdge(8, 9, 2, ++eid).second);
   ASSERT_TRUE(target.AddEdge(10, 7, 2, ++eid).second);
 
-  std::vector<std::map<typename  QueryGraph::VertexConstPtr,
-                       typename TargetGraph::VertexConstPtr>>
+  std::vector<std::map<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                       typename GUNDAM::VertexHandle<TargetGraph>::type>>
       match_result1;
 
-  std::vector<std::vector<std::pair<typename  QueryGraph::VertexConstPtr,
-                                    typename TargetGraph::VertexConstPtr>>>
+  std::vector<std::vector<std::pair<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                                    typename GUNDAM::VertexHandle<TargetGraph>::type>>>
       match_result2;
 
   uint64_t start, end;
@@ -479,16 +490,16 @@ void TestVF2Speed1(int times_outer, int times_inner) {
 
       int count = _vf2::VF2_Recursive<MatchSemantics::kIsomorphism>(
           query, target,
-          _vf2::LabelEqual<typename QueryGraph::VertexConstPtr,
-                           typename TargetGraph::VertexConstPtr>(),
-          _vf2::LabelEqual<typename QueryGraph::EdgeConstPtr,
-                           typename TargetGraph::EdgeConstPtr>(),
+          _vf2::LabelEqual<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                           typename GUNDAM::VertexHandle<TargetGraph>::type>(),
+          _vf2::LabelEqual<typename GUNDAM::  EdgeHandle< QueryGraph>::type,
+                           typename GUNDAM::  EdgeHandle<TargetGraph>::type>(),
           std::bind(
               _vf2::MatchCallbackSaveResult<
-                  typename QueryGraph::VertexConstPtr,
-                  typename TargetGraph::VertexConstPtr,
-                  std::vector<std::map<typename QueryGraph::VertexConstPtr,
-                                       typename TargetGraph::VertexConstPtr>>>,
+                  typename GUNDAM::VertexHandle< QueryGraph>::type,
+                  typename GUNDAM::VertexHandle<TargetGraph>::type,
+                  std::vector<std::map<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                                       typename GUNDAM::VertexHandle<TargetGraph>::type>>>,
               std::placeholders::_1, &max_result, &match_result1));
 
       ASSERT_EQ(40, count);
@@ -504,16 +515,16 @@ void TestVF2Speed1(int times_outer, int times_inner) {
 
       int count = _vf2::VF2_NonRecursive<MatchSemantics::kIsomorphism>(
           query, target,
-          _vf2::LabelEqual<typename QueryGraph::VertexConstPtr,
-                           typename TargetGraph::VertexConstPtr>(),
-          _vf2::LabelEqual<typename QueryGraph::EdgeConstPtr,
-                           typename TargetGraph::EdgeConstPtr>(),
+          _vf2::LabelEqual<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                           typename GUNDAM::VertexHandle<TargetGraph>::type>(),
+          _vf2::LabelEqual<typename GUNDAM::  EdgeHandle< QueryGraph>::type,
+                           typename GUNDAM::  EdgeHandle<TargetGraph>::type>(),
           std::bind(
               _vf2::MatchCallbackSaveResult<
-                  typename QueryGraph::VertexConstPtr,
-                  typename TargetGraph::VertexConstPtr,
-                  std::vector<std::map<typename QueryGraph::VertexConstPtr,
-                                       typename TargetGraph::VertexConstPtr>>>,
+                  typename GUNDAM::VertexHandle< QueryGraph>::type,
+                  typename GUNDAM::VertexHandle<TargetGraph>::type,
+                  std::vector<std::map<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                                       typename GUNDAM::VertexHandle<TargetGraph>::type>>>,
               std::placeholders::_1, &max_result, &match_result1));
 
       ASSERT_EQ(40, count);
@@ -549,10 +560,10 @@ void TestVF2Speed1(int times_outer, int times_inner) {
           query, target,
           std::bind(
               _vf2::MatchCallbackSaveResult1<
-                  typename  QueryGraph::VertexConstPtr,
-                  typename TargetGraph::VertexConstPtr,
-                  std::vector<std::map<typename  QueryGraph::VertexConstPtr,
-                                       typename TargetGraph::VertexConstPtr>>>,
+                  typename GUNDAM::VertexHandle< QueryGraph>::type,
+                  typename GUNDAM::VertexHandle<TargetGraph>::type,
+                  std::vector<std::map<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                                       typename GUNDAM::VertexHandle<TargetGraph>::type>>>,
               std::placeholders::_1, &max_result, &match_result1));
 
       ASSERT_EQ(40, count);
@@ -568,11 +579,11 @@ void TestVF2Speed1(int times_outer, int times_inner) {
       int count = VF2<MatchSemantics::kIsomorphism>(
           query, target,
           std::bind(_vf2::MatchCallbackSaveResult2<
-                        typename QueryGraph::VertexConstPtr,
-                        typename TargetGraph::VertexConstPtr,
+                        typename GUNDAM::VertexHandle< QueryGraph>::type,
+                        typename GUNDAM::VertexHandle<TargetGraph>::type,
                         std::vector<std::vector<
-                            std::pair<typename QueryGraph::VertexConstPtr,
-                                      typename TargetGraph::VertexConstPtr>>>>,
+                            std::pair<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                                      typename GUNDAM::VertexHandle<TargetGraph>::type>>>>,
                     std::placeholders::_1, &max_result, &match_result2));
 
       ASSERT_EQ(40, count);
@@ -584,10 +595,10 @@ void TestVF2Speed1(int times_outer, int times_inner) {
     for (int i = 0; i < times_inner; i++) {
       int count = VF2<MatchSemantics::kIsomorphism>(
           query, target,
-          LabelEqual2<typename  QueryGraph::VertexConstPtr,
-                      typename TargetGraph::VertexConstPtr>,
-          LabelEqual2<typename  QueryGraph::EdgeConstPtr,
-                      typename TargetGraph::EdgeConstPtr>,
+          LabelEqual2<typename GUNDAM::VertexHandle< QueryGraph>::type,
+                      typename GUNDAM::VertexHandle<TargetGraph>::type>,
+          LabelEqual2<typename GUNDAM::  EdgeHandle< QueryGraph>::type,
+                      typename GUNDAM::  EdgeHandle<TargetGraph>::type>,
           -1, match_result1);
 
       ASSERT_EQ(40, count);

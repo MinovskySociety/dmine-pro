@@ -7,6 +7,7 @@
 #include "gmar_discover_info.h"
 #include "gpar_template/gpar_discover.h"
 #include "gpar_template/gpar_new.h"
+#include "gundam/type_getter/vertex_handle.h"
 #include "ml_model.h"
 namespace gmine_new {
 template <class Pattern, class DataGraph, class MLModel, class ManualCheck,
@@ -16,7 +17,7 @@ void GMARDiscover(MLModel &ml_model, DataGraph &data_graph,
                   ManualCheck manual_check, SelectCallback select_callback) {
   for (int i = 1; i <= gmar_discover_info.max_iter_num; i++) {
     std::cout << "round " << i << std::endl;
-    DataGraph ml_graph = data_graph;
+    DataGraph ml_graph(data_graph);
     ml_model.BuildMLGraph(ml_graph);
     std::cout << "vertex num = " << ml_graph.CountVertex() << " "
               << " edge num = " << ml_graph.CountEdge() << std::endl;
@@ -45,7 +46,7 @@ void GMARDiscover(MLModel &ml_model, DataGraph &data_graph,
       break;
     }
   }
-  DataGraph ml_graph = data_graph;
+  DataGraph ml_graph(data_graph);
   ml_model.BuildMLGraph(ml_graph);
   std::cout << "vertex num = " << ml_graph.CountVertex() << " "
             << " edge num = " << ml_graph.CountEdge() << std::endl;
@@ -64,7 +65,7 @@ void GMARDiscover(MLModel &ml_model, DataGraph &data_graph,
                   const int max_iter_num) {
   for (int i = 1; i <= max_iter_num; i++) {
     std::cout << "round " << i << std::endl;
-    DataGraph ml_graph = data_graph;
+    DataGraph ml_graph(data_graph);
     ml_model.BuildMLGraph(ml_graph);
     std::string ml_v_file = "/Users/apple/Desktop/liantong_v.csv";
     std::string ml_e_file = "/Users/apple/Desktop/liantong_e.csv";
@@ -79,7 +80,7 @@ void GMARDiscover(MLModel &ml_model, DataGraph &data_graph,
     auto manual_check = [](auto &gpar) {
       // gmar:
       /*
-      for (auto vertex_it = gpar.pattern.VertexCBegin(); !vertex_it.IsDone();
+      for (auto vertex_it = gpar.pattern.VertexBegin(); !vertex_it.IsDone();
            vertex_it++) {
         if (vertex_it->id() == gpar.x_node_ptr()->id()) continue;
         if (vertex_it->CountOutEdge(-1) > 0) return false;
@@ -92,20 +93,20 @@ void GMARDiscover(MLModel &ml_model, DataGraph &data_graph,
       // x node cannot has q edge
       if (gpar.x_node_ptr()->CountOutEdge(gpar.q_edge_label()) > 0)
         return false;
-      for (auto it = gpar.pattern.VertexCBegin(); !it.IsDone(); it++) {
+      for (auto it = gpar.pattern.VertexBegin(); !it.IsDone(); it++) {
         if (it->label() == 1000000001) not_fake_num++;
         if (it->label() == 1000000002) fake_num++;
       }
       // not fake or fake node num is less than 1
       if (not_fake_num >= 2 || fake_num >= 2) return false;
-      for (auto vertex_it = gpar.pattern.VertexCBegin(); !vertex_it.IsDone();
+      for (auto vertex_it = gpar.pattern.VertexBegin(); !vertex_it.IsDone();
            vertex_it++) {
         // if (vertex_it->label() == 1002 && vertex_it->CountOutEdge(3) >= 1)
         //  return false;
 
         int head_num = 0;
         int length_num = 0;
-        for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+        for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
              edge_it++) {
           // 不允许出现由 attribute 点拓展一个新的 user/phone 点出来
           if ((vertex_it->label() == 1001 || vertex_it->label() == 1002) &&
@@ -125,9 +126,9 @@ void GMARDiscover(MLModel &ml_model, DataGraph &data_graph,
           }
           //一个phone最多只能有一个 head 跟一个 length
           if (vertex_it->label() == 1002) {
-            if (edge_it->const_dst_ptr()->label() == 3003) length_num++;
-            if (edge_it->const_dst_ptr()->label() >= 1000000003 &&
-                edge_it->const_dst_ptr()->label() <= 1000000373)
+            if (edge_it->const_dst_handle()->label() == 3003) length_num++;
+            if (edge_it->const_dst_handle()->label() >= 1000000003 &&
+                edge_it->const_dst_handle()->label() <= 1000000373)
               head_num++;
           }
         }
@@ -150,7 +151,7 @@ void GMARDiscover(MLModel &ml_model, DataGraph &data_graph,
       break;
     }
   }
-  DataGraph ml_graph = data_graph;
+  DataGraph ml_graph(data_graph);
   ml_model.BuildMLGraph(ml_graph);
   std::string ml_v_file = "/Users/apple/Desktop/liantong_v.csv";
   std::string ml_e_file = "/Users/apple/Desktop/liantong_e.csv";
@@ -169,7 +170,7 @@ void GMARDiscover(
     DataGraph &data_graph, const int max_iter_num) {
   for (int i = 1; i <= max_iter_num; i++) {
     std::cout << "round " << i << std::endl;
-    DataGraph ml_graph = data_graph;
+    DataGraph ml_graph(data_graph);
     for (const auto &ml_model : model_container) {
       ml_model->BuildMLGraph(ml_graph);
     }
@@ -185,7 +186,7 @@ void GMARDiscover(
     std::cout << "discover begin" << std::endl;
     auto manual_check = [&model_container](auto &gpar) {
       // gmar:
-      for (auto vertex_it = gpar.pattern.VertexCBegin(); !vertex_it.IsDone();
+      for (auto vertex_it = gpar.pattern.VertexBegin(); !vertex_it.IsDone();
            vertex_it++) {
         if (vertex_it->id() == gpar.x_node_ptr()->id()) continue;
         for (const auto &ml_model : model_container) {
@@ -199,20 +200,20 @@ void GMARDiscover(
       // x node cannot has q edge
       if (gpar.x_node_ptr()->CountOutEdge(gpar.q_edge_label()) > 0)
         return false;
-      for (auto it = gpar.pattern.VertexCBegin(); !it.IsDone(); it++) {
+      for (auto it = gpar.pattern.VertexBegin(); !it.IsDone(); it++) {
         if (it->label() == 1000000001) not_fake_num++;
         if (it->label() == 1000000002) fake_num++;
       }
       // not fake or fake node num is less than 1
       if (not_fake_num >= 2 || fake_num >= 2) return false;
-      for (auto vertex_it = gpar.pattern.VertexCBegin(); !vertex_it.IsDone();
+      for (auto vertex_it = gpar.pattern.VertexBegin(); !vertex_it.IsDone();
            vertex_it++) {
         // if (vertex_it->label() == 1002 && vertex_it->CountOutEdge(3) >= 1)
         //  return false;
 
         int head_num = 0;
         int length_num = 0;
-        for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+        for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
              edge_it++) {
           // 不允许出现由 attribute 点拓展一个新的 user/phone 点出来
           if ((vertex_it->label() == 1001 || vertex_it->label() == 1002) &&
@@ -264,7 +265,7 @@ void GMARDiscover(
       break;
     }
   }
-  DataGraph ml_graph = data_graph;
+  DataGraph ml_graph(data_graph);
   for (const auto &ml_model : model_container) {
     ml_model->BuildMLGraph(ml_graph);
   }
@@ -288,7 +289,7 @@ void GMARDiscover(
     ManualCheck manual_check, SelectCallback select_callback) {
   for (int i = 1; i <= gmar_discover_info.max_iter_num; i++) {
     std::cout << "round " << i << std::endl;
-    DataGraph ml_graph = data_graph;
+    DataGraph ml_graph(data_graph);
     for (const auto &ml_model : model_container) {
       ml_model->BuildMLGraph(ml_graph);
     }
@@ -326,7 +327,7 @@ void GMARDiscover(
       break;
     }
   }
-  DataGraph ml_graph = data_graph;
+  DataGraph ml_graph(data_graph);
   for (const auto &ml_model : model_container) {
     ml_model->BuildMLGraph(ml_graph);
   }

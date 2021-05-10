@@ -1,5 +1,5 @@
-#ifndef _LABEL_HPP
-#define _LABEL_HPP
+#ifndef _GUNDAM_DATA_TYPE_LABEL_HPP
+#define _GUNDAM_DATA_TYPE_LABEL_HPP
 
 #include <string>
 #include <type_traits>

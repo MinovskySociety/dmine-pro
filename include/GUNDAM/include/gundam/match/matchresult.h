@@ -1,8 +1,14 @@
-#ifndef _MATCHRESULT_H
-#define _MATCHRESULT_H
+#ifndef _GUNDAM_MATCH_MATCHRESULT_H
+#define _GUNDAM_MATCH_MATCHRESULT_H
 #include <ostream>
+
+#include "gundam/match/match.h"
+
+namespace GUNDAM{
+
 // single match_result is ptr->ptr
-template <typename PatternVertexIDType, typename TargetVertexIDType,
+template <typename PatternVertexIDType, 
+          typename  TargetVertexIDType,
           typename MatchResultContainer>
 void MatchResultToFile(const MatchResultContainer &r, std::ostream &out) {
   //size_t total_match_num = r.size();
@@ -14,17 +20,10 @@ void MatchResultToFile(const MatchResultContainer &r, std::ostream &out) {
       vertex_id_to_index.insert(
           std::make_pair(single_pair.first->id(),
                          static_cast<int>(index_to_vertex_id.size() - 1)));
-      // std::cout << static_cast<int>(index_to_vertex_id.size() - 1) << " "
-      //           << single_pair.first->id() << std::endl;
     }
     break;
   }
   out << "match_id";
-  /*
-  for (int i = 0; i < index_to_vertex_id.size(); i++) {
-    out << "," << index_to_vertex_id[i];
-  }
-  */
   for (const auto &it : index_to_vertex_id) {
     out << "," << it;
   }
@@ -38,16 +37,59 @@ void MatchResultToFile(const MatchResultContainer &r, std::ostream &out) {
       match_target_result[now_index] = single_pair.second->id();
     }
     out << (++now_match_id);
-    /*
-    for (int i = 0; i < match_target_result.size(); i++) {
-      out << "," << match_target_result[i];
-    }
-    */
     for (const auto &it : match_target_result) {
       out << "," << it;
     }
     out << std::endl;
   }
 }
+  
+// single match_result is ptr->ptr
+template <typename SrcGraphType, 
+          typename DstGraphType,
+          auto... MatchSetConfigures>
+void MatchSetToFile(MatchSet<SrcGraphType,
+                             DstGraphType,
+                             MatchSetConfigures...>& match_set, 
+                    std::ostream &out) {
+  if (match_set.Empty()){
+    return;
+  }
+
+  using SrcVertexHandle = typename GUNDAM::VertexHandle<SrcGraphType>::type;
+  using DstVertexHandle = typename GUNDAM::VertexHandle<SrcGraphType>::type;
+
+  std::vector<SrcVertexHandle> src_vertex_handle_set;
+
+  auto match_it = match_set.MatchBegin();
+  assert(!match_it.IsDone());
+  for (auto map_it = match_it->MapBegin();
+           !map_it.IsDone();
+            map_it++){
+    src_vertex_handle_set.emplace_back(map_it->src_handle());
+  }
+
+  out << "match_id";
+  for (auto &src_vertex_handle : src_vertex_handle_set) {
+    out << "," << src_vertex_handle->id();
+  }
+  out << std::endl;
+  
+  int now_match_id = 0;
+  for (auto match_it = match_set.MatchBegin();
+           !match_it.IsDone(); match_it++){
+    assert(src_vertex_handle_set.size() == match_it->size());
+    out << (now_match_id++);
+    for (auto &src_vertex_handle : src_vertex_handle_set) {
+      auto dst_vertex_handle = match_it->MapTo(src_vertex_handle);
+      assert(dst_vertex_handle);
+      out << "," << dst_vertex_handle->id();
+    }
+    out << std::endl;
+  }
+}
+
+}; // namespace GUNDAM
+
 
 #endif

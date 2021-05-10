@@ -38,12 +38,12 @@ constexpr bool using_manual_check = true;
 auto manual_check = [](auto &gpar) {
   /*
   // biokg data:
-  for (auto vertex_it = gpar.pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = gpar.pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
       auto dst_ptr = edge_it->const_dst_ptr();
-      for (auto dst_edge_it = dst_ptr->OutEdgeCBegin();
+      for (auto dst_edge_it = dst_ptr->OutEdgeBegin();
   !dst_edge_it.IsDone(); dst_edge_it++) { if
   (dst_edge_it->const_dst_ptr()->id() == vertex_it->id() &&
             dst_edge_it->label() == edge_it->label()) {
@@ -56,7 +56,7 @@ auto manual_check = [](auto &gpar) {
   */
 
   // gmar:
-  for (auto vertex_it = gpar.pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = gpar.pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     if (vertex_it->id() == gpar.x_node_ptr()->id()) continue;
     // if (vertex_it->CountOutEdge(-1) > 0) return false;
@@ -67,20 +67,20 @@ auto manual_check = [](auto &gpar) {
   int fake_num = 0;
   // x node cannot has q edge
   if (gpar.x_node_ptr()->CountOutEdge(gpar.q_edge_label()) > 0) return false;
-  for (auto it = gpar.pattern.VertexCBegin(); !it.IsDone(); it++) {
+  for (auto it = gpar.pattern.VertexBegin(); !it.IsDone(); it++) {
     if (it->label() == 1000000001) not_fake_num++;
     if (it->label() == 1000000002) fake_num++;
   }
   // not fake or fake node num is less than 1
   if (not_fake_num >= 2 || fake_num >= 2) return false;
-  for (auto vertex_it = gpar.pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = gpar.pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     // if (vertex_it->label() == 1002 && vertex_it->CountOutEdge(3) >= 1)
     //  return false;
 
     int head_num = 0;
     int length_num = 0;
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
       // 不允许出现由 attribute 点拓展一个新的 user/phone 点出来
       if ((vertex_it->label() == 1001 || vertex_it->label() == 1002) &&
@@ -100,9 +100,9 @@ auto manual_check = [](auto &gpar) {
       }
       //一个phone最多只能有一个 head 跟一个 length
       if (vertex_it->label() == 1002) {
-        if (edge_it->const_dst_ptr()->label() == 3003) length_num++;
-        if (edge_it->const_dst_ptr()->label() >= 1000000003 &&
-            edge_it->const_dst_ptr()->label() <= 1000000373)
+        if (edge_it->const_dst_handle()->label() == 3003) length_num++;
+        if (edge_it->const_dst_handle()->label() >= 1000000003 &&
+            edge_it->const_dst_handle()->label() <= 1000000373)
           head_num++;
       }
     }
@@ -114,52 +114,52 @@ auto manual_check = [](auto &gpar) {
 auto select_callback = [](auto &a, auto &b) {
   // gmar:
   int num1 = 0, num2 = 0;
-  for (auto vertex_it = a.pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = a.pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     num1 += vertex_it->CountOutEdge(-1);
   }
-  for (auto vertex_it = b.pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = b.pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     num2 += vertex_it->CountOutEdge(-1);
   }
   if (num1 != num2) return num1 > num2;
   // liantong data
   int numa = 0, numb = 0;
-  for (auto vertex_it = a.pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = a.pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     if (vertex_it->label() == 1002) {
       // phone
       std::set<int> adj_user_set;
-      for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
-        if (edge_it->const_dst_ptr()->label() == 1001) {
-          adj_user_set.insert(edge_it->const_dst_ptr()->id());
+        if (edge_it->const_dst_handle()->label() == 1001) {
+          adj_user_set.insert(edge_it->const_dst_handle()->id());
         }
       }
-      for (auto edge_it = vertex_it->InEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->InEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
-        if (edge_it->const_src_ptr()->label() == 1001) {
-          adj_user_set.insert(edge_it->const_src_ptr()->id());
+        if (edge_it->const_src_handle()->label() == 1001) {
+          adj_user_set.insert(edge_it->const_src_handle()->id());
         }
       }
       if (adj_user_set.size() == 1) numa++;
     }
   }
-  for (auto vertex_it = b.pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = b.pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     if (vertex_it->label() == 1002) {
       // phone
       std::set<int> adj_user_set;
-      for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
-        if (edge_it->const_dst_ptr()->label() == 1001) {
-          adj_user_set.insert(edge_it->const_dst_ptr()->id());
+        if (edge_it->const_dst_handle()->label() == 1001) {
+          adj_user_set.insert(edge_it->const_dst_handle()->id());
         }
       }
-      for (auto edge_it = vertex_it->InEdgeCBegin(); !edge_it.IsDone();
+      for (auto edge_it = vertex_it->InEdgeBegin(); !edge_it.IsDone();
            edge_it++) {
-        if (edge_it->const_src_ptr()->label() == 1001) {
-          adj_user_set.insert(edge_it->const_src_ptr()->id());
+        if (edge_it->const_src_handle()->label() == 1001) {
+          adj_user_set.insert(edge_it->const_src_handle()->id());
         }
       }
       if (adj_user_set.size() == 1) numb++;

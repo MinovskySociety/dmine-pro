@@ -4,6 +4,8 @@
 
 #include "gtest/gtest.h"
 
+#include "gundam/type_getter/vertex_handle.h"
+
 #include "gundam/graph_type/graph.h"
 #include "gundam/graph_type/large_graph.h"
 #include "gundam/graph_type/large_graph2.h"
@@ -13,7 +15,7 @@ template <class GraphType>
 void TestBuildGraph(GraphType& g) {
   bool res;
 
-  typename GraphType::VertexPtr v1;
+  typename GUNDAM::VertexHandle<GraphType>::type v1;
   std::tie(v1, res) = g.AddVertex(1, 1);
   ASSERT_TRUE(res);
   ASSERT_TRUE(v1);
@@ -25,7 +27,7 @@ void TestBuildGraph(GraphType& g) {
   ASSERT_TRUE(g.AddVertex(4, 4).second);
   ASSERT_TRUE(g.AddVertex(5, 5).second);
 
-  typename GraphType::VertexPtr v5;
+  typename GUNDAM::VertexHandle<GraphType>::type v5;
   std::tie(v5, res) = g.AddVertex(5, 100);
   ASSERT_FALSE(res);
   ASSERT_TRUE(v5);
@@ -82,7 +84,7 @@ void PrintGraph1(const GraphType& g) {
 
   std::cout << "Vertex" << std::endl;
   count = 0;
-  for (it_v = g.VertexCBegin(); !it_v.IsDone(); it_v++) {
+  for (it_v = g.VertexBegin(); !it_v.IsDone(); it_v++) {
     std::cout << it_v->id() << " " << it_v->label() << std::endl;
     ++count;
   }
@@ -94,7 +96,7 @@ void PrintGraph1(const GraphType& g) {
 
   std::cout << "Edge" << std::endl;
   count = 0;
-  for (it_e = g.EdgeCBegin(); !it_e.IsDone(); it_e++) {
+  for (it_e = g.EdgeBegin(); !it_e.IsDone(); it_e++) {
     std::cout << it_e->id() << " " << it_e->label() << " " << it_e->src_id()
               << " " << it_e->dst_id() << std::endl;
     ++count;
@@ -138,16 +140,16 @@ void PrintGraph3(const GraphType& g) {
   int count_v = 0;
   int count_e = 0;
 
-  for (auto it_v = g.VertexCBegin(); !it_v.IsDone(); it_v++) {
+  for (auto it_v = g.VertexBegin(); !it_v.IsDone(); it_v++) {
     std::cout << "v - " << it_v->id() << " " << it_v->label() << std::endl;
 
     int count_out = 0;
-    for (auto it_e = it_v->OutEdgeCBegin(); !it_e.IsDone(); it_e++) {
+    for (auto it_e = it_v->OutEdgeBegin(); !it_e.IsDone(); it_e++) {
       std::cout << "  e - " << it_e->id() << " " << it_e->label() << " "
                 << it_e->src_id() << " " << it_e->dst_id() << std::endl;
 
-      ASSERT_EQ(it_e->src_ptr()->id(), it_e->src_id());
-      ASSERT_EQ(it_e->dst_ptr()->id(), it_e->dst_id());
+      ASSERT_EQ(it_e->src_handle()->id(), it_e->src_id());
+      ASSERT_EQ(it_e->dst_handle()->id(), it_e->dst_id());
 
       ++count_out;
     }
@@ -169,7 +171,7 @@ void TestGraph1() {
   GraphType g;
   bool res;
 
-  typename GraphType::VertexPtr v1;
+  typename GUNDAM::VertexHandle<GraphType>::type v1;
   std::tie(v1, res) = g.AddVertex(1, 1);
   ASSERT_TRUE(res);
   ASSERT_TRUE(v1);
@@ -181,7 +183,7 @@ void TestGraph1() {
   ASSERT_TRUE(g.AddVertex(4, 4).second);
   ASSERT_TRUE(g.AddVertex(5, 5).second);
 
-  typename GraphType::VertexPtr v5;
+  typename GUNDAM::VertexHandle<GraphType>::type v5;
   std::tie(v5, res) = g.AddVertex(5, 100);
   ASSERT_FALSE(res);
   ASSERT_TRUE(v5);
@@ -204,13 +206,13 @@ void TestGraph1() {
   auto v1a = g.FindVertex(1);
   ASSERT_EQ(v1, v1a);
 
-  typename GraphType::VertexPtr v2 = g.FindVertex(2);
+  typename GUNDAM::VertexHandle<GraphType>::type v2 = g.FindVertex(2);
   ASSERT_TRUE(v2);
-  typename GraphType::VertexConstPtr v2const = g.FindConstVertex(2);
-  ASSERT_TRUE(v2const);
-  ASSERT_EQ(v2, v2const);
-  ASSERT_EQ(2, v2const->id());
-  ASSERT_EQ(2, v2const->label());
+  // typename GraphType::VertexConstPtr v2const = g.FindConstVertex(2);
+  // ASSERT_TRUE(v2const);
+  // ASSERT_EQ(v2, v2const);
+  // ASSERT_EQ(2, v2const->id());
+  // ASSERT_EQ(2, v2const->label());
 
   {
     typename GraphType::VertexIterator it;
@@ -226,11 +228,11 @@ void TestGraph1() {
   }
 
   {
-    typename GraphType::VertexConstIterator it;
+    typename GraphType::VertexIterator it;
     ASSERT_TRUE(it.IsDone());
 
     int count = 0;
-    for (it = g.VertexCBegin(); !it.IsDone(); it++) {
+    for (it = g.VertexBegin(); !it.IsDone(); it++) {
       std::cout << it->id() << " " << it->label() << std::endl;
       ++count;
     }
@@ -243,7 +245,7 @@ void TestGraph1() {
   //  ASSERT_TRUE(it.IsDone());
 
   //  int count = 0;
-  //  for (it = g.VertexCBegin(1); !it.IsDone(); it++) {
+  //  for (it = g.VertexBegin(1); !it.IsDone(); it++) {
   //    std::cout << it->id() << " " << it->label() << std::endl;
   //    ++count;
   //  }
@@ -256,7 +258,7 @@ void TestGraph1() {
   //  ASSERT_TRUE(it.IsDone());
 
   //  int count = 0;
-  //  for (it = g.VertexCBegin(2); !it.IsDone(); it++) {
+  //  for (it = g.VertexBegin(2); !it.IsDone(); it++) {
   //    std::cout << it->id() << " " << it->label() << std::endl;
   //    ++count;
   //  }
@@ -293,8 +295,8 @@ void TestGraph1() {
 
   //   int count = 0;
   //   for (it = g.EdgeBegin(); !it.IsDone(); ++it) {
-  //     std::cout << it->id() << " " << it->label() << " " << it->src_ptr()->id()
-  //               << " " << it->dst_ptr()->id() << std::endl;
+  //     std::cout << it->id() << " " << it->label() << " " << it->src_handle()->id()
+  //               << " " << it->dst_handle()->id() << std::endl;
   //     ++count;
   //   }
   //   std::cout << std::endl;
@@ -306,9 +308,9 @@ void TestGraph1() {
   //   ASSERT_TRUE(it.IsDone());
 
   //   int count = 0;
-  //   for (it = g.EdgeCBegin(); !it.IsDone(); it++) {
-  //     std::cout << it->id() << " " << it->label() << " " << it->src_ptr()->id()
-  //               << " " << it->dst_ptr()->id() << std::endl;
+  //   for (it = g.EdgeBegin(); !it.IsDone(); it++) {
+  //     std::cout << it->id() << " " << it->label() << " " << it->src_handle()->id()
+  //               << " " << it->dst_handle()->id() << std::endl;
   //     ++count;
   //   }
   //   std::cout << std::endl;
@@ -337,7 +339,7 @@ void TestGraph1() {
   //   ASSERT_TRUE(it.IsDone());
 
   //   int count = 0;
-  //   for (it = g.VertexCBegin(); !it.IsDone(); ++it) {
+  //   for (it = g.VertexBegin(); !it.IsDone(); ++it) {
   //     std::cout << it->id() << " " << it->label() << std::endl;
   //     ++count;
   //   }
@@ -350,9 +352,9 @@ void TestGraph1() {
   //   ASSERT_TRUE(it.IsDone());
 
   //   int count = 0;
-  //   for (it = g.EdgeCBegin(); !it.IsDone(); ++it) {
-  //     std::cout << it->id() << " " << it->label() << " " << it->src_ptr()->id()
-  //               << " " << it->dst_ptr()->id() << std::endl;
+  //   for (it = g.EdgeBegin(); !it.IsDone(); ++it) {
+  //     std::cout << it->id() << " " << it->label() << " " << it->src_handle()->id()
+  //               << " " << it->dst_handle()->id() << std::endl;
   //     ++count;
   //   }
   //   ASSERT_EQ(count, g.CountEdge());

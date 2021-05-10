@@ -1,5 +1,5 @@
-#ifndef _ATTRIBUTE_H
-#define _ATTRIBUTE_H
+#ifndef _GUNDAM_COMPONENT_ATTRIBUTE_H
+#define _GUNDAM_COMPONENT_ATTRIBUTE_H
 
 #include <sstream>
 #include <string>
@@ -28,7 +28,7 @@ class Attribute_;
 template <class A, class B>
 inline int CopyAllAttributes(A& from, B& to) {
   int count = 0;
-  for (auto it_a = from->AttributeCBegin(); !it_a.IsDone(); ++it_a) {
+  for (auto it_a = from->AttributeBegin(); !it_a.IsDone(); ++it_a) {
     switch (it_a->value_type()) {
       case GUNDAM::BasicDataType::kTypeInt:
         if (!to->template AddAttribute<int>(it_a->key(),
@@ -274,6 +274,10 @@ class Attribute_<AttributeType::kSeparated,
     //   const void* const temp_ptr = static_cast<const void*>(this);
     //   return static_cast<const AttributeContentPtrType*>(temp_ptr);
     // }
+
+    inline operator bool() const {
+      return !this->IsNull();
+    }
     
     inline bool IsNull() const { 
       return AttributeContentPtrType::IsNull(); 
@@ -433,19 +437,19 @@ class Attribute_<AttributeType::kSeparated,
                              this->attributes_.end());
   }
 
-  AttributeConstIterator AttributeCBegin() const {
+  AttributeConstIterator AttributeBegin() const {
     return AttributeConstIterator(this->attributes_.cbegin(),
                                   this->attributes_.cend());
   }
 
-  AttributePtr FindAttributePtr(const AttributeKeyType_& key) {
+  AttributePtr FindAttribute(const AttributeKeyType_& key) {
     /// <iterator of attribute container, bool>
     auto ret = this->attributes_.Find(key);
     if (!ret.second) return AttributePtr();
     return AttributePtr(ret.first);
   }
 
-  AttributeConstPtr FindConstAttributePtr(const AttributeKeyType_& key) const {
+  AttributeConstPtr FindAttribute(const AttributeKeyType_& key) const {
     /// <constant iterator of attribute container, bool>
     auto ret = this->attributes_.FindConst(key);
     if (!ret.second) return AttributeConstPtr();
@@ -460,6 +464,11 @@ class Attribute_<AttributeType::kSeparated,
     return static_cast<ConcreteValue<ConcreteDataType>*>(
                ret.first.template get<kAttributeValuePtrIdx>())
         ->value();
+  }
+
+  template <typename ConcreteDataType>
+  const ConcreteDataType& attribute(const AttributeKeyType_& key) const {
+    return this->template const_attribute<ConcreteDataType>(key);
   }
 
   template <typename ConcreteDataType>
@@ -888,6 +897,10 @@ class Attribute_<AttributeType::kGrouped,
         return AttributeContentPtrType::IsNull();
       }
 
+      inline operator bool() const {
+        return !this->IsNull();
+      }
+
       template<bool judge = is_const_,
                 typename std::enable_if<judge, bool>::type = false>
       inline const AttributeContentPtrType* operator->() const{
@@ -1095,11 +1108,11 @@ class Attribute_<AttributeType::kGrouped,
         return true;
       }
 
-      inline bool FindAttributePtr(const ContainerIDType& container_id){
+      inline bool FindAttribute(const ContainerIDType& container_id){
         return this->HasValue(container_id);
       }
       
-      inline bool FindAttributeConstPtr(const ContainerIDType& container_id) const{
+      inline bool FindAttributeConst(const ContainerIDType& container_id) const{
         return this->HasValue(container_id);
       }
 
@@ -1219,14 +1232,14 @@ class Attribute_<AttributeType::kGrouped,
       this->attribute_list_ptr_container_.end());
     }
 
-    inline AttributeConstIterator AttributeCBegin(
+    inline AttributeConstIterator AttributeBegin(
                 const ContainerIDType& container_id) const{
       return AttributeConstIterator(container_id,
            this->attribute_list_ptr_container_.cbegin(),
            this->attribute_list_ptr_container_.cend());
     }
 
-    inline AttributePtr FindAttributePtr(
+    inline AttributePtr FindAttribute(
                       const ContainerIDType&  container_id,
                               const AttributeKeyType_& key) {
       /// <iterator, bool> 
@@ -1239,7 +1252,7 @@ class Attribute_<AttributeType::kGrouped,
       /// return the corresponds attribute ptr for that container_id
       const bool kAddAttributeRet = ret.first
                                        .template get<kAttributeListPtrIdx>()
-                                      ->FindAttributePtr(container_id);
+                                      ->FindAttribute(container_id);
       if (kAddAttributeRet){
         /// has found
         return AttributePtr(container_id, ret.first); /// not null
@@ -1248,7 +1261,7 @@ class Attribute_<AttributeType::kGrouped,
       return AttributePtr(); /// null
     }
 
-    inline AttributeConstPtr FindConstAttributePtr(
+    inline AttributeConstPtr FindAttribute(
                       const ContainerIDType&  container_id,
                               const AttributeKeyType_& key) const {
       /// <iterator, bool> 
@@ -1261,7 +1274,7 @@ class Attribute_<AttributeType::kGrouped,
       /// return the corresponds attribute ptr for that container_id
       const bool kAddAttributeRet = ret.first
                                        .template get_const<kAttributeListPtrIdx>()
-                                      ->FindAttributeConstPtr(container_id);
+                                      ->FindAttributeConst(container_id);
       if (kAddAttributeRet){
         /// has found
         return AttributeConstPtr(container_id, ret.first); /// not null
@@ -1597,19 +1610,21 @@ class Attribute_<AttributeType::kGrouped,
                ->AttributeBegin(this->attribute_container_id_);
   }
 
-  inline AttributeConstIterator AttributeCBegin() const {
-    return this->attribute_container_group_ptr_
-               ->AttributeCBegin(this->attribute_container_id_);
+  inline AttributeConstIterator AttributeBegin() const {
+    return static_cast<const AttributeContainerGroupType*>(
+                              this->attribute_container_group_ptr_)
+             ->AttributeBegin(this->attribute_container_id_);
   }
 
-  inline AttributePtr FindAttributePtr(const AttributeKeyType_& key) {
+  inline AttributePtr FindAttribute(const AttributeKeyType_& key) {
     return this->attribute_container_group_ptr_
-               ->FindAttributePtr(this->attribute_container_id_, key);
+               ->FindAttribute(this->attribute_container_id_, key);
   }
 
-  inline AttributeConstPtr FindConstAttributePtr(const AttributeKeyType_& key) const {
-    return this->attribute_container_group_ptr_
-               ->FindConstAttributePtr(this->attribute_container_id_, key);
+  inline AttributeConstPtr FindAttribute(const AttributeKeyType_& key) const {
+    return static_cast<const AttributeContainerGroupType*>(
+                              this->attribute_container_group_ptr_)
+              ->FindAttribute(this->attribute_container_id_, key);
   }
 
   template <typename ConcreteDataType>

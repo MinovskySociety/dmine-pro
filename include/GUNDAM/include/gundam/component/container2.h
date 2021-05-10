@@ -1,5 +1,5 @@
-#ifndef _CONTAINER2_H
-#define _CONTAINER2_H
+#ifndef _GUNDAM_COMPONENT_CONTAINER2_H
+#define _GUNDAM_COMPONENT_CONTAINER2_H
 
 #include <algorithm>
 #include <map>

@@ -38,13 +38,13 @@ void TransposePattern(const GraphType &G) {
   size_t sz = G.CountVertex();
   std::cout << "node label:\n";
   for (int i = 1; i <= sz; i++) {
-    std::cout << i << " " << G.FindConstVertex(i)->label() << "\n";
+    std::cout << i << " " << G.FindVertex(i)->label() << "\n";
   }
   std::cout << "edge:\n";
   for (int i = 1; i <= sz; i++) {
-    for (auto it = G.FindConstVertex(i)->OutEdgeCBegin(); !it.IsDone(); it++) {
-      std::cout << it->const_src_ptr()->id() << " " << it->const_dst_ptr()->id()
-                << " " << it->label() << "\n";
+    for (auto it = G.FindVertex(i)->OutEdgeBegin(); !it.IsDone(); it++) {
+      std::cout << it->const_src_handle()->id() << " "
+                << it->const_dst_handle()->id() << " " << it->label() << "\n";
     }
   }
 }

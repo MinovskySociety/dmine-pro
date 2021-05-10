@@ -139,17 +139,17 @@ void WritePatternToFile(Pattern &pattern, std::ofstream &out) {
     return;
   }
   out << "node label:" << std::endl;
-  for (auto vertex_it = pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     out << vertex_it->id() << " " << vertex_it->label() << std::endl;
   }
   out << "edge:" << std::endl;
-  for (auto vertex_it = pattern.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = pattern.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
-      out << edge_it->const_src_ptr()->id() << " "
-          << edge_it->const_dst_ptr()->id() << " " << edge_it->label()
+      out << edge_it->const_src_handle()->id() << " "
+          << edge_it->const_dst_handle()->id() << " " << edge_it->label()
           << std::endl;
     }
   }

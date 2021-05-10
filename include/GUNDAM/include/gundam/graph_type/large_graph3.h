@@ -1,9 +1,12 @@
-#ifndef _LARGE_GRAPH3_H
-#define _LARGE_GRAPH3_H
+#ifndef _GUNDAM_GRAPH_TYPE_LARGE_GRAPH3_H
+#define _GUNDAM_GRAPH_TYPE_LARGE_GRAPH3_H
 
 #include "gundam/component/attribute.h"
-#include ""gundam/component/container2.h""
+#include "gundam/component/container2.h"
 #include "gundam/component/iterator2.h"
+
+#include "gundam/type_getter/vertex_handle.h"
+#include "gundam/type_getter/edge_handle.h"
 
 namespace GUNDAM {
 template <class VertexIDType, class VertexLabelType,
@@ -40,11 +43,11 @@ class LargeGraph3 {
   };
 
   struct GetEdgeSrc {
-    constexpr VertexData *operator()(EdgeData &e) const { return e.src_ptr(); }
+    constexpr VertexData *operator()(EdgeData &e) const { return e.src_handle(); }
   };
 
   struct GetEdgeDst {
-    constexpr VertexData *operator()(EdgeData &e) const { return e.dst_ptr(); }
+    constexpr VertexData *operator()(EdgeData &e) const { return e.dst_handle(); }
   };
 
   using VertexDataContainer =
@@ -264,13 +267,13 @@ class LargeGraph3 {
 
     const VertexIDType &dst_id() const { return dst_->id(); }
 
-    VertexData *src_ptr() { return src_; }
+    VertexData *src_handle() { return src_; }
 
-    VertexData *dst_ptr() { return dst_; }
+    VertexData *dst_handle() { return dst_; }
 
-    const VertexData *const_src_ptr() const { return src_; }
+    const VertexData *const_src_handle() const { return src_; }
 
-    const VertexData *const_dst_ptr() const { return dst_; }
+    const VertexData *const_dst_handle() const { return dst_; }
 
    private:
     EdgeIDType id_;
@@ -280,6 +283,21 @@ class LargeGraph3 {
     // EdgeAttributeListType attributes_;
   };
 
+ private:
+  friend class VertexHandle<LargeGraph3>;
+  friend class VertexHandle<const LargeGraph3>;
+  
+  friend class EdgeHandle<LargeGraph3>;
+  friend class EdgeHandle<const LargeGraph3>;
+
+  using VertexPtr = VertexData *;
+
+  using VertexConstPtr = const VertexData *;
+
+  using EdgePtr = EdgeData *;
+
+  using EdgeConstPtr = const EdgeData *;
+
  public:
   using VertexType = VertexData;
 
@@ -287,20 +305,12 @@ class LargeGraph3 {
 
   using EdgeType = EdgeData;
 
-  using VertexPtr = VertexData *;
-
-  using VertexConstPtr = const VertexData *;
-
   using VertexIterator = GIterator<typename VertexDataContainer::iterator,
                                    VertexData, DefaultCast>;
 
   using VertexConstIterator =
       GIterator<typename VertexDataContainer::const_iterator, const VertexData,
                 DefaultCast>;
-
-  using EdgePtr = EdgeData *;
-
-  using EdgeConstPtr = const EdgeData *;
 
   static constexpr bool vertex_has_attribute = true;
 
@@ -372,6 +382,7 @@ class LargeGraph3 {
     return VertexPtr(&*it2);
   }
 
+ private:
   VertexConstPtr FindConstVertex(const typename VertexType::IDType &id) const {
     auto it = vertex_id_dict_.Find(id);
     if (it == vertex_id_dict_.cend()) return VertexConstPtr(nullptr);
@@ -380,7 +391,8 @@ class LargeGraph3 {
     assert(it2 != vertex_data_.cend());
     return VertexPtr(&*it2);
   }    
-
+ 
+ public:
   VertexIterator VertexBegin() {
     return VertexIterator(vertex_data_.begin(), vertex_data_.end());
   }

@@ -1,5 +1,5 @@
-#ifndef _DATATYPE_H
-#define _DATATYPE_H
+#ifndef _GUNDAM_DATA_TYPE_DATATYPE_H
+#define _GUNDAM_DATA_TYPE_DATATYPE_H
 
 #include <cstdint>
 #include <sstream>

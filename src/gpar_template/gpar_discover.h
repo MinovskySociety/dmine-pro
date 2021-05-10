@@ -73,7 +73,8 @@ inline void CalEachGPAR(int32_t round, GPAR &gpar, DataGraph &data_graph,
     }
     return;
   }
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<DataGraph>::type;
   std::vector<DataGraphVertexConstPtr> result_list;
   auto zero_begin = std::chrono::system_clock::now();
   GPARMatch(gpar, data_graph);
