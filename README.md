@@ -1,3 +1,5 @@
+目前main分支还在逐步更新，稳定版本已移步到dev1.0分支
+
 # dmine_pro使用方法
     运行方法:
     dmine_pro [yaml配置文件路径]
