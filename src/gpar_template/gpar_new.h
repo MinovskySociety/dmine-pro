@@ -20,7 +20,9 @@ class GPAR {
   using EdgeIDType = typename EdgeType::IDType;
   using EdgeLabelType = typename EdgeType::LabelType;
   using VertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<const Pattern>::type;
   using EdgePtr = typename GUNDAM::EdgeHandle<Pattern>::type;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<const Pattern>::type;
   using VertexSizeType = size_t;
 
   GPAR() = default;
@@ -34,7 +36,7 @@ class GPAR {
     this->q_edge_label_ = q;
   }
   // another constructor
-  GPAR(Pattern& pattern, const VertexIDType x_node_id,
+  GPAR(const Pattern& pattern, const VertexIDType x_node_id,
        const VertexIDType y_node_id, const EdgeLabelType q) {
     this->pattern = pattern;
     this->x_node_ptr_ = this->pattern.FindVertex(x_node_id);
@@ -52,6 +54,8 @@ class GPAR {
   VertexPtr y_node_ptr() const { return this->y_node_ptr_; }
   EdgeLabelType q_edge_label() const { return this->q_edge_label_; }
   bool operator<(const GPAR<Pattern>& b) const { return 1; }
+  const Pattern& const_pattern() const { return this->pattern; }
+
   GPAR& operator=(const GPAR<Pattern>& b) {
     this->pattern = b.pattern;
     this->x_node_ptr_ = this->pattern.FindConstVertex(b.x_node_ptr_->id());
@@ -101,9 +105,12 @@ class DiscoverdGPAR : public GPAR<Pattern> {
   using EdgeIDType = typename EdgeType::IDType;
   using EdgeLabelType = typename EdgeType::LabelType;
   using VertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<const Pattern>::type;
   using EdgePtr = typename GUNDAM::EdgeHandle<Pattern>::type;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<const Pattern>::type;
   using VertexSizeType = size_t;
-  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
+  using DataGraphVertexPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   using SuppType = std::vector<DataGraphVertexPtr>;
   using ConfType = double;
 

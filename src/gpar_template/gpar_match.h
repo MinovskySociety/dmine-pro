@@ -13,7 +13,7 @@
 #include "gundam/algorithm/vf2_boost.h"
 namespace gmine_new {
 template <class GPAR, class DataGraph>
-inline void GPARMatch(GPAR &gpar, DataGraph &data_graph) {
+inline void GPARMatch(GPAR &gpar, const DataGraph &data_graph) {
   using VertexIDType = typename GPAR::VertexIDType;
   using QueryVertexPtr = typename GPAR::VertexPtr;
   using TargetVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;

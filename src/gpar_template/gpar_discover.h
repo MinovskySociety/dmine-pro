@@ -41,12 +41,12 @@ inline void ReadDataGraph(const char *v_file, const char *e_file,
   LOG(INFO) << "read data graph time = " << read_data_graph_time;
 }
 template <class GPAR, class GPARList>
-inline void UpdateState(GPAR &gpar, GPARList &gpar_list) {
+inline void UpdateState(const GPAR &gpar, GPARList &gpar_list) {
   gpar_list.push_back(gpar);
 }
 
 template <class GPAR, class GPARList>
-inline void AddNoMatchPattern(int32_t round, GPAR &gpar,
+inline void AddNoMatchPattern(int32_t round, const GPAR &gpar,
                               GPARList &no_match_gpar_list) {
   using VertexLabelType = typename GPAR::VertexLabelType;
   using VertexIDType = typename GPAR::VertexIDType;
@@ -61,8 +61,8 @@ inline void AddNoMatchPattern(int32_t round, GPAR &gpar,
   no_match_gpar_list.push_back(match_zero_pattern);
 }
 template <class GPAR, class DataGraph, class GPARList>
-inline void CalEachGPAR(int32_t round, GPAR &gpar, DataGraph &data_graph,
-                        int32_t supp_r_limit, GPARList &gpar_list,
+inline void CalEachGPAR(int32_t round, GPAR &gpar, const DataGraph &data_graph,
+                        const int32_t supp_r_limit, GPARList &gpar_list,
                         GPARList &supp_zero_gpar_list,
                         GPARList &less_supp_limit_gpar_list) {
   if (gpar.pattern.CountEdge() > 0 && gpar.supp_R_size() < supp_r_limit &&

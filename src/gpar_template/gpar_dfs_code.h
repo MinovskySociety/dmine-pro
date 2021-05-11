@@ -161,7 +161,8 @@ void DFS(VertexPtr now_vertex_ptr, std::set<VertexPtr> &used_vertex,
   }
 }
 template <class GPAR, class DFSCodeContainer>
-inline void GetGPARDFSCode(GPAR &gpar, DFSCodeContainer &dfs_code_container) {
+inline void GetGPARDFSCode(const GPAR &gpar,
+                           DFSCodeContainer &dfs_code_container) {
   using EdgePtr = typename GPAR::EdgePtr;
   using VertexPtr = typename GPAR::VertexPtr;
   using EdgeIDType = typename GPAR::EdgeIDType;
