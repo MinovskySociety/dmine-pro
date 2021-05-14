@@ -1,9 +1,9 @@
-#include "../tgraph_rule/tgraph.h"
 #include "../tgraph_rule/comm.h"
 #include "../tgraph_rule/config.h"
 #include "../tgraph_rule/discover.h"
 #include "../tgraph_rule/match.h"
 #include "../tgraph_rule/partition.h"
+#include "../tgraph_rule/tgraph.h"
 #include "../tgraph_rule/tgraph_rule.h"
 
 using namespace toy;
@@ -101,7 +101,7 @@ void app_apply(Config &config, bool cal_percision = false) {
     // cal R block
     if (cal_percision) {
       MatchResult match_rlt;
-      const auto &x_ptr = rule.FindConstVertex(link.from_);
+      const auto &x_ptr = rule.FindVertex(link.from_);
       // PrintTGR(rule);
       m_ptr->DoMatchWithX(tg, rule, match_rlt);
       // set msg
@@ -122,10 +122,10 @@ void app_apply(Config &config, bool cal_percision = false) {
     // block end
     // cal Q block
     {
-      Q query = rule;
+      Q query(rule);
       RemoveLink(query, link);
       MatchResult match_rlt;
-      const auto &x_ptr = query.FindConstVertex(link.from_);
+      const auto &x_ptr = query.FindVertex(link.from_);
       // PrintTGR(query);
       m_ptr->DoMatchWithX(tg, query, match_rlt);
       // set msg

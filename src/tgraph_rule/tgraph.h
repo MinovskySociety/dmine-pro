@@ -76,7 +76,7 @@ class TGraph {
   inline iterator Begin() { return graph_stream_.begin(); }
   inline iterator End() { return graph_stream_.end(); }
 
-  inline const_iterator Begin() const { return graph_stream_.Begin(); }
+  inline const_iterator CBegin() const { return graph_stream_.cbegin(); }
   inline const_iterator CEnd() const { return graph_stream_.cend(); }
   inline size_t Size() const { return graph_stream_.size(); }
   inline SIZE_T TimeWindowNumber() const { return time_window_number_; }

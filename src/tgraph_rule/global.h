@@ -79,6 +79,7 @@ struct NewEdge {
 using DataGraph = GUNDAM::LargeGraph2<VID_T, VLABEL_T, std::string, EID_T,
                                       ELABEL_T, std::string>;
 using TargetVertex = typename GUNDAM::VertexHandle<DataGraph>::type;
+using ConstTargetVertex = typename GUNDAM::VertexHandle<const DataGraph>::type;
 using VertexIDType = typename DataGraph::VertexType::IDType;
 using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
 using EdgePtr = typename GUNDAM::EdgeHandle<DataGraph>::type;
@@ -87,9 +88,11 @@ using Pattern = GUNDAM::LargeGraph2<VID_T, VLABEL_T, std::string, EID_T,
                                     ELABEL_T, std::string>;
 using Q = Pattern;
 using QueryVertex = typename GUNDAM::VertexHandle<Pattern>::type;
-using MatchMap = std::map<QueryVertex, TargetVertex>;
+using ConstQueryVertex = typename GUNDAM::VertexHandle<const Pattern>::type;
+using MatchMap = std::map<ConstQueryVertex, ConstTargetVertex>;
 using MatchResult = std::vector<MatchMap>;
-using CandidateSetContainer = std::map<QueryVertex, std::vector<TargetVertex>>;
+using CandidateSetContainer =
+    std::map<ConstQueryVertex, std::vector<ConstTargetVertex>>;
 using EdgeMap = std::vector<std::vector<TIME_T>>;  // e in query, format:
                                                    // (timestamp, map_id), ...
 using TimeQueue =

@@ -9,15 +9,15 @@ namespace toy {
  * @param: match vertex pair
  * @return: true/false
  * @desc: return true if edge orders match
-*/
+ */
 static bool OrderMatchAlgorithm(const MatchMap &match_map) {
   // caution: No consider for duplicated edge, like this: e1=(u, v, l, t),
   // e2=(u, v, l, t)
   // LOG_T("Do Order Check Filter...");
   EdgeMap edge_map;
   std::vector<TimeQueue> time_q_set;
-  std::vector<QueryVertex> query_vertex_list;
-  std::vector<TargetVertex> target_vertex_list;
+  std::vector<ConstQueryVertex> query_vertex_list;
+  std::vector<ConstTargetVertex> target_vertex_list;
   for (auto &iter : match_map) {
     query_vertex_list.emplace_back(iter.first);
     target_vertex_list.emplace_back(iter.second);
@@ -30,12 +30,12 @@ static bool OrderMatchAlgorithm(const MatchMap &match_map) {
       auto &query_dst_vertex_id = query_vertex_list[j]->id();
       // std::cout << query_src_vertex_id << "," << query_dst_vertex_id << "\n";
       // get query edge
-      for (auto query_edge_iter = query_vertex_list[i]->OutEdgeCBegin();
+      for (auto query_edge_iter = query_vertex_list[i]->OutEdgeBegin();
            !query_edge_iter.IsDone(); query_edge_iter++) {
         auto &vertex_id = query_edge_iter->dst_id();
         if (query_dst_vertex_id == vertex_id) {
           auto &edge_label = query_edge_iter->label();
-          auto attribute_ptr = query_edge_iter->FindAttributePtr(TIME_KEY);
+          auto attribute_ptr = query_edge_iter->FindAttribute(TIME_KEY);
           ATTRIBUTE_PTR_CHECK(attribute_ptr);
           TIME_T timestamp = attribute_ptr->template value<int>();
           // needn't check order if timestamp equals 0.
@@ -49,10 +49,10 @@ static bool OrderMatchAlgorithm(const MatchMap &match_map) {
           TimeQueue time_queue;
           auto &target_src_vertex_id = target_vertex_list[i]->id();
           auto &target_dst_vertex_id = target_vertex_list[j]->id();
-          for (auto target_edge_iter = target_vertex_list[i]->OutEdgeCBegin(
+          for (auto target_edge_iter = target_vertex_list[i]->OutEdgeBegin(
                    edge_label, target_vertex_list[j]);
                !target_edge_iter.IsDone(); target_edge_iter++) {
-            auto attribute_ptr = target_edge_iter->FindAttributePtr(TIME_KEY);
+            auto attribute_ptr = target_edge_iter->FindAttribute(TIME_KEY);
             ATTRIBUTE_PTR_CHECK(attribute_ptr);
             TIME_T timestamp = attribute_ptr->template value<int>();
             time_queue.push(timestamp);
@@ -123,7 +123,7 @@ static bool OrderMatchAlgorithm(const MatchMap &match_map) {
 
 /* Clear match result
  * @param: match result
-*/
+ */
 void MatchClear(MatchResult &match_result) {
   match_result.clear();
   match_result.shrink_to_fit();
@@ -132,14 +132,14 @@ void MatchClear(MatchResult &match_result) {
 /* Get match number
  * @param: match result
  * @return: match number
-*/
+ */
 SIZE_T MatchNum(const MatchResult &match_result) {
   return static_cast<SIZE_T>(match_result.size());
 }
 
 /* Class Match
  * @desc: match method
-*/
+ */
 class Match {
  public:
   Match() {}
@@ -148,14 +148,14 @@ class Match {
   /* Do match with x in pattern
    * @param: tgraph, pattern, match result
    * @desc: only calculate match of pattern with x once in t-graph
-  */
+   */
   void DoMatchWithX(const TGraph &tg, const Pattern &pattern,
                     MatchResult &match_result) {  // NOTE: setX must be called
                                                   // once before this function
     // LOG_S("Match Start");
     CandidateSetContainer candidate_set, candidate_set_tmp;
     MatchMap match_state;
-    const auto &x_ptr = pattern.FindConstVertex(x_id_);
+    const auto &x_ptr = pattern.FindVertex(x_id_);
     auto target_set = x_hash_set_;
     // do match in a graph of stream
     auto t_begin = std::chrono::steady_clock::now();
@@ -172,7 +172,7 @@ class Match {
       // do match for each x candidate
       for (auto id_iter = target_set.begin(); id_iter != target_set.end();) {
         match_state.clear();
-        match_state[x_ptr] = iter->FindConstVertex(*id_iter);
+        match_state[x_ptr] = iter->FindVertex(*id_iter);
         candidate_set_tmp = candidate_set;
         size_t size_bf = match_result.size();
         // std::cout << size_bf << "\n";
@@ -203,7 +203,7 @@ class Match {
   /* Do match
    * @param: tgraph, pattern, match result
    * @desc: calculate all matches of pattern in t-graph
-  */
+   */
   void DoMatch(const TGraph &tg, const Pattern &pattern,
                MatchResult &match_result) {
     // LOG_S("Match Start");
@@ -225,14 +225,14 @@ class Match {
   /* Init x
    * @param: tgraph, link
    * @desc: init x with link and record x before match
-  */
+   */
   void InitX(const TGraph &tg, const LinkBase &link) {
     x_id_ = link.from_;
     const auto xlabel = link.from_label_;
     LOG_T("XLabel = ", xlabel);
     // Note: here only init X with vertexes in first time window
     const auto &graph = *(tg.CBegin());
-    for (auto vertex_it = graph.VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = graph.VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
       if (vertex_it->label() == xlabel) {
         VID_T vid = vertex_it->id();
@@ -262,7 +262,7 @@ class Match {
 
 /* MatchNoOrder
  * @desc: match without order of edge
-*/
+ */
 class MatchNoOrder : public Match {
  public:
   MatchNoOrder() {}
@@ -303,7 +303,7 @@ class MatchNoOrder : public Match {
 
 /* MatchWithOrder
  * @desc: match with order of edge
-*/
+ */
 class MatchWithOrder : public Match {
  public:
   MatchWithOrder() {}
@@ -349,7 +349,7 @@ class MatchWithOrder : public Match {
 
 /* MatchWithOrder
  * @desc: match with order of edge and filter in every match node
-*/
+ */
 class MatchWithOrderFilter : public Match {
  public:
   MatchWithOrderFilter() {}
@@ -409,7 +409,7 @@ class MatchWithOrderFilter : public Match {
 
 /* Class MatchFactory
  * @desc: return one match method
-*/
+ */
 class MatchFactory {
  public:
   MatchFactory() {}

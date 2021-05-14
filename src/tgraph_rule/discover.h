@@ -15,7 +15,7 @@ namespace toy {
 static omp_lock_t OMP_LOCK;
 /* Class Discover
  * @desc: Discover TGR in loops
-*/
+ */
 class Discover {
  public:
   Discover(TGraph &tg, TGraphRule &tgr, Config &config,
@@ -182,7 +182,7 @@ class Discover {
   /* calculate PCA confidnece of given query */
   void calPCAConf(const Q &query, GRADE_T &r_supp, GRADE_T &conf) {
     r_supp = calSupp(query);
-    Q q_query = query;
+    Q q_query(query);
     removeLink(q_query);
     GRADE_T q_supp = calSupp(q_query);
     conf = q_supp <= r_supp ? 0 : (r_supp * 1.0) / (q_supp - r_supp);
@@ -193,11 +193,12 @@ class Discover {
   /* calculate BF confidnece of given query */
   void calBFConf(const Q &query, GRADE_T &r_supp, GRADE_T &conf) {
     r_supp = calSupp(query);
-    Q q_query = query;
+    Q q_query(query);
     removeLink(q_query);
     GRADE_T q_supp = calSupp(q_query);
-    conf = q_supp <= r_supp ? 0 : (r_supp * (x_supp_ - xyq_supp_) * 1.0) /
-                                      ((q_supp - r_supp) * x_supp_);
+    conf = q_supp <= r_supp ? 0
+                            : (r_supp * (x_supp_ - xyq_supp_) * 1.0) /
+                                  ((q_supp - r_supp) * x_supp_);
     std::cout << "q_supp = " << q_supp << ", r_supp = " << r_supp
               << ", bf-conf = " << conf << "\n";
   }
@@ -205,7 +206,7 @@ class Discover {
   /* Expand Edge
    * @param: next candidates set, query, rule support
    * @desc: expand given query(rule), select one edge
-  */
+   */
   void expandEdge(std::vector<std::pair<Q, GRADE_T>> &next_candidates,
                   const Q &query, const GRADE_T r_supp) {
     NewEdge expand_e;  // expand edge info
@@ -216,10 +217,10 @@ class Discover {
     expand_e.max_order_ = 0;
     // find max order in query
     if (use_order_) {
-      for (auto edge_iter = query.EdgeCBegin(); !edge_iter.IsDone();
+      for (auto edge_iter = query.EdgeBegin(); !edge_iter.IsDone();
            edge_iter++) {
         if (edge_iter->id() == link_.id_) continue;  // jump link
-        auto attr_ptr = edge_iter->FindAttributePtr(TIME_KEY);
+        auto attr_ptr = edge_iter->FindAttribute(TIME_KEY);
         ATTRIBUTE_PTR_CHECK(attr_ptr);
         TIME_T order = attr_ptr->template value<int>();
         if (order > expand_e.max_order_) {
@@ -233,7 +234,7 @@ class Discover {
         tgraph_.VLabelVLabelInnerHashTable();
     const auto &vlabel2elabel_hash_table = tgraph_.VLabelELabelHashTable();
 
-    for (auto vertex_iter = query.VertexCBegin(); !vertex_iter.IsDone();
+    for (auto vertex_iter = query.VertexBegin(); !vertex_iter.IsDone();
          vertex_iter++) {
       expand_e.expand_vid_ = vertex_iter->id();
       if (expand_e.expand_vid_ == link_.to_) continue;  // jump link dst
@@ -284,13 +285,13 @@ class Discover {
   /* Add new Edge
    * @param: next candidates set, query, new edge, rule support
    * @desc: add new edge in given query(rule)
-  */
+   */
   void addOneEdge(std::vector<std::pair<Q, GRADE_T>> &next_candidates,
                   const Q &query, const NewEdge &expand_e,
                   const GRADE_T r_supp) {
     // add edge with new vertex
     {
-      Q q_tmp = query;
+      Q q_tmp(query);
       q_tmp.AddVertex(expand_e.next_vid_, expand_e.next_vlabel_);
       EdgePtr edge_iter = nullptr;
       if (expand_e.is_out_) {
@@ -311,14 +312,14 @@ class Discover {
           expandOrder(next_candidates, q_tmp, edge_iter, expand_e, r_supp);
         }
       } else {
-        next_candidates.push_back({q_tmp, r_supp});
+        next_candidates.emplace_back(q_tmp, r_supp);
       }
     }
 
     // add edge in existed vertex
     {
-      Q q_tmp = query;
-      for (auto vertex_iter = q_tmp.VertexCBegin(); !vertex_iter.IsDone();
+      Q q_tmp(query);
+      for (auto vertex_iter = q_tmp.VertexBegin(); !vertex_iter.IsDone();
            vertex_iter++) {
         auto dst_vid = vertex_iter->id();
         if (dst_vid != expand_e.expand_vid_ &&
@@ -344,7 +345,7 @@ class Discover {
               expandOrder(next_candidates, q_tmp, edge_iter, expand_e, r_supp);
             }
           } else {
-            next_candidates.push_back({q_tmp, r_supp});
+            next_candidates.emplace_back(q_tmp, r_supp);
           }
         }
       }
@@ -354,7 +355,7 @@ class Discover {
   /* Expand Order
    * @param: next candidates set, query, edge ptr, new edge, rule support
    * @desc: add order in given query(rule)
-  */
+   */
   void expandOrder(std::vector<std::pair<Q, GRADE_T>> &next_candidates,
                    Q &query, EdgePtr edge_ptr, const NewEdge &expand_e,
                    const GRADE_T r_supp) {
@@ -362,14 +363,14 @@ class Discover {
     for (int x = 1; x <= expand_e.max_order_; x++) {
       // new edge order equals with [1, max_order]
       edge_ptr->SetAttribute(TIME_KEY, static_cast<TIME_T>(x));
-      const auto src_vertex = edge_ptr->const_src_ptr();
-      const auto dst_vertex = edge_ptr->const_dst_ptr();
+      const auto src_vertex = edge_ptr->const_src_handle();
+      const auto dst_vertex = edge_ptr->const_dst_handle();
       bool not_exist = true;
       std::unordered_set<TIME_T> order_hash;
       for (auto query_edge_iter =
-               src_vertex->OutEdgeCBegin(edge_ptr->label(), dst_vertex);
+               src_vertex->OutEdgeBegin(edge_ptr->label(), dst_vertex);
            !query_edge_iter.IsDone(); query_edge_iter++) {
-        auto query_attr_ptr = query_edge_iter->FindAttributePtr(TIME_KEY);
+        auto query_attr_ptr = query_edge_iter->FindAttribute(TIME_KEY);
         ATTRIBUTE_PTR_CHECK(query_attr_ptr);
         TIME_T query_order = query_attr_ptr->template value<int>();
         if (order_hash.find(query_order) == order_hash.end()) {
@@ -382,13 +383,13 @@ class Discover {
       // std::cout << "######### equal order\n";
       // PrintTGR(rule);
       if (not_exist) {
-        next_candidates.push_back({query, r_supp});
+        next_candidates.emplace_back(query, r_supp);
       }
       // new edge order insert in [1, max_order]
-      Q query_tmp = query;
+      Q query_tmp(query);
       for (auto query_edge_iter = query_tmp.EdgeBegin();
            !query_edge_iter.IsDone(); query_edge_iter++) {
-        auto query_attr_ptr = query_edge_iter->FindAttributePtr(TIME_KEY);
+        auto query_attr_ptr = query_edge_iter->FindAttribute(TIME_KEY);
         ATTRIBUTE_PTR_CHECK(query_attr_ptr);
         TIME_T query_order = query_attr_ptr->template value<int>();
         if (query_order >= x) {
@@ -400,7 +401,7 @@ class Discover {
       query_edge_iter->SetAttribute(TIME_KEY, static_cast<TIME_T>(x));
       // std::cout << "######### insert order\n";
       // PrintTGR(rule_tmp);
-      next_candidates.push_back({query_tmp, r_supp});
+      next_candidates.emplace_back(query_tmp, r_supp);
     }
     // new edge order is max_order + 1
     edge_ptr->SetAttribute(TIME_KEY,
@@ -408,21 +409,21 @@ class Discover {
     // if link has order, order++
     if (link_.has_order_) {
       auto link_ptr = query.FindEdge(link_.id_);
-      auto link_attr_ptr = link_ptr->FindAttributePtr(TIME_KEY);
+      auto link_attr_ptr = link_ptr->FindAttribute(TIME_KEY);
       ATTRIBUTE_PTR_CHECK(link_attr_ptr);
       link_ptr->SetAttribute(TIME_KEY,
                              static_cast<TIME_T>(expand_e.max_order_ + 2));
     }
     // std::cout << "######### last order\n";
     // PrintTGR(rule);
-    next_candidates.push_back({query, r_supp});
+    next_candidates.emplace_back(query, r_supp);
   }
 
   /* Auto Morphism
    * @param: query1, query2
    * @return: true/false
    * @desc: check whether 2 querys are isomorphic
-  */
+   */
   bool autoMorphism(const Q &q1, const Q &q2) {
     MatchResult match_rlt;
     m_ptr_->DoMatch(q1, q2, match_rlt);
@@ -440,7 +441,7 @@ class Discover {
    * @param: candidate list, query
    * @return: true/false
    * @desc: check whether query and items in candidate list are isomorphic
-  */
+   */
   bool existInCandidates(const std::vector<Q> &candidate_list, const Q &query) {
     for (const auto &candidate : candidate_list) {
       if (autoMorphism(query, candidate)) {
@@ -454,7 +455,7 @@ class Discover {
    * @param: candidate list, query
    * @return: true/false
    * @desc: check whether query and items in candidate list are isomorphic
-  */
+   */
   bool existInCandidates(
       const std::vector<std::pair<Q, GRADE_T>> &candidate_list,
       const Q &query) {
@@ -470,7 +471,7 @@ class Discover {
    * @param: top-k queue, query, confidence
    * @return: true/false
    * @desc: check whether query is existed in top-k queue
-  */
+   */
   bool existInTopKQueue(const KQueue<Q> &k_queue, const Q &query,
                         GRADE_T conf) {
     for (auto iter = k_queue.cbegin(); iter != k_queue.cend(); iter++) {
@@ -487,7 +488,7 @@ class Discover {
   /* remove prediction link in query */
   void removeLink(Q &query) {
     query.EraseEdge(link_.id_);
-    auto vertex_ptr = query.FindConstVertex(link_.to_);
+    auto vertex_ptr = query.FindVertex(link_.to_);
     if (vertex_ptr) {
       if (vertex_ptr->CountOutEdge() == 0 && vertex_ptr->CountInEdge() == 0) {
         query.EraseVertex(link_.to_);
@@ -542,7 +543,7 @@ class Discover {
                             std::to_string(cnt) + "_v.csv";
         outfile.open(vfile.data());
         outfile << "vertex_id:int64,label_id:int\n";
-        for (auto v_iter = query.VertexCBegin(); !v_iter.IsDone(); v_iter++) {
+        for (auto v_iter = query.VertexBegin(); !v_iter.IsDone(); v_iter++) {
           outfile << v_iter->id() << "," << v_iter->label() << "\n";
         }
         outfile.close();
@@ -555,14 +556,14 @@ class Discover {
         outfile.open(efile.data());
         outfile << "edge_id:int64,source_id:int64,target_id:int64,label_id:int,"
                    "timestamp:int64\n";
-        for (auto e_iter = query.EdgeCBegin(); !e_iter.IsDone(); e_iter++) {
+        for (auto e_iter = query.EdgeBegin(); !e_iter.IsDone(); e_iter++) {
           if (e_iter->id() == link_.id_) {
-            auto attribute_ptr = e_iter->FindAttributePtr(TIME_KEY);
+            auto attribute_ptr = e_iter->FindAttribute(TIME_KEY);
             ATTRIBUTE_PTR_CHECK(attribute_ptr);
             prediction_link_order = attribute_ptr->template value<int>();
             continue;
           }
-          auto attribute_ptr = e_iter->FindAttributePtr(TIME_KEY);
+          auto attribute_ptr = e_iter->FindAttribute(TIME_KEY);
           ATTRIBUTE_PTR_CHECK(attribute_ptr);
           TIME_T timestamp = attribute_ptr->template value<int>();
           outfile << eid++ << "," << e_iter->src_id() << "," << e_iter->dst_id()
