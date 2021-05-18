@@ -6,22 +6,25 @@
 
 #include "gundam/component/generator.h"
 #include "gundam/data_type/datatype.h"
-
+#include "gundam/type_getter/edge_handle.h"
+#include "gundam/type_getter/vertex_handle.h"
 namespace gmine_new {
 
 template <class Pattern, class DataGraph>
 class Literal {
  public:
   using PatternVertexType = typename Pattern::VertexType;
-  using PatternVertexPtr = typename Pattern::VertexPtr;
+  using PatternVertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
   using PatternVertexIDType = typename Pattern::VertexType::IDType;
-  using PatternVertexConstPtr = typename Pattern::VertexConstPtr;
+  using PatternVertexConstPtr =
+      typename GUNDAM::VertexHandle<const Pattern>::type;
 
   using DataGraphIDType = typename DataGraph::VertexType::IDType;
   using DataGraphVertexType = typename DataGraph::VertexType;
   using DataGraphVertexIDType = typename DataGraph::VertexType::IDType;
-  using DataGraphVertexPtr = typename DataGraph::VertexPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   using DataGraphEdgeType = typename DataGraph::EdgeType;
   using DataGraphEdgeIDType = typename DataGraph::EdgeType::IDType;
   using DataGraphEdgeLabelType = typename DataGraphEdgeType::LabelType;
@@ -30,7 +33,7 @@ class Literal {
   using DataGraphAttributePtr = typename DataGraph::VertexType::AttributePtr;
   using DataGraphVertexAttributeKeyType =
       typename DataGraph::VertexType::AttributeKeyType;
-  using DataGraphEdgePtr = typename DataGraph::EdgeConstPtr;
+  using DataGraphEdgePtr = typename GUNDAM::EdgeHandle<const DataGraph>::type;
   virtual ~Literal() {}
   virtual bool Satisfy(const std::map<PatternVertexConstPtr,
                                       DataGraphVertexConstPtr> &) const = 0;
@@ -59,7 +62,7 @@ class AttributeLiteral : public Literal<Pattern, DataGraph> {
   using DataGraphVertexAttributeKeyType =
       typename BaseLiteralType::DataGraphVertexAttributeKeyType;
   using DataGraphEdgeIDType = typename BaseLiteralType::DataGraphEdgeIDType;
-  using DataGraphEdgePtr = typename DataGraph::EdgeConstPtr;
+  using DataGraphEdgePtr = typename GUNDAM::EdgeHandle<const DataGraph>::type;
   using DataGraphVertexIDType = typename BaseLiteralType::DataGraphIDType;
   PatternVertexConstPtr vertex_ptr_;
   DataGraphVertexAttributeKeyType attr_key_;
@@ -67,7 +70,7 @@ class AttributeLiteral : public Literal<Pattern, DataGraph> {
  public:
   AttributeLiteral(Pattern &pattern, PatternVertexIDType vertex_id,
                    DataGraphVertexAttributeKeyType attr_key) {
-    this->vertex_ptr_ = pattern.FindConstVertex(vertex_id);
+    this->vertex_ptr_ = pattern.FindVertex(vertex_id);
     this->attr_key_ = attr_key;
   }
   ~AttributeLiteral() {}
@@ -76,7 +79,7 @@ class AttributeLiteral : public Literal<Pattern, DataGraph> {
           &match_result) const override {
     DataGraphVertexConstPtr match_ptr =
         match_result.find(this->vertex_ptr_)->second;
-    if (match_ptr->FindConstAttributePtr(this->attr_key_).IsNull()) {
+    if (match_ptr->FindAttribute(this->attr_key_).IsNull()) {
       return false;
     }
     return true;
@@ -90,7 +93,7 @@ class AttributeLiteral : public Literal<Pattern, DataGraph> {
       std::set<DataGraphEdgeIDType> *diff_edge_set = nullptr) const override {
     DataGraphVertexPtr data_graph_vertex_ptr = data_graph.FindVertex(
         match_result.find(this->vertex_ptr_)->second->id());
-    if (!(data_graph_vertex_ptr->FindAttributePtr(this->attr_key_)).IsNull()) {
+    if (!(data_graph_vertex_ptr->FindAttribute(this->attr_key_)).IsNull()) {
       return false;
     }
     data_graph_vertex_ptr->AddAttribute(this->attr_key_, std::string{"#"});
@@ -129,15 +132,16 @@ class EdgeLiteral : public Literal<Pattern, DataGraph> {
   using DataGraphEdgeLabelType =
       typename BaseLiteralType::DataGraphEdgeLabelType;
   using DataGraphEdgeIDType = typename BaseLiteralType::DataGraphEdgeIDType;
-  using DataGraphEdgePtr = typename DataGraph::EdgeConstPtr;
+  using DataGraphEdgePtr = typename GUNDAM::EdgeHandle<const DataGraph>::type;
+  ;
   using DataGraphVertexAttributeKeyType =
       typename DataGraph::VertexType::AttributeKeyType;
 
  public:
   EdgeLiteral(Pattern &pattern, PatternVertexIDType src_id,
               PatternVertexIDType dst_id, DataGraphEdgeLabelType edge_label)
-      : src_ptr_{pattern.FindConstVertex(src_id)},
-        dst_ptr_{pattern.FindConstVertex(dst_id)},
+      : src_ptr_{pattern.FindVertex(src_id)},
+        dst_ptr_{pattern.FindVertex(dst_id)},
         edge_label_{edge_label} {
     assert(src_ptr_);
     assert(dst_ptr_);
@@ -148,9 +152,9 @@ class EdgeLiteral : public Literal<Pattern, DataGraph> {
           &match_result) const override {
     auto &match_src_ptr = match_result.find(this->src_ptr_)->second;
     auto &match_dst_ptr = match_result.find(this->dst_ptr_)->second;
-    for (auto it = match_src_ptr->OutEdgeCBegin(this->edge_label_);
-         !it.IsDone(); ++it) {
-      if (it->const_dst_ptr() == match_dst_ptr) return true;
+    for (auto it = match_src_ptr->OutEdgeBegin(this->edge_label_); !it.IsDone();
+         ++it) {
+      if (it->const_dst_handle() == match_dst_ptr) return true;
     }
     return false;
   }
@@ -214,7 +218,7 @@ class VariableLiteral : public Literal<Pattern, DataGraph> {
       typename BaseLiteralType::DataGraphAttributeConstPtr;
   using DataGraphAttributePtr = typename BaseLiteralType::DataGraphAttributePtr;
   using DataGraphEdgeIDType = typename BaseLiteralType::DataGraphEdgeIDType;
-  using DataGraphEdgePtr = typename DataGraph::EdgeConstPtr;
+  using DataGraphEdgePtr = typename GUNDAM::EdgeHandle<const DataGraph>::type;
   using DataGraphVertexIDType = typename BaseLiteralType::DataGraphIDType;
   std::pair<PatternVertexConstPtr, DataGraphVertexAttributeKeyType> x_, y_;
 
@@ -223,9 +227,9 @@ class VariableLiteral : public Literal<Pattern, DataGraph> {
                   DataGraphVertexAttributeKeyType x_attr_key,
                   PatternVertexIDType y_id,
                   DataGraphVertexAttributeKeyType y_attr_key) {
-    this->x_.first = pattern.FindConstVertex(x_id);
+    this->x_.first = pattern.FindVertex(x_id);
     this->x_.second = x_attr_key;
-    this->y_.first = pattern.FindConstVertex(y_id);
+    this->y_.first = pattern.FindVertex(y_id);
     this->y_.second = y_attr_key;
   }
   ~VariableLiteral() {}
@@ -239,9 +243,9 @@ class VariableLiteral : public Literal<Pattern, DataGraph> {
     DataGraphVertexConstPtr match_y_ptr =
         match_result.find(this->y_.first)->second;
     DataGraphAttributeConstPtr x_attr_ptr =
-        match_x_ptr->FindConstAttributePtr(this->x_.second);
+        match_x_ptr->FindAttribute(this->x_.second);
     DataGraphAttributeConstPtr y_attr_ptr =
-        match_y_ptr->FindConstAttributePtr(this->y_.second);
+        match_y_ptr->FindAttribute(this->y_.second);
     if (x_attr_ptr.IsNull() || y_attr_ptr.IsNull()) return false;
     GUNDAM::BasicDataType x_value_type = x_attr_ptr->value_type();
     GUNDAM::BasicDataType y_value_type = y_attr_ptr->value_type();
@@ -281,8 +285,8 @@ class VariableLiteral : public Literal<Pattern, DataGraph> {
         data_graph.FindVertex(match_result.find(this->x_.first)->second->id());
     DataGraphVertexPtr y_ptr =
         data_graph.FindVertex(match_result.find(this->y_.first)->second->id());
-    DataGraphAttributePtr x_attr_ptr = x_ptr->FindAttributePtr(this->x_.second);
-    DataGraphAttributePtr y_attr_ptr = y_ptr->FindAttributePtr(this->y_.second);
+    DataGraphAttributePtr x_attr_ptr = x_ptr->FindAttribute(this->x_.second);
+    DataGraphAttributePtr y_attr_ptr = y_ptr->FindAttribute(this->y_.second);
     if (y_attr_ptr.IsNull()) {
       y_ptr->AddAttribute(this->y_.second, std::string{"#"});
     }
@@ -377,7 +381,7 @@ class ConstantLiteral : public Literal<Pattern, DataGraph> {
       typename BaseLiteralType::DataGraphAttributeConstPtr;
   using DataGraphAttributePtr = typename BaseLiteralType::DataGraphAttributePtr;
   using DataGraphEdgeIDType = typename BaseLiteralType::DataGraphEdgeIDType;
-  using DataGraphEdgePtr = typename DataGraph::EdgeConstPtr;
+  using DataGraphEdgePtr = typename GUNDAM::EdgeHandle<const DataGraph>::type;
   using DataGraphVertexIDType = typename BaseLiteralType::DataGraphIDType;
 
  private:
@@ -387,7 +391,7 @@ class ConstantLiteral : public Literal<Pattern, DataGraph> {
  public:
   ConstantLiteral(Pattern &pattern, PatternVertexIDType x_id,
                   DataGraphVertexAttributeKeyType attr_key, ConstantType c) {
-    this->x_.first = pattern.FindConstVertex(x_id);
+    this->x_.first = pattern.FindVertex(x_id);
     this->x_.second = attr_key;
     this->c_ = c;
   }
@@ -398,7 +402,7 @@ class ConstantLiteral : public Literal<Pattern, DataGraph> {
     DataGraphVertexConstPtr match_x_ptr =
         match_result.find(this->x_.first)->second;
     DataGraphAttributeConstPtr x_attr_ptr =
-        match_x_ptr->FindConstAttributePtr(this->x_.second);
+        match_x_ptr->FindAttribute(this->x_.second);
     if (x_attr_ptr.IsNull()) return false;
     if (x_attr_ptr->template const_value<ConstantType>() != this->c_)
       return false;
@@ -413,7 +417,7 @@ class ConstantLiteral : public Literal<Pattern, DataGraph> {
       std::set<DataGraphEdgeIDType> *diff_edge_set = nullptr) const override {
     DataGraphVertexPtr x_ptr =
         data_graph.FindVertex(match_result.find(this->x_.first)->second->id());
-    DataGraphAttributePtr x_attr_ptr = x_ptr->FindAttributePtr(this->x_.second);
+    DataGraphAttributePtr x_attr_ptr = x_ptr->FindAttribute(this->x_.second);
     if (x_attr_ptr.IsNull()) {
       x_ptr->AddAttribute(this->x_.second, std::string{"#"});
     }

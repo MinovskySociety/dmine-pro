@@ -83,8 +83,8 @@ inline bool GARUpdateCallBack(CandidateSetContainer &candidate_set,
 template <bool check_y_flag, class GAR, class DataGraph, class ResultContainer>
 int GenXYParticalMatch(const GAR &gar, const DataGraph &target,
                        ResultContainer &match_result) {
-  using PatternVertexConstPtr = typename GAR::PatternType::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr = typename GAR::PatternVertexConstPtr;
+  using DataGraphVertexConstPtr = typename GAR::DataGraphVertexConstPtr;
   // using ResultType = typename ResultContainer::value_type;
   using LiteralSetType = typename GAR::LiteralSetType;
   std::set<PatternVertexConstPtr> pivot;
@@ -127,8 +127,8 @@ template <bool check_y_flag, class GAR, class DataGraph, class ResultContainer>
 int CalCompleteMatch(const GAR &gar, const DataGraph &target,
                      ResultContainer &xy_result,
                      ResultContainer &match_result) {
-  using PatternVertexConstPtr = typename GAR::PatternType::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr = typename GAR::PatternVertexConstPtr;
+  using DataGraphVertexConstPtr = typename GAR::DataGraphVertexConstPtr;
   // using ResultType = typename ResultContainer::value_type;
   using LiteralSetType = typename GAR::LiteralSetType;
   std::set<PatternVertexConstPtr> pivot;
@@ -167,8 +167,8 @@ int CalCompleteMatch(const GAR &gar, const DataGraph &target,
 
 template <bool check_y_flag, class GAR, class DataGraph, class ResultContainer,
           class = typename std::enable_if<std::is_convertible<
-              std::pair<typename GAR::PatternType::VertexConstPtr,
-                        typename DataGraph::VertexConstPtr>,
+              std::pair<typename GAR::PatternVertexConstPtr,
+                        typename GUNDAM::VertexHandle<const DataGraph>::type>,
               typename ResultContainer::value_type::value_type>::value>::type>
 inline int GARMatch(const GAR &gar, const DataGraph &target,
                     ResultContainer &match_result) {
@@ -181,14 +181,14 @@ inline int GARMatch(const GAR &gar, const DataGraph &target,
 // using partical match
 template <bool check_y_flag, class GAR, class DataGraph, class ResultContainer,
           class = typename std::enable_if<std::is_convertible<
-              std::pair<typename GAR::PatternType::VertexConstPtr,
-                        typename DataGraph::VertexConstPtr>,
+              std::pair<typename GAR::PatternVertexConstPtr,
+                        typename GUNDAM::VertexHandle<const DataGraph>::type>,
               typename ResultContainer::value_type::value_type>::value>::type>
 inline int GARMatch(const GAR &gar, const DataGraph &target,
                     typename ResultContainer::value_type &match_state,
                     ResultContainer &match_result) {
-  using PatternVertexConstPtr = typename GAR::PatternType::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr = typename GAR::PatternVertexConstPtr;
+  using DataGraphVertexConstPtr = typename GAR::DataGraphVertexConstPtr;
   // using ResultType = typename ResultContainer::value_type;
   using LiteralSetType = typename GAR::LiteralSetType;
   match_result.clear();
@@ -218,21 +218,15 @@ inline int GARMatch(const GAR &gar, const DataGraph &target,
 
   CandidateSetContainerType candidate_set;
   bool flag =
-      GUNDAM::_dp_iso::InitCandidateSet<GUNDAM::MatchSemantics::kIsomorphism,
-                                        typename GAR::PatternType, DataGraph>(
-          gar.pattern(), target, candidate_set);
+      GUNDAM::_dp_iso::InitCandidateSet<GUNDAM::MatchSemantics::kIsomorphism>(
+          gar.const_pattern(), target, candidate_set);
   if (!flag) return 0;
-  flag =
-      GUNDAM::_dp_iso::RefineCandidateSet(gar.pattern(), target, candidate_set);
+  flag = GUNDAM::_dp_iso::RefineCandidateSet(gar.const_pattern(), target,
+                                             candidate_set);
   if (!flag) return 0;
-  std::set<DataGraphVertexConstPtr> target_matched;
-  for (const auto &match_pair : match_state) {
-    target_matched.insert(match_pair.second);
-  }
   size_t result_count = 0;
-  GUNDAM::_dp_iso::_DPISO<GUNDAM::MatchSemantics::kIsomorphism,
-                          typename GAR::PatternType, DataGraph>(
-      candidate_set, match_state, target_matched, result_count, user_call_back,
+  GUNDAM::DPISO<GUNDAM::MatchSemantics::kIsomorphism>(
+      gar.const_pattern(), target, candidate_set, match_state, user_call_back,
       prune_call_back, clock());
   // GUNDAM::VF2_Label_Equal<GUNDAM::MatchSemantics::kIsomorphism>(
   //    gar.pattern(), target, user_call_back, prune_call_back,

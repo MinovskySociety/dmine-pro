@@ -16,14 +16,16 @@ class GraphAssociationRule {
 
  public:
   using PatternVertexType = typename Pattern::VertexType;
-  using PatternVertexPtr = typename Pattern::VertexPtr;
+  using PatternVertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
   using PatternVertexIDType = typename Pattern::VertexType::IDType;
-  using PatternVertexConstPtr = typename Pattern::VertexConstPtr;
+  using PatternVertexConstPtr =
+      typename GUNDAM::VertexHandle<const Pattern>::type;
 
   using DataGraphVertexIDType = typename DataGraph::VertexType::IDType;
   using DataGraphVertexType = typename DataGraph::VertexType;
-  using DataGraphVertexPtr = typename DataGraph::VertexPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   using DataGraphEdgeType = typename DataGraph::EdgeType;
   using DataGraphEdgeLabelType = typename DataGraphEdgeType::LabelType;
   using DataGraphVertexAttributeKeyType =
@@ -147,6 +149,7 @@ class GraphAssociationRule {
 
   Pattern &pattern() { return pattern_; }
   const Pattern &pattern() const { return pattern_; }
+  const Pattern &const_pattern() const { return pattern_; }
 
   LiteralSetType &x_literal_set() { return x_literal_set_; }
   const LiteralSetType &x_literal_set() const { return x_literal_set_; }

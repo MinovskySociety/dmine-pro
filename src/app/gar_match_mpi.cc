@@ -10,6 +10,7 @@
 #include "gar/gar.h"
 #include "gar/gar_match.h"
 #include "gar_config.h"
+#include "gundam/type_getter/vertex_handle.h"
 
 int main(int argc, char* argv[]) {
   if (argc > 2) {
@@ -35,8 +36,12 @@ int main(int argc, char* argv[]) {
   using GAR = gmine_new::GraphAssociationRule<Pattern, DataGraph>;
   using PatternVertexID = typename Pattern::VertexType::IDType;
   using DataGraphVertexID = typename DataGraph::VertexType::IDType;
-  using PatternVertexConstPtr = typename Pattern::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr =
+      typename GUNDAM::VertexHandle<const Pattern>::type;
+  using PatternVertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
+  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
 
   using MatchMap = std::map<PatternVertexConstPtr, DataGraphVertexConstPtr>;
   using MatchResultList = std::vector<MatchMap>;
@@ -80,8 +85,8 @@ int main(int argc, char* argv[]) {
                          gar_match_info.gar_list[0].name + "_match.csv";
     std::ofstream result_file(result);
 
-    MatchResultToFile<PatternVertexID, DataGraphVertexID>(match_result,
-                                                          result_file);
+    GUNDAM::MatchResultToFile<PatternVertexID, DataGraphVertexID>(match_result,
+                                                                  result_file);
     std::cout << "out end!" << std::endl;
 
   } else {
@@ -99,7 +104,7 @@ int main(int argc, char* argv[]) {
       it->CalPivot(pivot);
     }
     Pattern contain_x_y_pattern;
-    for (auto vertex_it = gar.pattern().VertexCBegin(); !vertex_it.IsDone();
+    for (auto vertex_it = gar.pattern().VertexBegin(); !vertex_it.IsDone();
          vertex_it++) {
       PatternVertexConstPtr vertex_ptr = vertex_it;
       if (pivot.count(vertex_ptr)) {
@@ -111,7 +116,7 @@ int main(int argc, char* argv[]) {
         recv_message;
     if (myrank == 0) {
       // cal XY Match
-      using MatchMap = std::map<PatternVertexConstPtr, DataGraphVertexConstPtr>;
+      using MatchMap = std::map<PatternVertexPtr, DataGraphVertexPtr>;
       using MatchResultList = std::vector<MatchMap>;
       MatchResultList xy_match_result;
       GUNDAM::DPISO<GUNDAM::MatchSemantics::kIsomorphism>(
@@ -150,7 +155,7 @@ int main(int argc, char* argv[]) {
             // std::cout << "cur = " << pivot_cur << std::endl;
             send_message[pivot_cur].push_back(
                 xy_match_result[match_pos]
-                               [contain_x_y_pattern.FindConstVertex(it->id())]
+                               [contain_x_y_pattern.FindVertex(it->id())]
                                    ->id());
             pivot_cur++;
           }
@@ -197,8 +202,8 @@ int main(int argc, char* argv[]) {
         for (const auto& it : pivot) {
           DataGraphVertexIDType pivot_match_data_graph_id =
               recv_message[pivot_cur][i];
-          match_state.emplace(
-              it, data_graph.FindConstVertex(pivot_match_data_graph_id));
+          match_state.emplace(it,
+                              data_graph.FindVertex(pivot_match_data_graph_id));
           pivot_cur++;
         }
         MatchResultList temp_match_result_list;
@@ -212,7 +217,7 @@ int main(int argc, char* argv[]) {
       send_message.resize(gar.pattern().CountVertex());
       for (const auto& single_match : total_match_result) {
         int pattern_vertex_cur = 0;
-        for (auto vertex_it = gar.pattern().VertexCBegin(); !vertex_it.IsDone();
+        for (auto vertex_it = gar.pattern().VertexBegin(); !vertex_it.IsDone();
              vertex_it++) {
           PatternVertexConstPtr vertex_ptr = vertex_it;
           send_message[pattern_vertex_cur].push_back(
@@ -246,12 +251,11 @@ int main(int argc, char* argv[]) {
         for (int num = 0; num < total_match_size; num++) {
           int pattern_vertex_cur = 0;
           MatchMap match_result;
-          for (auto vertex_it = gar.pattern().VertexCBegin();
+          for (auto vertex_it = gar.pattern().VertexBegin();
                !vertex_it.IsDone(); vertex_it++) {
             PatternVertexConstPtr vertex_ptr = vertex_it;
             DataGraphVertexConstPtr data_vertex_ptr =
-                data_graph.FindConstVertex(
-                    recv_message[pattern_vertex_cur][num]);
+                data_graph.FindVertex(recv_message[pattern_vertex_cur][num]);
             match_result.emplace(vertex_ptr, data_vertex_ptr);
             pattern_vertex_cur++;
           }
@@ -263,8 +267,8 @@ int main(int argc, char* argv[]) {
       std::string result = gar_match_info.result_dir +
                            gar_match_info.gar_list[0].name + "_match.csv";
       std::ofstream result_file(result);
-      MatchResultToFile<PatternVertexID, DataGraphVertexID>(total_match_result,
-                                                            result_file);
+      GUNDAM::MatchResultToFile<PatternVertexID, DataGraphVertexID>(
+          total_match_result, result_file);
       std::cout << "out end!" << std::endl;
     }
     MPI_Finalize();

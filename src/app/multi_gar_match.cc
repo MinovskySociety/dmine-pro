@@ -23,8 +23,10 @@ int main() {
                                        uint64_t, uint32_t, std::string>;
   using PatternVertexID = typename Pattern::VertexType::IDType;
   using DataGraphVertexID = typename DataGraph::VertexType::IDType;
-  using PatternVertexConstPtr = typename Pattern::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr =
+      typename GUNDAM::VertexHandle<const Pattern>::type;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   using GAR = gmine_new::GraphAssociationRule<Pattern, DataGraph>;
   using MatchMap = std::map<PatternVertexConstPtr, DataGraphVertexConstPtr>;
   using MatchResultList = std::vector<MatchMap>;

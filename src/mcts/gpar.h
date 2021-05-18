@@ -20,9 +20,9 @@ class GPAR {
   using EdgeIDType = typename EdgeType::IDType;
   using EdgeLabelType = typename EdgeType::LabelType;
   using VertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
-  using VertexConstPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<const Pattern>::type;
   using EdgePtr = typename GUNDAM::EdgeHandle<Pattern>::type;
-  using EdgeConstPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<const Pattern>::type;
   using VertexSizeType = size_t;
 
   GPAR() = default;
@@ -50,8 +50,8 @@ class GPAR {
     this->y_node_ptr_ = this->pattern.FindVertex(b.y_node_ptr_->id());
     this->q_edge_label_ = b.q_edge_label_;
   }
-  VertexConstPtr x_node_ptr() const { return this->x_node_ptr_; }
-  VertexConstPtr y_node_ptr() const { return this->y_node_ptr_; }
+  VertexPtr x_node_ptr() const { return this->x_node_ptr_; }
+  VertexPtr y_node_ptr() const { return this->y_node_ptr_; }
   EdgeLabelType q_edge_label() const { return this->q_edge_label_; }
   bool operator<(const GPAR<Pattern>& b) const { return 1; }
   GPAR& operator=(const GPAR<Pattern>& b) {
@@ -139,7 +139,7 @@ class GPAR {
   size_t supp_Q_size_;
   size_t supp_R_size_;
   double gpar_conf;
-  VertexConstPtr x_node_ptr_, y_node_ptr_;
+  VertexPtr x_node_ptr_, y_node_ptr_;
   EdgeLabelType q_edge_label_;
 };
 template <class Pattern, class DataGraph>
@@ -153,11 +153,12 @@ class DiscoverdGPAR : public GPAR<Pattern> {
   using EdgeIDType = typename EdgeType::IDType;
   using EdgeLabelType = typename EdgeType::LabelType;
   using VertexPtr = typename GUNDAM::VertexHandle<Pattern>::type;
-  using VertexConstPtr = typename GUNDAM::VertexHandle<Pattern>::type;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<const Pattern>::type;
   using EdgePtr = typename GUNDAM::EdgeHandle<Pattern>::type;
-  using EdgeConstPtr = typename GUNDAM::EdgeHandle<Pattern>::type;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<const Pattern>::type;
   using VertexSizeType = size_t;
-  using DataGraphVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
+  using DataGraphVertexPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   using SuppType = std::vector<DataGraphVertexPtr>;
   using ConfType = double;
 

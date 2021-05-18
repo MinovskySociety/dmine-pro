@@ -62,9 +62,9 @@ inline void GPARExpandOrigin(GPAR &gpar, const VertexLabelSet &vertex_label_set,
 template <class GPARList>
 inline void UniqueGPAROrigin(GPARList &gpar_list);
 template <class GPAR, class DataGraph>
-inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph);
+inline void CalSuppQ(GPAR &gpar, const DataGraph &data_graph);
 template <class GPAR, class DataGraph>
-inline void CalSuppR(GPAR &gpar, DataGraph &data_graph);
+inline void CalSuppR(GPAR &gpar, const DataGraph &data_graph);
 template <class GPARList, typename SuppType, class DataGraph>
 inline void FilterGPARUsingSuppRLimit(GPARList &gpar_list,
                                       const DataGraph &data_graph,
@@ -345,8 +345,8 @@ inline void AddNewEdgeOutPatternOrigin(GPAR &gpar,
 template <class GPARList>
 inline void UniqueGPAROrigin(GPARList &gpar_list) {
   using GPAR = typename GPARList::value_type;
-  using VertexConstPtr = typename GPAR::VertexConstPtr;
-  using EdgeConstPtr = typename GPAR::EdgeConstPtr;
+  using VertexConstPtr = typename GPAR::VertexPtr;
+  using EdgeConstPtr = typename GPAR::EdgePtr;
   using MatchMap = std::map<VertexConstPtr, VertexConstPtr>;
   using MatchResultList = std::vector<MatchMap>;
   GPARList unique_gpar_list;
@@ -372,15 +372,18 @@ inline void UniqueGPAROrigin(GPARList &gpar_list) {
   std::swap(gpar_list, unique_gpar_list);
 }
 template <class GPAR, class DataGraph>
-inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph) {
+inline void CalSuppQ(GPAR &gpar, const DataGraph &data_graph) {
   // TransposePattern(gpar.pattern);
-  using SuppType = std::vector<typename GUNDAM::VertexHandle<DataGraph>::type>;
-  using SuppSet = std::set<typename GUNDAM::VertexHandle<DataGraph>::type>;
-  using MatchMap = std::map<typename GPAR::VertexConstPtr,
-                            typename GUNDAM::VertexHandle<DataGraph>::type>;
-  using CandidateSetType =
-      std::map<typename GPAR::VertexConstPtr,
-               std::vector<typename GUNDAM::VertexHandle<DataGraph>::type>>;
+  using SuppType =
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using SuppSet =
+      std::set<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using MatchMap =
+      std::map<typename GPAR::VertexPtr,
+               typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using CandidateSetType = std::map<
+      typename GPAR::VertexPtr,
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>>;
   using MatchResult = std::vector<MatchMap>;
   SuppType &supp_Q = gpar.supp_Q();
   SuppType temp_supp_Q;
@@ -405,8 +408,8 @@ inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph) {
     if (!GUNDAM::_vf2::InitCandidateSet<GUNDAM::MatchSemantics::kIsomorphism>(
             gpar.pattern, data_graph,
             GUNDAM::_vf2::LabelEqual<
-                typename GPAR::VertexConstPtr,
-                typename GUNDAM::VertexHandle<DataGraph>::type>(),
+                typename GPAR::VertexPtr,
+                typename GUNDAM::VertexHandle<const DataGraph>::type>(),
             candidate_set)) {
       return;
     }
@@ -418,11 +421,11 @@ inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph) {
           gpar.pattern, data_graph, candidate_set, gpar.x_node_ptr()->id(),
           target_ptr->id(),
           GUNDAM::_vf2::LabelEqual<
-              typename GPAR::VertexConstPtr,
-              typename GUNDAM::VertexHandle<DataGraph>::type>(),
+              typename GPAR::VertexPtr,
+              typename GUNDAM::VertexHandle<const DataGraph>::type>(),
           GUNDAM::_vf2::LabelEqual<
-              typename GPAR::EdgeConstPtr,
-              typename GUNDAM::EdgeHandle<DataGraph>::type>(),
+              typename GPAR::EdgePtr,
+              typename GUNDAM::EdgeHandle<const DataGraph>::type>(),
           1, match_result);
       auto t_end = clock();
       // std::cout << "cal time is " << (1.0 * t_end - t_begin) / CLOCKS_PER_SEC
@@ -435,15 +438,18 @@ inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph) {
   }
 }
 template <class GPAR, class DataGraph>
-inline void CalSuppR(GPAR &gpar, DataGraph &data_graph) {
-  using SuppType = std::vector<typename GUNDAM::VertexHandle<DataGraph>::type>;
-  using SuppSet = std::set<typename GUNDAM::VertexHandle<DataGraph>::type>;
-  using MatchMap = std::map<typename GPAR::VertexConstPtr,
-                            typename GUNDAM::VertexHandle<DataGraph>::type>;
+inline void CalSuppR(GPAR &gpar, const DataGraph &data_graph) {
+  using SuppType =
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using SuppSet =
+      std::set<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using MatchMap =
+      std::map<typename GPAR::VertexPtr,
+               typename GUNDAM::VertexHandle<const DataGraph>::type>;
   using MatchResult = std::vector<MatchMap>;
-  using CandidateSetType =
-      std::map<typename GPAR::VertexConstPtr,
-               std::vector<typename GUNDAM::VertexHandle<DataGraph>::type>>;
+  using CandidateSetType = std::map<
+      typename GPAR::VertexPtr,
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>>;
   SuppType &supp_R = gpar.supp_R();
   SuppType temp_supp_R;
   size_t gpar_edge = gpar.pattern.CountEdge();
@@ -471,8 +477,8 @@ inline void CalSuppR(GPAR &gpar, DataGraph &data_graph) {
     if (!GUNDAM::_vf2::InitCandidateSet<GUNDAM::MatchSemantics::kIsomorphism>(
             gpar.pattern, data_graph,
             GUNDAM::_vf2::LabelEqual<
-                typename GPAR::VertexConstPtr,
-                typename GUNDAM::VertexHandle<DataGraph>::type>(),
+                typename GPAR::VertexPtr,
+                typename GUNDAM::VertexHandle<const DataGraph>::type>(),
             candidate_set)) {
       return;
     }
@@ -482,11 +488,11 @@ inline void CalSuppR(GPAR &gpar, DataGraph &data_graph) {
           gpar.pattern, data_graph, candidate_set, gpar.x_node_ptr()->id(),
           target_ptr->id(),
           GUNDAM::_vf2::LabelEqual<
-              typename GPAR::VertexConstPtr,
-              typename GUNDAM::VertexHandle<DataGraph>::type>(),
+              typename GPAR::VertexPtr,
+              typename GUNDAM::VertexHandle<const DataGraph>::type>(),
           GUNDAM::_vf2::LabelEqual<
-              typename GPAR::EdgeConstPtr,
-              typename GUNDAM::EdgeHandle<DataGraph>::type>(),
+              typename GPAR::EdgePtr,
+              typename GUNDAM::EdgeHandle<const DataGraph>::type>(),
           1, match_result);
       if (match_result.size() >= 1) {
         temp_supp_R.push_back(target_ptr);
@@ -522,7 +528,8 @@ inline void FilterGPARUsingSuppRLimit(GPARList &gpar_list,
 }
 template <class GPAR, class DataGraph>
 inline double diff(GPAR &query, GPAR &target, const DataGraph &data_graph) {
-  using SuppType = std::vector<typename GUNDAM::VertexHandle<DataGraph>::type>;
+  using SuppType =
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>;
   SuppType &a_supp_r = query.supp_R();
   SuppType &b_supp_r = target.supp_R();
   SuppType intersection_result;
