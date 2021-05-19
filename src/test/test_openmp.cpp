@@ -14,7 +14,7 @@ int main() {
   using GraphType = LargeGraph<uint64_t, uint32_t, std::string, uint64_t,
                                uint32_t, std::string>;
   GraphType pattern, data_graph;
-  using VertexConstPtr = typename GraphType::VertexConstPtr;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<GraphType>::type;
   using VertexIDType = typename GraphType::VertexType::IDType;
   using EdgeLabelType = typename GraphType::EdgeType::LabelType;
   using QueryVertexPtr = VertexConstPtr;

@@ -34,13 +34,16 @@ int main(int argc, char* argv[]) {
   res = ReadGARChaseInfoYAML(config_file_path, gar_chase_info);
   if (res < 0) return res;
 
-  using Pattern = GUNDAM::SmallGraph<uint32_t, uint32_t, uint32_t, uint32_t>;
+  using Pattern = GUNDAM::LargeGraph2<uint64_t, uint32_t, std::string, uint64_t,
+                                      uint32_t, std::string>;
   using DataGraph = GUNDAM::LargeGraph2<uint64_t, uint32_t, std::string,
                                         uint64_t, uint32_t, std::string>;
   using PatternVertexID = typename Pattern::VertexType::IDType;
   using DataGraphVertexID = typename DataGraph::VertexType::IDType;
-  using PatternVertexConstPtr = typename Pattern::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr =
+      typename GUNDAM::VertexHandle<const Pattern>::type;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   using GAR = gmine_new::GraphAssociationRule<Pattern, DataGraph>;
   using MatchMap = std::map<PatternVertexConstPtr, DataGraphVertexConstPtr>;
   using MatchResultList = std::vector<MatchMap>;

@@ -57,11 +57,11 @@ bool ConvertGraphToGSIGraph(YAML::Node &config, DataGraph &data_graph) {
   std::set<VertexIDType> vertex_id_set;
   VertexIDType vertex_id_counter = 0;
   std::map<VertexIDType, VertexIDType> vertex_id_map;
-  for (auto vertex_it = data_graph.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = data_graph.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     vertex_label_set.insert(vertex_it->label());
     vertex_id_set.insert(vertex_it->id());
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
       edge_label_set.insert(edge_it->label());
     }
@@ -83,9 +83,9 @@ bool ConvertGraphToGSIGraph(YAML::Node &config, DataGraph &data_graph) {
   }
   std::set<std::tuple<int, int, int>> edge_set;
   int edge_sum = 0;
-  for (auto vertex_it = data_graph.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = data_graph.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
       if (edge_set.count(
               {edge_it->src_id(), edge_it->dst_id(), edge_it->label()})) {
@@ -99,15 +99,15 @@ bool ConvertGraphToGSIGraph(YAML::Node &config, DataGraph &data_graph) {
   output_gsi << data_graph.CountVertex() << " " << edge_sum << " "
              << vertex_label_counter << " " << edge_label_counter << std::endl;
   edge_set.clear();
-  for (auto vertex_it = data_graph.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = data_graph.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
     output_gsi << "v " << vertex_id_map[vertex_it->id()] << " "
                << vertex_label_map[vertex_it->label()] << std::endl;
   }
 
-  for (auto vertex_it = data_graph.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = data_graph.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
       if (edge_set.count(
               {edge_it->src_id(), edge_it->dst_id(), edge_it->label()})) {

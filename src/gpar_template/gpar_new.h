@@ -157,7 +157,9 @@ class DiscoverdGPAR : public GPAR<Pattern> {
     return *this;
   }
   SuppType& supp_Q() { return this->supp_Q_; }
+  const SuppType& supp_Q() const { return this->supp_Q_; }
   SuppType& supp_R() { return this->supp_R_; }
+  const SuppType& supp_R() const { return this->supp_R_; }
   size_t supp_Q_size() const { return this->supp_Q_.size(); }
   size_t supp_R_size() const { return this->supp_R_.size(); }
   ConfType conf() const { return this->conf_; }

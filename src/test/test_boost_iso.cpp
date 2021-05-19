@@ -8,7 +8,7 @@ int main() {
                            std::string>;
 
   Graph data_graph, ret_graph;
-  using VertexConstPtr = typename Graph::VertexConstPtr;
+  // using VertexConstPtr = typename Graph::VertexConstPtr;
   ReadCSVGraph(
       data_graph,
       "/Users/apple/Desktop/buaa/code/dmine-pro/testdata/"

@@ -12,12 +12,12 @@ void test() {
 
   using DataGraph = GUNDAM::LargeGraph2<uint64_t, uint32_t, std::string,
                                         uint64_t, uint32_t, std::string>;
-  using TargetVertexPtr = typename DataGraph::VertexConstPtr;
+  using TargetVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   DataGraph data_graph;
-  using VertexConstPtr = typename DataGraph::VertexConstPtr;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using VertexIDType = typename DataGraph::VertexType::IDType;
   using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-  using EdgeConstPtr = typename GraphType::EdgeConstPtr;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<DataGraph>::type;
   ReadCSVGraph(data_graph,
                "/Users/apple/Desktop/buaa/data/cu4999_1/liantong_v.csv",
                "/Users/apple/Desktop/buaa/data/cu4999_1/liantong_e.csv");
@@ -53,12 +53,12 @@ void testsinglegpar() {
 
   using DataGraph = GUNDAM::LargeGraph2<uint64_t, uint32_t, std::string,
                                         uint64_t, uint32_t, std::string>;
-  using TargetVertexPtr = typename DataGraph::VertexConstPtr;
+  using TargetVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   DataGraph data_graph;
-  using VertexConstPtr = typename DataGraph::VertexConstPtr;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using VertexIDType = typename DataGraph::VertexType::IDType;
   using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-  using EdgeConstPtr = typename GraphType::EdgeConstPtr;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<DataGraph>::type;
   ReadCSVGraph(data_graph,
                "/Users/apple/Desktop/buaa/data/cu4999_1/liantong_v.csv",
                "/Users/apple/Desktop/buaa/data/cu4999_1/liantong_e.csv");
@@ -74,9 +74,9 @@ void testsinglegpar() {
   clock_t t_begin, t_end;
   t_begin = clock();
   int a = 1;
-  for (auto vertex_it = data_graph.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = data_graph.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
       a++;
     }
@@ -190,14 +190,13 @@ void testsinglegpar() {
 
       std::vector<VertexConstPtr> possible_supp, supp;
       for (int i = 0; i < 5000; i++) {
-        possible_supp.push_back(data_graph.FindConstVertex(i));
+        possible_supp.push_back(data_graph.FindVertex(i));
       }
-      VertexConstPtr query_vertex_ptr = pattern.FindConstVertex(1);
-      using MatchMap =
-          std::map<typename GraphType::VertexConstPtr, VertexConstPtr>;
+      VertexConstPtr query_vertex_ptr = pattern.FindVertex(1);
+      using MatchMap = std::map<VertexConstPtr, VertexConstPtr>;
       using MatchResult = std::vector<MatchMap>;
       MatchResult match_result;
-      std::vector<typename GraphType::VertexConstPtr> supp_list;
+      std::vector<VertexConstPtr> supp_list;
       supp_list.push_back(query_vertex_ptr);
       auto user_callback = [&match_result](auto &match_state) {
         match_result.push_back(match_state);
@@ -259,20 +258,20 @@ int main() {
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,
                                        uint64_t, uint32_t, std::string>;
 
-  using TargetVertexPtr = typename DataGraph::VertexConstPtr;
+  using TargetVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   DataGraph data_graph;
-  using VertexConstPtr = typename DataGraph::VertexConstPtr;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using VertexIDType = typename DataGraph::VertexType::IDType;
   using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-  using EdgeConstPtr = typename GraphType::EdgeConstPtr;
+  using EdgeConstPtr = typename GUNDAM::EdgeHandle<DataGraph>::type;
   ReadCSVGraph(data_graph,
                "/Users/apple/Desktop/buaa/data/cu4999_1/liantong_v.csv",
                "/Users/apple/Desktop/buaa/data/cu4999_1/liantong_e.csv");
   clock_t t_begin, t_end;
   t_begin = clock();
-  for (auto vertex_it = data_graph.VertexCBegin(); !vertex_it.IsDone();
+  for (auto vertex_it = data_graph.VertexBegin(); !vertex_it.IsDone();
        vertex_it++) {
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
     }
   }
@@ -346,7 +345,7 @@ int main() {
      std::cout << "supp = " << it->id() << std::endl;
    }
   */
-  VertexConstPtr query_vertex_ptr = pattern.FindConstVertex(1);
+  VertexConstPtr query_vertex_ptr = pattern.FindVertex(1);
   std::set<VertexConstPtr> res_supp;
   auto match_callback =
       std::bind(_dp_iso::MatchCallbackSaveSupp<VertexConstPtr, VertexConstPtr,
@@ -396,7 +395,7 @@ int main() {
 
   std::vector<VertexConstPtr> possible_supp, supp;
   for (int i = 0; i < 5000; i++) {
-    possible_supp.push_back(data_graph.FindConstVertex(i));
+    possible_supp.push_back(data_graph.FindVertex(i));
   }
   sort(possible_supp.begin(), possible_supp.end());
   t_begin = clock();

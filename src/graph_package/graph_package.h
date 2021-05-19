@@ -1,8 +1,8 @@
 #ifndef _GRAPH_PACKAGE_H
 #define _GRAPH_PACKAGE_H
 
-#include <graph_package/gpdef.h>
 #include <graph_package/attribute_dict.h>
+#include <graph_package/gpdef.h>
 #include <graph_package/label_dict.h>
 #include <graph_package/type_dict.h>
 
@@ -17,7 +17,7 @@ struct GraphPackageInfo {
   void Reset() {
     name.clear();
     dict_dir.clear();
-    graph_dir.clear();    
+    graph_dir.clear();
     label_file.clear();
     attr_file.clear();
     type_file.clear();
@@ -26,23 +26,23 @@ struct GraphPackageInfo {
     has_dict = true;
     has_graph = true;
     has_attr = true;
-    is_grouping = true;    
-    has_skeleton = true;    
+    is_grouping = true;
+    has_skeleton = true;
     check_graph = true;
   }
 
   std::string name;
   std::filesystem::path dict_dir;
-  std::filesystem::path graph_dir;  
+  std::filesystem::path graph_dir;
   std::filesystem::path label_file;
   std::filesystem::path attr_file;
   std::filesystem::path type_file;
   std::vector<std::filesystem::path> vertex_files;
   std::vector<std::filesystem::path> edge_files;
   bool has_dict = true;
-  bool has_graph = true;  
+  bool has_graph = true;
   bool has_attr = true;
-  bool is_grouping = true;  
+  bool is_grouping = true;
   bool has_skeleton = true;
   bool check_graph = true;
 };
@@ -205,7 +205,7 @@ class GraphPackage {
 
     std::set<Label> label_set;
 
-    for (auto it_v = graph_.VertexCBegin(); !it_v.IsDone(); ++it_v) {
+    for (auto it_v = graph_.VertexBegin(); !it_v.IsDone(); ++it_v) {
       const auto &label = it_v->label();
       if (!label_set.emplace(label).second) continue;
 
@@ -214,7 +214,7 @@ class GraphPackage {
       if (r) ++count;
     }
 
-    for (auto it_e = graph_.EdgeCBegin(); !it_e.IsDone(); ++it_e) {
+    for (auto it_e = graph_.EdgeBegin(); !it_e.IsDone(); ++it_e) {
       const auto &label = it_e->label();
       if (!label_set.emplace(label).second) continue;
 
@@ -317,10 +317,10 @@ class GraphPackage {
 
     int count = 0;
 
-    for (auto it_v = graph_.VertexCBegin(); !it_v.IsDone(); ++it_v) {
+    for (auto it_v = graph_.VertexBegin(); !it_v.IsDone(); ++it_v) {
       if (!label_set.empty() && label_set.count(it_v->label()) == 0) continue;
 
-      auto it_attr = it_v->FindConstAttributePtr(attr_key);
+      auto it_attr = it_v->FindAttribute(attr_key);
       if (it_attr.IsNull()) continue;
 
       if (all_attr_value_str.emplace(it_attr->value_str()).second) {
@@ -335,13 +335,13 @@ class GraphPackage {
       }
     }
 
-    // for (auto it_e = graph_.EdgeCBegin(); !it_e.IsDone(); ++it_e) {
+    // for (auto it_e = graph_.EdgeBegin(); !it_e.IsDone(); ++it_e) {
     // modified by wenzhi
-    for (auto it_v = graph_.VertexCBegin(); !it_v.IsDone(); ++it_v) {
-      for (auto it_e = it_v->OutEdgeCBegin(); !it_e.IsDone(); ++it_e) {
+    for (auto it_v = graph_.VertexBegin(); !it_v.IsDone(); ++it_v) {
+      for (auto it_e = it_v->OutEdgeBegin(); !it_e.IsDone(); ++it_e) {
         if (!label_set.empty() && label_set.count(it_e->label()) == 0) continue;
 
-        auto it_attr = it_e->FindConstAttributePtr(attr_key);
+        auto it_attr = it_e->FindAttribute(attr_key);
         if (it_attr.IsNull()) continue;
 
         if (all_attr_value_str.emplace(it_attr->value_str()).second) {

@@ -1,13 +1,12 @@
 #include <iostream>
 
-#include "../gpar/gpar.h"
 #include "gar/csv_gar.h"
 #include "gundam/graph_type/large_graph.h"
 void TestReadGAR() {
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,
                                        uint64_t, uint32_t, std::string>;
 
-  gmine_new::GraphAssociationRule<gmine_new::GraphType, DataGraph> test;
+  gmine_new::GraphAssociationRule<DataGraph, DataGraph> test;
 
   gmine_new::ReadGAR(test,
                      "C:\\Users\\Administrator\\Desktop\\buaa\\dmine-"

@@ -12,12 +12,12 @@ int main() {
 
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,
                                        uint64_t, uint32_t, std::string>;
-  using TargetVertexPtr = typename DataGraph::VertexConstPtr;
+  using TargetVertexPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   DataGraph data_graph;
-  using VertexConstPtr = typename DataGraph::VertexConstPtr;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   using VertexIDType = typename DataGraph::VertexType::IDType;
   using EdgeLabelType = typename DataGraph::EdgeType::LabelType;
-  using EdgeConstPtr = typename GraphType::EdgeConstPtr;
+  // using EdgeConstPtr = typename GraphType::EdgeConstPtr;
   ReadCSVGraph(
       data_graph,
       "/Users/apple/Desktop/buaa/data/cu4999_1_remove_web/liantong_v.csv",

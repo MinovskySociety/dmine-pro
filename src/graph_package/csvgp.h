@@ -77,13 +77,13 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
                 AttributeDict &attr_dict, TypeDict &type_dict) {
   std::cout << "Check Vertex/Edge labels:" << std::endl;
   std::set<Label> all_label_set;
-  for (auto v_iter = graph.VertexCBegin(); !v_iter.IsDone(); ++v_iter) {
+  for (auto v_iter = graph.VertexBegin(); !v_iter.IsDone(); ++v_iter) {
     all_label_set.insert(v_iter->label());
   }
-  // for (auto e_iter = graph.EdgeCBegin(); !e_iter.IsDone(); ++e_iter) {
+  // for (auto e_iter = graph.EdgeBegin(); !e_iter.IsDone(); ++e_iter) {
   // modified by wenzhi
-  for (auto v_iter = graph.VertexCBegin(); !v_iter.IsDone(); v_iter++) {
-    for (auto e_iter = v_iter->OutEdgeCBegin(); !e_iter.IsDone(); ++e_iter) {
+  for (auto v_iter = graph.VertexBegin(); !v_iter.IsDone(); v_iter++) {
+    for (auto e_iter = v_iter->OutEdgeBegin(); !e_iter.IsDone(); ++e_iter) {
       all_label_set.insert(e_iter->label());
     }
   }
@@ -103,12 +103,12 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
 
     bool shared = false;
 
-    auto attr_v_iter = graph.VertexCBegin(attr_info.attr_label_id);
+    auto attr_v_iter = graph.VertexBegin(attr_info.attr_label_id);
     if (attr_v_iter.IsDone()) {
       // AttributeValueConstant
       for (auto &attr_value_info : attr_info) {
         auto attr_value_v_iter =
-            graph.VertexCBegin(attr_value_info.attr_value_label_id);
+            graph.VertexBegin(attr_value_info.attr_value_label_id);
 
         if (!attr_value_v_iter.IsDone()) {
           shared = true;
@@ -131,24 +131,24 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
 
         auto attr_value_iter = attr_info.end();
 
-        auto is_e_iter = attr_v_iter->OutEdgeCBegin(ReservedLabel::kIs);
+        auto is_e_iter = attr_v_iter->OutEdgeBegin(ReservedLabel::kIs);
         if (is_e_iter.IsDone()) {
-          auto attr_ptr = attr_v_iter->FindConstAttributePtr("value");
+          auto attr_ptr = attr_v_iter->FindAttribute("value");
           if (attr_ptr.IsNull()) return false;
 
           attr_value_iter = attr_info.Find(attr_ptr->value_str());
 
         } else {
-          auto value_ptr = is_e_iter->const_dst_ptr();
-          auto equal_e_iter = value_ptr->OutEdgeCBegin(ReservedLabel::kEqual);
+          auto value_ptr = is_e_iter->const_dst_handle();
+          auto equal_e_iter = value_ptr->OutEdgeBegin(ReservedLabel::kEqual);
           if (equal_e_iter.IsDone()) {
-            auto attr_ptr = value_ptr->FindConstAttributePtr("value");
+            auto attr_ptr = value_ptr->FindAttribute("value");
             if (attr_ptr.IsNull()) return false;
 
             attr_value_iter = attr_info.Find(attr_ptr->value_str());
 
           } else {
-            auto constant_ptr = equal_e_iter->const_dst_ptr();
+            auto constant_ptr = equal_e_iter->const_dst_handle();
             auto type_iter = type_dict.Find(attr_info.type_name);
             if (type_iter == type_dict.end()) return false;
             auto type_value_iter = type_iter->Find(constant_ptr->label());
@@ -191,7 +191,7 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
     // std::cout << type_info.value_label_id << std::endl;
     // std::cout << type_info.value_data_type << std::endl;
 
-    auto value_v_iter = graph.VertexCBegin(type_info.value_label_id);
+    auto value_v_iter = graph.VertexBegin(type_info.value_label_id);
     if (value_v_iter.IsDone()) {
       for (auto &type_value_info : type_info) {
         // std::cout << type_value_info.value_str << std::endl;
@@ -199,7 +199,7 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
         // std::cout << type_value_info.value_constant_label_id << std::endl;
 
         auto value_constant_v_iter =
-            graph.VertexCBegin(type_value_info.value_constant_label_id);
+            graph.VertexBegin(type_value_info.value_constant_label_id);
         if (!value_constant_v_iter.IsDone()) {
           // std::cout << value_constant_v_iter->id() << std::endl;
           // std::cout << value_constant_v_iter->label() << std::endl;
@@ -218,14 +218,14 @@ bool CheckGraph(const Graph &graph, const LabelDict &label_dict,
       do {
         auto type_value_iter = type_info.end();
 
-        auto equal_e_iter = value_v_iter->OutEdgeCBegin(ReservedLabel::kEqual);
+        auto equal_e_iter = value_v_iter->OutEdgeBegin(ReservedLabel::kEqual);
         if (equal_e_iter.IsDone()) {
-          auto attr_ptr = value_v_iter->FindConstAttributePtr("value");
+          auto attr_ptr = value_v_iter->FindAttribute("value");
           if (attr_ptr.IsNull()) return false;
 
           type_value_iter = type_info.Find(attr_ptr->value_str());
         } else {
-          auto constant_v_ptr = equal_e_iter->const_dst_ptr();
+          auto constant_v_ptr = equal_e_iter->const_dst_handle();
 
           type_value_iter = type_info.Find(constant_v_ptr->label());
         }

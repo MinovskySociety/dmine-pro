@@ -16,8 +16,8 @@ int GARChase(
     EdgeIDGen &edge_id_gen,
     std::set<typename DataGraph::VertexType::IDType> *diff_vertex_set = nullptr,
     std::set<typename DataGraph::EdgeType::IDType> *diff_edge_set = nullptr) {
-  using PatternVertexConstPtr = typename GAR::PatternType::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr = typename GAR::PatternVertexConstPtr;
+  using DataGraphVertexConstPtr = typename GAR::DataGraphVertexConstPtr;
   using MatchMap = std::map<PatternVertexConstPtr, DataGraphVertexConstPtr>;
   using MatchResultList = std::vector<MatchMap>;
 

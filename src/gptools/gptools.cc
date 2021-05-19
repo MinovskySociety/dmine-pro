@@ -51,6 +51,6 @@ int main(int argc, char **argv) {
     return res;
   }
 
-  quick_exit(0);
+  // quick_exit(0);
   return 0;
 }

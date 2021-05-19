@@ -18,7 +18,7 @@ int main() {
   std::cout << "read graph time is :"
             << (1.0 * t_end - t_begin) / CLOCKS_PER_SEC << std::endl;
   size_t Max = 0;
-  for (auto it = g.VertexCBegin(4); !it.IsDone(); it++) {
+  for (auto it = g.VertexBegin(4); !it.IsDone(); it++) {
     Max += it->CountOutVertex(2);
   }
   std::cout << "Max = " << Max << std::endl;

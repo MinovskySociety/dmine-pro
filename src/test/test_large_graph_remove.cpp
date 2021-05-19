@@ -8,7 +8,7 @@ int main() {
                                        uint64_t, uint32_t, std::string>;
   using Pattern = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string, uint64_t,
                                      uint32_t, std::string>;
-  using VertexConstPtr = typename DataGraph::VertexConstPtr;
+  using VertexConstPtr = typename GUNDAM::VertexHandle<DataGraph>::type;
   DataGraph data_graph;
   data_graph.AddVertex(1, 1);
   data_graph.AddVertex(2, 2);
@@ -17,8 +17,8 @@ int main() {
   query.AddVertex(1, 1);
   query.AddVertex(2, 2);
   query.AddEdge(1, 2, 1, 1);
-  GUNDAM::Match<const DataGraph, const DataGraph> partical_match;
-  GUNDAM::MatchSet<const DataGraph, const DataGraph> res;
+  GUNDAM::Match<DataGraph, DataGraph> partical_match;
+  GUNDAM::MatchSet<DataGraph, DataGraph> res;
   GUNDAM::DPISO_UsingPatricalMatchAndMatchSet(query, data_graph, partical_match,
                                               res);
   std::cout << "size = " << res.size() << std::endl;

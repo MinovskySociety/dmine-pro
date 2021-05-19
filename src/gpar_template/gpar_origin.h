@@ -47,28 +47,30 @@ inline void GPARExpandOrigin(const GPAR &gpar,
 template <class GPARList>
 inline void UniqueGPAROrigin(GPARList &gpar_list);
 template <class GPAR, class DataGraph>
-inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph);
+inline void CalSuppQ(GPAR &gpar, const DataGraph &data_graph);
 template <class GPAR, class DataGraph>
-inline void CalSuppR(GPAR &gpar, DataGraph &data_graph);
+inline void CalSuppR(GPAR &gpar, const DataGraph &data_graph);
 template <class GPARList, typename SuppType, class DataGraph>
 inline void FilterGPARUsingSuppRLimit(GPARList &gpar_list,
                                       const DataGraph &data_graph,
                                       const SuppType &sigma);
 template <class GPAR, class DataGraph>
-inline double diff(GPAR &query, GPAR &target, const DataGraph &data_graph);
+inline double diff(const GPAR &query, const GPAR &target,
+                   const DataGraph &data_graph);
 template <class GPAR, class DataGraph>
 inline double conf(const GPAR &gpar, const DataGraph &data_graph);
 template <class GPAR, class DataGraph>
-inline double F(GPAR &query, GPAR &target, const DataGraph &data_graph,
-                size_t k);
+inline double F(const GPAR &query, const GPAR &target,
+                const DataGraph &data_graph, size_t k);
 template <class GPAR, class TopKContainerType>
 inline bool GPARInTopKContainer(const GPAR &gpar,
                                 const TopKContainerType &top_k_container);
 template <class GPAR>
 inline bool CheckIsIsoOrigin(const GPAR &query, const GPAR &target);
 template <class TopKContainerType, class GPARList, class GPAR, class DataGraph>
-inline void IncDiv(TopKContainerType &top_k_container, size_t k, GPAR &gpar,
-                   GPARList &total_gpar, const DataGraph &data_graph);
+inline void IncDiv(TopKContainerType &top_k_container, size_t k,
+                   const GPAR &gpar, GPARList &total_gpar,
+                   const DataGraph &data_graph);
 template <class GPAR, class DataGraph>
 inline bool IsExtendable(const GPAR &gpar, const DataGraph &data_graph);
 template <class TopKContainerType>
@@ -112,7 +114,8 @@ inline void DMineOrigin(
       CalTimeOrigin(build_data_information_begin, build_data_information_end);
   std::cout << "get data graph information time is "
             << build_data_information_time << std::endl;
-  using SuppContainer = std::set<typename DataGraph::VertexConstPtr>;
+  using SuppContainer =
+      std::set<typename GUNDAM::VertexHandle<const DataGraph>::type>;
   using SuppType = size_t;
   using ConfType = double;
   using GPARList = std::vector<DiscoverdGPAR<Pattern, DataGraph>>;
@@ -208,9 +211,9 @@ inline void AddNewEdgeInPatternOrigin(const GPAR &gpar,
   VertexIDType x_node_id = gpar.x_node_ptr()->id();
   VertexIDType y_node_id = gpar.y_node_ptr()->id();
   EdgeLabelType q_edge_label = gpar.q_edge_label();
-  for (auto src_node_iter = gpar.pattern.VertexCBegin();
-       !src_node_iter.IsDone(); src_node_iter++) {
-    for (auto dst_node_iter = gpar.pattern.VertexCBegin();
+  for (auto src_node_iter = gpar.pattern.VertexBegin(); !src_node_iter.IsDone();
+       src_node_iter++) {
+    for (auto dst_node_iter = gpar.pattern.VertexBegin();
          !dst_node_iter.IsDone(); dst_node_iter++) {
       // not add self loop
       if (src_node_iter->id() == dst_node_iter->id()) continue;
@@ -251,7 +254,7 @@ inline void AddNewEdgeOutPatternOrigin(const GPAR &gpar,
   EdgeLabelType q_edge_label = gpar.q_edge_label();
   VertexIDType new_vertex_id = static_cast<VertexIDType>(pattern_size + 1);
 
-  for (auto node_iter = gpar.pattern.VertexCBegin(); !node_iter.IsDone();
+  for (auto node_iter = gpar.pattern.VertexBegin(); !node_iter.IsDone();
        node_iter++) {
     if (node_iter->id() == y_node_id) continue;
     for (const auto &possible_vertex_label : vertex_label_set) {
@@ -317,15 +320,18 @@ inline void UniqueGPAROrigin(GPARList &gpar_list) {
   std::swap(gpar_list, unique_gpar_list);
 }
 template <class GPAR, class DataGraph>
-inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph) {
+inline void CalSuppQ(GPAR &gpar, const DataGraph &data_graph) {
   // TransposePattern(gpar.pattern);
-  using SuppType = std::vector<typename DataGraph::VertexConstPtr>;
-  using SuppSet = std::set<typename DataGraph::VertexConstPtr>;
-  using MatchMap = std::map<typename GPAR::VertexConstPtr,
-                            typename DataGraph::VertexConstPtr>;
-  using CandidateSetType =
+  using SuppType =
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using SuppSet =
+      std::set<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using MatchMap =
       std::map<typename GPAR::VertexConstPtr,
-               std::vector<typename DataGraph::VertexConstPtr>>;
+               typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using CandidateSetType = std::map<
+      typename GPAR::VertexConstPtr,
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>>;
   using MatchResult = std::vector<MatchMap>;
   SuppType &supp_Q = gpar.supp_Q();
   SuppType temp_supp_Q;
@@ -335,15 +341,18 @@ inline void CalSuppQ(GPAR &gpar, DataGraph &data_graph) {
   return;
 }
 template <class GPAR, class DataGraph>
-inline void CalSuppR(GPAR &gpar, DataGraph &data_graph) {
-  using SuppType = std::vector<typename DataGraph::VertexConstPtr>;
-  using SuppSet = std::set<typename DataGraph::VertexConstPtr>;
-  using MatchMap = std::map<typename GPAR::VertexConstPtr,
-                            typename DataGraph::VertexConstPtr>;
-  using MatchResult = std::vector<MatchMap>;
-  using CandidateSetType =
+inline void CalSuppR(GPAR &gpar, const DataGraph &data_graph) {
+  using SuppType =
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using SuppSet =
+      std::set<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using MatchMap =
       std::map<typename GPAR::VertexConstPtr,
-               std::vector<typename DataGraph::VertexConstPtr>>;
+               typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  using MatchResult = std::vector<MatchMap>;
+  using CandidateSetType = std::map<
+      typename GPAR::VertexConstPtr,
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>>;
   SuppType &supp_R = gpar.supp_R();
   SuppType temp_supp_R;
   size_t gpar_edge = gpar.pattern.CountEdge();
@@ -361,7 +370,8 @@ inline void FilterGPARUsingSuppRLimit(GPARList &gpar_list,
                                       const DataGraph &data_graph,
                                       const SuppType &sigma) {
   GPARList filter_gpar_list;
-  using SuppContainerType = std::set<typename DataGraph::VertexConstPtr>;
+  using SuppContainerType =
+      std::set<typename GUNDAM::VertexHandle<const DataGraph>::type>;
 #pragma omp parallel for schedule(dynamic)
   for (int i = 0; i < static_cast<int>(gpar_list.size()); ++i) {
     auto &gpar = gpar_list[i];
@@ -382,10 +392,12 @@ inline void FilterGPARUsingSuppRLimit(GPARList &gpar_list,
   std::swap(filter_gpar_list, gpar_list);
 }
 template <class GPAR, class DataGraph>
-inline double diff(GPAR &query, GPAR &target, const DataGraph &data_graph) {
-  using SuppType = std::vector<typename DataGraph::VertexConstPtr>;
-  SuppType &a_supp_r = query.supp_R();
-  SuppType &b_supp_r = target.supp_R();
+inline double diff(const GPAR &query, const GPAR &target,
+                   const DataGraph &data_graph) {
+  using SuppType =
+      std::vector<typename GUNDAM::VertexHandle<const DataGraph>::type>;
+  const SuppType &a_supp_r = query.supp_R();
+  const SuppType &b_supp_r = target.supp_R();
   SuppType intersection_result;
   auto t_begin = clock();
   std::set_intersection(
@@ -407,7 +419,7 @@ inline double diff(GPAR &query, GPAR &target, const DataGraph &data_graph) {
         if (query_supp_r.count(x_match_ptr)) {
           return true;
         }
-        auto it = x_match_ptr->OutEdgeCBegin(query.q_edge_label(), y_match_ptr);
+        auto it = x_match_ptr->OutEdgeBegin(query.q_edge_label(), y_match_ptr);
         if (!it.IsDone()) {
           query_supp_r.insert(x_match_ptr);
         }
@@ -421,7 +433,7 @@ inline double diff(GPAR &query, GPAR &target, const DataGraph &data_graph) {
           return true;
         }
         auto it =
-            x_match_ptr->OutEdgeCBegin(target.q_edge_label(), y_match_ptr);
+            x_match_ptr->OutEdgeBegin(target.q_edge_label(), y_match_ptr);
         if (!it.IsDone()) {
           target_supp_r.insert(x_match_ptr);
         }
@@ -461,7 +473,7 @@ inline double conf(const GPAR &gpar, const DataGraph &data_graph) {
         if (supp_r.count(x_match_ptr)) {
           return true;
         }
-        auto it = x_match_ptr->OutEdgeCBegin(gpar.q_edge_label(), y_match_ptr);
+        auto it = x_match_ptr->OutEdgeBegin(gpar.q_edge_label(), y_match_ptr);
         if (!it.IsDone()) {
           supp_r.insert(x_match_ptr);
         }
@@ -472,8 +484,8 @@ inline double conf(const GPAR &gpar, const DataGraph &data_graph) {
   */
 }
 template <class GPAR, class DataGraph>
-inline double F(GPAR &query, GPAR &target, const DataGraph &data_graph,
-                size_t k) {
+inline double F(const GPAR &query, const GPAR &target,
+                const DataGraph &data_graph, size_t k) {
   // this parameter is in experiment in paper
   double lamda = 0.5;
   double ret = (1 - lamda) / (k - 1) *
@@ -516,8 +528,9 @@ inline bool GPARInTopKContainer(const GPAR &gpar,
   return false;
 }
 template <class TopKContainerType, class GPARList, class GPAR, class DataGraph>
-inline void IncDiv(TopKContainerType &top_k_container, size_t k, GPAR &gpar,
-                   GPARList &total_gpar, const DataGraph &data_graph) {
+inline void IncDiv(TopKContainerType &top_k_container, size_t k,
+                   const GPAR &gpar, GPARList &total_gpar,
+                   const DataGraph &data_graph) {
   size_t up_limit = k % 2 ? k / 2 + 1 : k / 2;
   if (GPARInTopKContainer(gpar, top_k_container)) {
     return;

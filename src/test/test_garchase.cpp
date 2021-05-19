@@ -1,5 +1,4 @@
 
-#include "../gpar/gpar.h"
 #include "OutputGraph.h"
 #include "gar/csv_gar.h"
 #include "gar/gar.h"
@@ -12,7 +11,7 @@ void TestGARMatch() {
                                        uint32_t, uint32_t>;
   using namespace gmine_new;
   GraphType query, target;
-  GUNDAM::SimpleArithmeticIDGenerator<EdgeIDType> edge_id_gen;
+  GUNDAM::SimpleArithmeticIDGenerator<uint64_t> edge_id_gen;
   // build target
   for (int i = 1; i <= 3; i++) target.AddVertex(i, 1);
   for (int i = 4; i <= 7; i++) target.AddVertex(i, 2);

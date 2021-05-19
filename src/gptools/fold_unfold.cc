@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "gundam/component/attribute.h"
+#include "gundam/type_getter/vertex_handle.h"
 #include "select.h"
-
 namespace gptools {
 
 using namespace graphpackage;
@@ -14,7 +14,8 @@ using namespace graphpackage;
 int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
                   const std::set<AttributeKey> &fold_attr_list,
                   // Vertex &vertex,
-                  Graph::VertexPtr &vertex, std::vector<ID> &remove_vertex_list,
+                  GUNDAM::VertexHandle<Graph>::type &vertex,
+                  std::vector<ID> &remove_vertex_list,
                   std::vector<ID> &remove_edge_list) {
   // T1 : x.a0(c0) ==> x -has-> a0_a.value(c0)|A|
   // T2 : x.a0(c0) ==> x -has-> a0_a_c0|V|
@@ -25,9 +26,9 @@ int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
   // T7 : x.a0(c0) ==> x -has-> a0_a|A| -is-> t0_v|V| -equal-> t0_c_c0|V|
 
   int count = 0;
-  for (auto has_e_iter = vertex->OutEdgeCBegin(ReservedLabel::kHas);
+  for (auto has_e_iter = vertex->OutEdgeBegin(ReservedLabel::kHas);
        !has_e_iter.IsDone(); ++has_e_iter) {
-    auto attr_v = has_e_iter->const_dst_ptr();
+    auto attr_v = has_e_iter->const_dst_handle();
     auto attr_iter = attr_dict.Find(attr_v->label());
     if (attr_iter == attr_dict.end()) return -1;
 
@@ -38,10 +39,10 @@ int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
     std::string value_str;
     if (attr_iter->attr_label_id == attr_v->label()) {
       // T1, T3-T7
-      auto is_e_iter = attr_v->OutEdgeCBegin(ReservedLabel::kIs);
+      auto is_e_iter = attr_v->OutEdgeBegin(ReservedLabel::kIs);
       if (is_e_iter.IsDone()) {
         // T1
-        auto attr_ptr = attr_v->FindConstAttributePtr("value");
+        auto attr_ptr = attr_v->FindAttribute("value");
         if (attr_ptr.IsNull()) return -1;
         value_str = attr_ptr->value_str();
 
@@ -49,22 +50,22 @@ int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
 
       } else {
         // T3-T7
-        auto value_v = is_e_iter->const_dst_ptr();
+        auto value_v = is_e_iter->const_dst_handle();
         auto type_iter = type_dict.Find(attr_iter->type_name);
         if (type_iter == type_dict.end()) return -1;
 
         if (type_iter->value_label_id == value_v->label()) {
           // T3, T5-T7
-          auto equal_e_iter = value_v->OutEdgeCBegin(ReservedLabel::kEqual);
+          auto equal_e_iter = value_v->OutEdgeBegin(ReservedLabel::kEqual);
           if (is_e_iter.IsDone()) {
             // T3, T5
-            auto attr_ptr = value_v->FindConstAttributePtr("value");
+            auto attr_ptr = value_v->FindAttribute("value");
             if (attr_ptr.IsNull()) return -1;
             value_str = attr_ptr->value_str();
 
           } else {
             // T6, T7
-            auto constant_v = equal_e_iter->const_dst_ptr();
+            auto constant_v = equal_e_iter->const_dst_handle();
             auto type_value_iter = type_iter->Find(constant_v->label());
             if (type_value_iter == type_iter->end()) return -1;
             value_str = type_value_iter->value_str;
@@ -122,7 +123,7 @@ int FoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
           label_type != LabelType::kRelation)
         continue;
 
-      Graph::VertexPtr v_ptr = v_iter;
+      GUNDAM::VertexHandle<Graph>::type v_ptr = v_iter;
       res = FoldAttribute(attr_dict, type_dict, fold_attr_list, v_ptr,
                           remove_vertex_list, remove_edge_list);
       if (res < 0) return res;
@@ -132,7 +133,7 @@ int FoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
   } else {
     for (const auto &v_label : vertex_label_list) {
       for (auto v_iter = g.VertexBegin(v_label); !v_iter.IsDone(); ++v_iter) {
-        Graph::VertexPtr v_ptr = v_iter;
+        GUNDAM::VertexHandle<Graph>::type v_ptr = v_iter;
         res = FoldAttribute(attr_dict, type_dict, fold_attr_list, v_ptr,
                             remove_vertex_list, remove_edge_list);
         if (res < 0) return res;
@@ -156,8 +157,8 @@ int FoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
 int UnfoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
                     const std::set<AttributeKey> &unfold_attr_list,
                     int unfold_type) {
-  using VertexPtr = typename Graph::VertexPtr;
-  using EdgePtr = typename Graph::EdgePtr;
+  using VertexPtr = typename GUNDAM::VertexHandle<Graph>::type;
+  using EdgePtr = typename GUNDAM::EdgeHandle<Graph>::type;
 
   // T1 : x.a0(c0) ==> x -has-> a0_a.value(c0)|A|
   // T2 : x.a0(c0) ==> x -has-> a0_a_c0|V|
@@ -370,7 +371,7 @@ int UnfoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
       continue;
 
     for (const auto &attr_key : unfold_attr_list) {
-      auto attr = v_iter->FindConstAttributePtr(attr_key);
+      auto attr = v_iter->FindAttribute(attr_key);
       if (attr.IsNull()) {
         continue;
       }
@@ -469,9 +470,9 @@ int FoldRelation(GraphPackage &gp, const std::set<Label> &fold_relation_list) {
   std::vector<ID> remove_list;
 
   for (const auto &v_label : fold_relation_list) {
-    for (auto it_v = g.VertexCBegin(v_label); !it_v.IsDone(); ++it_v) {
-      auto it_e_source = it_v->InEdgeCBegin(ReservedLabel::kSource);
-      auto it_e_target = it_v->OutEdgeCBegin(ReservedLabel::kTarget);
+    for (auto it_v = g.VertexBegin(v_label); !it_v.IsDone(); ++it_v) {
+      auto it_e_source = it_v->InEdgeBegin(ReservedLabel::kSource);
+      auto it_e_target = it_v->OutEdgeBegin(ReservedLabel::kTarget);
       if (it_e_source.IsDone() || it_e_target.IsDone()) return -1;
 
       const auto &src = it_e_source->src_id();
@@ -508,7 +509,7 @@ int UnfoldRelation(GraphPackage &gp,
 
   std::vector<ID> remove_list;
 
-  for (auto it_e = g.EdgeCBegin(); !it_e.IsDone(); ++it_e) {
+  for (auto it_e = g.EdgeBegin(); !it_e.IsDone(); ++it_e) {
     auto label = it_e->label();
     if (unfold_relation_list.find(label) == unfold_relation_list.end())
       continue;

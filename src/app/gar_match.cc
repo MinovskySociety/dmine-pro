@@ -38,8 +38,10 @@ int main(int argc, char* argv[]) {
                                        uint64_t, uint32_t, std::string>;
   using PatternVertexID = typename Pattern::VertexType::IDType;
   using DataGraphVertexID = typename DataGraph::VertexType::IDType;
-  using PatternVertexConstPtr = typename Pattern::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr =
+      typename GUNDAM::VertexHandle<const Pattern>::type;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   using GAR = gmine_new::GraphAssociationRule<Pattern, DataGraph>;
   using MatchMap = std::map<PatternVertexConstPtr, DataGraphVertexConstPtr>;
   using MatchResultList = std::vector<MatchMap>;
@@ -78,8 +80,8 @@ int main(int argc, char* argv[]) {
   std::string result = gar_match_info.result_dir +
                        gar_match_info.gar_list[0].name + "_match.csv";
   std::ofstream result_file(result);
-  MatchResultToFile<PatternVertexID, DataGraphVertexID>(match_result,
-                                                        result_file);
+  GUNDAM::MatchResultToFile<PatternVertexID, DataGraphVertexID>(match_result,
+                                                                result_file);
   std::cout << "out end!" << std::endl;
 
   return 0;

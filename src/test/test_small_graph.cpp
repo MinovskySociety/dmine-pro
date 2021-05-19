@@ -42,8 +42,8 @@ int main() {
   pattern.AddEdge(4, 1, 1, 4);
   pattern.AddEdge(2, 6, 0, 5);
   pattern.AddEdge(4, 0, 0, 6);
-  using MatchMap = std::map<typename Pattern::VertexConstPtr,
-                            typename TargetGraph::VertexConstPtr>;
+  using MatchMap = std::map<typename GUNDAM::VertexHandle<Pattern>::type,
+                            typename GUNDAM::VertexHandle<TargetGraph>::type>;
   std::vector<MatchMap> match_result;
   auto user_callback = [&match_result](auto &match_state) {
     match_result.push_back(match_state);
@@ -53,10 +53,8 @@ int main() {
   auto prune_callback = [](auto &match_state) { return false; };
   auto update_callback = [](auto &candidate_set) { return true; };
   MatchMap match_state;
-  match_state.emplace(pattern.FindConstVertex(0),
-                      data_graph.FindConstVertex(2599834));
-  match_state.emplace(pattern.FindConstVertex(1),
-                      data_graph.FindConstVertex(2994577));
+  match_state.emplace(pattern.FindVertex(0), data_graph.FindVertex(2599834));
+  match_state.emplace(pattern.FindVertex(1), data_graph.FindVertex(2994577));
   auto t_begin = clock();
   GUNDAM::DPISO(pattern, data_graph, match_state, user_callback, prune_callback,
                 update_callback, 100.0);

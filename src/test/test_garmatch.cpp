@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "../gpar/gpar.h"
+//#include "../gpar/gpar.h"
 #include "gar/csv_gar.h"
 #include "gar/gar.h"
 #include "gar/gar_match.h"
@@ -106,13 +106,15 @@ int main(int argc, char* argv[]) {
     return 0;
   }
   std::string result_dir = config["ResultDir"].as<std::string>();
-
+  using VertexIDType = uint64_t;
   using Pattern = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string, uint64_t,
                                      uint32_t, std::string>;
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, std::string,
                                        uint64_t, uint32_t, std::string>;
-  using PatternVertexConstPtr = typename Pattern::VertexConstPtr;
-  using DataGraphVertexConstPtr = typename DataGraph::VertexConstPtr;
+  using PatternVertexConstPtr =
+      typename GUNDAM::VertexHandle<const Pattern>::type;
+  using DataGraphVertexConstPtr =
+      typename GUNDAM::VertexHandle<const DataGraph>::type;
   gmine_new::GraphAssociationRule<Pattern, DataGraph> gar;
   gmine_new::ReadGAR(gar, gar_vertex_file.c_str(), gar_edge_file.c_str(),
                      gar_literal_x_file.c_str(), gar_literal_y_file.c_str());
@@ -122,10 +124,8 @@ int main(int argc, char* argv[]) {
   using MatchResultList = std::vector<MatchMap>;
   MatchResultList match_result;
   std::map<PatternVertexConstPtr, DataGraphVertexConstPtr> match_state;
-  match_state.emplace(gar.pattern().FindConstVertex(1),
-                      data_graph.FindConstVertex(6));
-  match_state.emplace(gar.pattern().FindConstVertex(2),
-                      data_graph.FindConstVertex(7));
+  match_state.emplace(gar.pattern().FindVertex(1), data_graph.FindVertex(6));
+  match_state.emplace(gar.pattern().FindVertex(2), data_graph.FindVertex(7));
   int count =
       gmine_new::GARMatch<true>(gar, data_graph, match_state, match_result);
   if (count < 0) {
@@ -135,8 +135,8 @@ int main(int argc, char* argv[]) {
   std::cout << "Match count = " << count << std::endl;
   std::string result = result_dir + gar_name + "_match.csv";
   std::ofstream result_file(result);
-  MatchResultToFile<gmine_new::VertexIDType, gmine_new::VertexIDType>(
-      match_result, result_file);
+  GUNDAM::MatchResultToFile<VertexIDType, VertexIDType>(match_result,
+                                                        result_file);
   std::cout << "out end!" << std::endl;
   return 0;
 }

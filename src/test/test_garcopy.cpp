@@ -1,14 +1,15 @@
-#include "../gpar/gpar.h"
+
 #include "gar/csv_gar.h"
 #include "gar/gar.h"
 #include "gar/gar_chase.h"
 #include "gar/gar_match.h"
 #include "gundam/graph_type/large_graph.h"
+#include "gundam/type_getter/vertex_handle.h"
 void TestGARMatch() {
   using DataGraph = GUNDAM::LargeGraph<uint64_t, uint32_t, uint32_t, uint64_t,
                                        uint32_t, uint32_t>;
   using namespace gmine_new;
-  GraphType query;
+  DataGraph query;
   DataGraph target;
   // build target
   for (int i = 1; i <= 3; i++) target.AddVertex(i, 1);
@@ -40,15 +41,16 @@ void TestGARMatch() {
   query.AddEdge(2, 5, 2, ++cnt);
 
   // add X
-  GraphAssociationRule<GraphType, DataGraph> test1(query);
-  test1.AddX<ConstantLiteral<GraphType, DataGraph, std::string>>(
+  GraphAssociationRule<DataGraph, DataGraph> test1(query);
+  test1.AddX<ConstantLiteral<DataGraph, DataGraph, std::string>>(
       2, 1, std::string{"u2"});
-  test1.AddX<ConstantLiteral<GraphType, DataGraph, std::string>>(
+  test1.AddX<ConstantLiteral<DataGraph, DataGraph, std::string>>(
       3, 2, std::string{"456"});
-  test1.AddY<EdgeLiteral<GraphType, DataGraph>>(1, 5, 2);
-  std::vector<std::map<VertexConstPtr, typename DataGraph::VertexConstPtr>>
+  test1.AddY<EdgeLiteral<DataGraph, DataGraph>>(1, 5, 2);
+  std::vector<std::map<typename GUNDAM::VertexHandle<const DataGraph>::type,
+                       typename GUNDAM::VertexHandle<const DataGraph>::type>>
       match_result;
-  GraphAssociationRule<GraphType, DataGraph> test2 = test1;
+  GraphAssociationRule<DataGraph, DataGraph> test2 = test1;
   GARMatch<true>(test1, target, match_result);
   std::cout << "total Match = " << match_result.size() << std::endl;
   for (auto &it : match_result) {

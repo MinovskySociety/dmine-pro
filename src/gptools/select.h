@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "gptdef.h"
+#include "gundam/type_getter/vertex_handle.h"
 
 namespace gptools {
 
@@ -27,12 +28,12 @@ inline int RemoveVertexByIDList(Graph &g, const IDList &remove_list) {
 
 template <class LabelList>
 inline int RemoveVertexByLabelList(Graph &g,
-                                      const LabelList &vertex_label_list) {
+                                   const LabelList &vertex_label_list) {
   std::cout << "Label list count - " << vertex_label_list.size() << std::endl;
 
   std::vector<ID> remove_list;
   for (const Label &label : vertex_label_list) {
-    for (auto it_v = g.VertexCBegin(label); !it_v.IsDone(); ++it_v) {
+    for (auto it_v = g.VertexBegin(label); !it_v.IsDone(); ++it_v) {
       remove_list.emplace_back(it_v->id());
     }
   }
@@ -55,8 +56,8 @@ inline int RemoveEdgeByIDList(Graph &g, const IDList &remove_list) {
 
 #ifdef USE_GRAPH
 inline int RemoveEdgeByLabel(Graph &g, const Label &edge_label,
-                                const std::set<Label> &source_label_list,
-                                const std::set<Label> &target_label_list) {
+                             const std::set<Label> &source_label_list,
+                             const std::set<Label> &target_label_list) {
   std::cout << "edge label - " << edge_label << std::endl;
   std::cout << "source label count - " << source_label_list.size() << std::endl;
   std::cout << "target label count - " << target_label_list.size() << std::endl;
@@ -66,25 +67,25 @@ inline int RemoveEdgeByLabel(Graph &g, const Label &edge_label,
     // std::cout<<"checking vertex id: "<<it_v->id()<<std::endl;
     for (auto it_e = it_v->OutEdgeBegin(); !it_e.IsDone();) {
       // std::cout<<" wenzhi in erase edge: "<<std::endl;
-      if (edge_label != 0 && it_e->label() != edge_label){
+      if (edge_label != 0 && it_e->label() != edge_label) {
         // std::cout<<" wenzhi here #1# "<<std::endl;
         ++it_e;
         continue;
-      } 
+      }
       // std::cout<<" wenzhi here #2# "<<std::endl;
       if (!source_label_list.empty() &&
-           source_label_list.count(it_e->const_src_ptr()->label()) == 0){
+          source_label_list.count(it_e->const_src_handle()->label()) == 0) {
         // std::cout<<" wenzhi here #2# "<<std::endl;
         ++it_e;
         continue;
-      } 
+      }
       // std::cout<<" wenzhi here #3# "<<std::endl;
       if (!target_label_list.empty() &&
-           target_label_list.count(it_e->const_dst_ptr()->label()) == 0){
+          target_label_list.count(it_e->const_dst_handle()->label()) == 0) {
         // std::cout<<" wenzhi here #3# "<<std::endl;
         ++it_e;
         continue;
-      } 
+      }
       // std::cout<<"remove edge id: "<<it_e->id()<<std::endl;
       counter++;
       it_e = it_v->EraseEdge(it_e);
@@ -100,23 +101,23 @@ inline int RemoveEdgeByLabel(Graph &g, const Label &edge_label,
 }
 #else
 inline int RemoveEdgeByLabel(Graph &g, const Label &edge_label,
-                                const std::set<Label> &source_label_list,
-                                const std::set<Label> &target_label_list) {
+                             const std::set<Label> &source_label_list,
+                             const std::set<Label> &target_label_list) {
   std::cout << "edge label - " << edge_label << std::endl;
   std::cout << "source label count - " << source_label_list.size() << std::endl;
   std::cout << "target label count - " << target_label_list.size() << std::endl;
 
   std::vector<ID> remove_list;
-  ///for (auto it_e = g.EdgeCBegin(); !it_e.IsDone(); ++it_e) {
+  /// for (auto it_e = g.EdgeBegin(); !it_e.IsDone(); ++it_e) {
   /// modified by wenzhi
-  for (auto it_v = g.VertexCBegin(); !it_v.IsDone(); it_v++) {
-    for (auto it_e = it_v->OutEdgeCBegin(); !it_e.IsDone(); it_e++) {
+  for (auto it_v = g.VertexBegin(); !it_v.IsDone(); it_v++) {
+    for (auto it_e = it_v->OutEdgeBegin(); !it_e.IsDone(); it_e++) {
       if (edge_label != 0 && it_e->label() != edge_label) continue;
       if (!source_label_list.empty() &&
-          source_label_list.count(it_e->const_src_ptr()->label()) == 0)
+          source_label_list.count(it_e->const_src_handle()->label()) == 0)
         continue;
       if (!target_label_list.empty() &&
-          target_label_list.count(it_e->const_dst_ptr()->label()) == 0)
+          target_label_list.count(it_e->const_dst_handle()->label()) == 0)
         continue;
 
       remove_list.emplace_back(it_e->id());
@@ -124,12 +125,11 @@ inline int RemoveEdgeByLabel(Graph &g, const Label &edge_label,
   }
   return RemoveEdgeByIDList(g, remove_list);
 }
-#endif // USE_GRAPH
+#endif  // USE_GRAPH
 
 template <class LabelList, class AttributeKeyList>
-inline int RemoveVertexAttribute(Graph &g,
-                                    const LabelList &vertex_label_list,
-                                    const AttributeKeyList &attr_key_list) {
+inline int RemoveVertexAttribute(Graph &g, const LabelList &vertex_label_list,
+                                 const AttributeKeyList &attr_key_list) {
   std::cout << "vertex label count - " << vertex_label_list.size() << std::endl;
   std::cout << "attribute key count - " << attr_key_list.size() << std::endl;
 
@@ -147,24 +147,24 @@ inline int RemoveVertexAttribute(Graph &g,
 }
 
 inline int FindConnectedVertex(const Graph &g, std::set<ID> &connected_list) {
-  std::queue<Graph::VertexConstPtr> q;
+  std::queue<GUNDAM::VertexHandle<const Graph>::type> q;
   for (const auto &id : connected_list) {
-    auto v = g.FindConstVertex(id);
+    auto v = g.FindVertex(id);
     if (!v) return -1;
     q.emplace(v);
   }
   int count = 0;
   while (!q.empty()) {
     auto v = q.front();
-    for (auto it_e = v->OutEdgeCBegin(); !it_e.IsDone(); ++it_e) {
-      if (connected_list.emplace(it_e->const_dst_ptr()->id()).second) {
-        q.emplace(it_e->const_dst_ptr());
+    for (auto it_e = v->OutEdgeBegin(); !it_e.IsDone(); ++it_e) {
+      if (connected_list.emplace(it_e->const_dst_handle()->id()).second) {
+        q.emplace(it_e->const_dst_handle());
         ++count;
       }
     }
-    for (auto it_e = v->InEdgeCBegin(); !it_e.IsDone(); ++it_e) {
-      if (connected_list.emplace(it_e->const_src_ptr()->id()).second) {
-        q.emplace(it_e->const_src_ptr());
+    for (auto it_e = v->InEdgeBegin(); !it_e.IsDone(); ++it_e) {
+      if (connected_list.emplace(it_e->const_src_handle()->id()).second) {
+        q.emplace(it_e->const_src_handle());
         ++count;
       }
     }
@@ -186,7 +186,7 @@ inline int RemoveDisconnected(Graph &g, IDList &&start_vertex_list,
   if (res < 0) return res;
 
   std::vector<ID> remove_list;
-  for (auto it_v = g.VertexCBegin(); !it_v.IsDone(); ++it_v) {
+  for (auto it_v = g.VertexBegin(); !it_v.IsDone(); ++it_v) {
     auto id = it_v->id();
     if (connected_list.find(id) == connected_list.end() && rm_callback(it_v)) {
       remove_list.emplace_back(id);
@@ -199,10 +199,10 @@ inline int RemoveDisconnected(Graph &g, IDList &&start_vertex_list,
 
 template <class LabelList>
 inline int GetVertexList(const Graph &g, const LabelList &label_list,
-                            std::set<ID> &vertex_list) {
+                         std::set<ID> &vertex_list) {
   vertex_list.clear();
   for (const auto &label : label_list) {
-    for (auto it_v = g.VertexCBegin(label); !it_v.IsDone(); ++it_v) {
+    for (auto it_v = g.VertexBegin(label); !it_v.IsDone(); ++it_v) {
       vertex_list.emplace(it_v->id());
     }
   }
@@ -253,7 +253,6 @@ int SamplingVertexByIDList(Graph &g, const Label &label,
                            const std::set<ID> &id_list);
 
 int SamplingVertexRandom(Graph &g, const Label &label, size_t num);
-
 
 }  // namespace gptools
 

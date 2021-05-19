@@ -4,6 +4,7 @@
 #include "gundam/graph_type/large_graph.h"
 #include "gundam/io/csvgraph.h"
 #include "gundam/io/rapidcsv.h"
+#include "gundam/type_getter/vertex_handle.h"
 #include "yaml-cpp/yaml.h"
 template <class Graph, class LabelDict>
 bool GetGraphAndDict(YAML::Node &config, Graph &graph, LabelDict &label_dict) {
@@ -62,9 +63,8 @@ bool ConvertGraphToRDF(YAML::Node &config, Graph &graph,
   using VertexIDType = typename VertexType::IDType;
   using VertexLabelType = typename VertexType::LabelType;
   using EdgeLabelType = typename Graph::EdgeType::LabelType;
-  using VertexConstPtr = typename Graph::VertexConstPtr;
-  for (auto vertex_it = graph.VertexCBegin(); !vertex_it.IsDone();
-       vertex_it++) {
+  using VertexConstPtr = typename GUNDAM::VertexHandle<Graph>::type;
+  for (auto vertex_it = graph.VertexBegin(); !vertex_it.IsDone(); vertex_it++) {
     // std::cout << "id = " << vertex_it->id() << std::endl;
     // std::cout << "label = " << vertex_it->label() << std::endl;
     VertexIDType src_id = vertex_it->id();
@@ -77,10 +77,10 @@ bool ConvertGraphToRDF(YAML::Node &config, Graph &graph,
                << "has label"
                << "\""
                << " ." << std::endl;
-    for (auto edge_it = vertex_it->OutEdgeCBegin(); !edge_it.IsDone();
+    for (auto edge_it = vertex_it->OutEdgeBegin(); !edge_it.IsDone();
          edge_it++) {
       EdgeLabelType edge_label = edge_it->label();
-      VertexConstPtr dst_ptr = edge_it->const_dst_ptr();
+      VertexConstPtr dst_ptr = edge_it->dst_handle();
       VertexIDType dst_id = dst_ptr->id();
       VertexLabelType dst_label = dst_ptr->label();
       std::string dst_name = "pre:vertex_" + std::to_string(dst_id);
