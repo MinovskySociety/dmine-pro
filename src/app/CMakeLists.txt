@@ -4,15 +4,15 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/app)
 
 # 生成可执行程序
 add_executable(gar_match gar_match.cc gar_config.cc)
-target_link_libraries(gar_match PRIVATE yaml-cpp glog::glog)
+target_link_libraries(gar_match PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
 
 if(MPI_FOUND)
   add_executable(gar_match_mpi gar_match_mpi.cc gar_config.cc)
-  target_link_libraries(gar_match_mpi PRIVATE yaml-cpp glog::glog MPI::MPI_CXX)
+  target_link_libraries(gar_match_mpi PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES} ${MPI_CXX_LIBRARIES})
 endif()
 
 add_executable(gar_chase gar_chase.cc gar_config.cc)
-target_link_libraries(gar_chase PRIVATE yaml-cpp glog::glog)
+target_link_libraries(gar_chase PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
 
 add_executable(multi_gar_match multi_gar_match.cc)
 #add_executable(dmine dmine.cpp)
@@ -21,21 +21,21 @@ add_executable(multi_gar_match multi_gar_match.cc)
 #target_link_libraries(dmine_new PRIVATE glog::glog)
 
 add_executable(dmine_pro dmine_pro.cc)
-target_link_libraries(dmine_pro PRIVATE yaml-cpp glog::glog)
+target_link_libraries(dmine_pro PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
 
 add_executable(dmine_origin dmine_origin.cc)
-target_link_libraries(dmine_origin PRIVATE yaml-cpp glog::glog)
+target_link_libraries(dmine_origin PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
 
 add_executable(dmine_algo dmine_algo.cc)
-target_link_libraries(dmine_algo PRIVATE yaml-cpp glog::glog)
+target_link_libraries(dmine_algo PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
 
 if(MPI_FOUND)
   add_executable(mgm mgm.cc)
-  target_link_libraries(mgm PRIVATE yaml-cpp glog::glog MPI::MPI_CXX)
+  target_link_libraries(mgm PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES} ${MPI_CXX_LIBRARIES})
 endif()
 
 add_executable(multimgm multimgm.cc)
-target_link_libraries(multimgm PRIVATE yaml-cpp glog::glog MPI::MPI_CXX)
+target_link_libraries(multimgm PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES} ${MPI_CXX_LIBRARIES})
 
 #set(CMAKE_PREFIX_PATH "/home/sunguangzhi/libtorch")
 #find_package(Torch REQUIRED)
@@ -45,10 +45,10 @@ target_link_libraries(multimgm PRIVATE yaml-cpp glog::glog MPI::MPI_CXX)
 #set_property(TARGET multimgm PROPERTY CXX_STANDARD 14)
 
 add_executable(tgraph_discover tgraph_discover.cc)
-target_link_libraries(tgraph_discover PRIVATE yaml-cpp glog::glog)
+target_link_libraries(tgraph_discover PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
 
 add_executable(tgraph_apply tgraph_apply.cc)
-target_link_libraries(tgraph_apply PRIVATE yaml-cpp glog::glog MPI::MPI_CXX)
+target_link_libraries(tgraph_apply PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES} ${MPI_CXX_LIBRARIES})
 
 #add_executable(pattern_gen pattern_gen.cpp)
 
@@ -56,4 +56,4 @@ add_executable(datagraph_information datagraph_information.cpp)
 
 
 add_executable(gmar_discover gmar_discover.cpp)
-target_link_libraries(gmar_discover PRIVATE yaml-cpp glog::glog)
+target_link_libraries(gmar_discover PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})

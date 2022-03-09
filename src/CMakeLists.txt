@@ -2,27 +2,27 @@
 #link_directories(gpar)
 #add_subdirectory(gpar)
 
-include_directories(app)
-link_directories(app)
-add_subdirectory(app)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/app)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/app)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/app)
 
-include_directories(test)
-link_directories(test)
-add_subdirectory(test)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/test)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 #include_directories(GAR)
 #link_directories(GAR)
 #add_subdirectory(GAR)
 
 
-include_directories(graph_convert)
-link_directories(graph_convert)
-add_subdirectory(graph_convert)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/graph_convert)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/graph_convert)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/graph_convert)
 
 #add_subdirectory(ecs_by_gundam)
 
-add_subdirectory(graph_package)
-add_subdirectory(gptools)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/graph_package)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/gptools)
 
 # 源文件列表
 aux_source_directory(. SRCS)
