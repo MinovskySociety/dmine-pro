@@ -4,7 +4,7 @@ IF(APPLE)
     SET(CMAKE_C_COMPILER "/usr/local/Cellar/gcc/9.1.0/bin/gcc-9")
     SET(CMAKE_CXX_COMPILER "/usr/local/Cellar/gcc/9.1.0/bin/g++-9")
 ENDIF()
-project(dminepro)
+project(dmine-pro)
 
 # ------------------------------------------------------------------------------
 # cmake options
