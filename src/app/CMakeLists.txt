@@ -29,8 +29,10 @@ target_link_libraries(dmine_origin PRIVATE yaml-cpp glog::glog)
 add_executable(dmine_algo dmine_algo.cc)
 target_link_libraries(dmine_algo PRIVATE yaml-cpp glog::glog)
 
-add_executable(mgm mgm.cc)
-target_link_libraries(mgm PRIVATE yaml-cpp glog::glog)
+if(MPI_FOUND)
+  add_executable(mgm mgm.cc)
+  target_link_libraries(mgm PRIVATE yaml-cpp glog::glog MPI::MPI_CXX)
+endif()
 
 add_executable(multimgm multimgm.cc)
 target_link_libraries(multimgm PRIVATE yaml-cpp glog::glog MPI::MPI_CXX)

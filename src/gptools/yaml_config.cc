@@ -48,7 +48,8 @@ int ReadGraphPackageInfoYAML(const YAML::Node &graph_node,
         graph_info.vertex_files.emplace_back(p.second.as<std::string>());
         ++count;
       } else {
-        throw InvalidNode("VertexFile");
+        throw InvalidNode();
+        // throw InvalidNode("VertexFile");
       }
     } else if (node_name == "EdgeFile") {
       if (p.second.Type() == NodeType::Sequence) {
@@ -60,7 +61,8 @@ int ReadGraphPackageInfoYAML(const YAML::Node &graph_node,
         graph_info.edge_files.emplace_back(p.second.as<std::string>());
         ++count;
       } else {
-        throw InvalidNode("EdgeFile");
+        throw InvalidNode();
+        // throw InvalidNode("EdgeFile");
       }
     } else if (node_name == "HasDict" || node_name == "ReadDict" ||
                node_name == "WriteDict") {
@@ -96,10 +98,16 @@ int ReadGPActionsYAML(const YAML::Node &action_list_node,
   action_list.clear();
 
   if (!action_list_node.IsDefined()) return 0;
-  if (!action_list_node.IsSequence()) throw InvalidNode("ActionList");
+  if (!action_list_node.IsSequence()) {
+    throw InvalidNode();
+    // throw InvalidNode("ActionList");
+  }
 
   for (const auto &t : action_list_node) {
-    if (!t.IsMap()) throw InvalidNode("");
+    if (!t.IsMap()) {
+      throw InvalidNode();
+      // throw InvalidNode("");
+    } 
 
     auto type = t["Action"].as<std::string>();
     if (type == "RegisterEntity") {
@@ -131,7 +139,8 @@ int ReadGPActionsYAML(const YAML::Node &action_list_node,
     } else if (type == "UnfoldRelation") {
       action_list.emplace_back(std::make_unique<GPActionUnfoldRelation>(t));
     } else {
-      throw InvalidNode("Action");
+      throw InvalidNode();
+      // throw InvalidNode("Action");
     }
   }
 
