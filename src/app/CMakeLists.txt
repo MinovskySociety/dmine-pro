@@ -21,7 +21,7 @@ add_executable(multi_gar_match multi_gar_match.cc)
 #target_link_libraries(dmine_new PRIVATE glog::glog)
 
 add_executable(dmine_pro dmine_pro.cc)
-target_link_libraries(dmine_pro PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
+target_link_libraries(dmine_pro PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES})
 
 add_executable(dmine_origin dmine_origin.cc)
 target_link_libraries(dmine_origin PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
@@ -56,4 +56,4 @@ add_executable(datagraph_information datagraph_information.cpp)
 
 
 add_executable(gmar_discover gmar_discover.cpp)
-target_link_libraries(gmar_discover PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES})
+target_link_libraries(gmar_discover PRIVATE ${YAML_LIBRARIES}  ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES})
