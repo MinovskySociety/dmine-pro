@@ -1050,8 +1050,11 @@ inline void FilterGPARUsingSuppRLimit(GPARList& gpar_list,
   using SuppContainerType =
       std::set<typename GUNDAM::VertexHandle<DataGraph>::type>;
   int index = 0;
-#pragma omp parallel for schedule(static, MAX_THREAD_NUM)
-  for (auto& gpar : gpar_list) {
+  #pragma omp parallel for schedule(static, MAX_THREAD_NUM)
+  for (int gpar_list_idx = 0; 
+           gpar_list_idx < gpar_list.size(); 
+           gpar_list_idx++) {
+    auto& gpar = gpar_list[gpar_list_idx];
     CalSuppQ(gpar, data_graph);
     gpar.supp_Q_size_ = gpar.supp_Q_size();
     CalSuppR(gpar, data_graph);
