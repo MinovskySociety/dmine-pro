@@ -218,7 +218,7 @@ inline int GetLabelList(const graphpackage::LabelDict &label_dict,
   for (const auto &label_name : name_list) {
     std::cout << "  " << label_name;
     auto label = label_dict.GetLabelID(label_name);
-    if (label == 0) {
+    if (label == -1) {
       std::cout << " not found." << std::endl;
       return -1;
     }

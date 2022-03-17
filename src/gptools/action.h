@@ -159,7 +159,7 @@ class GPActionSampling : public GPAction {
     if (!vertex_label_name_.empty() && !list_file_.empty()) {
       std::cout << "Vertex label: " << vertex_label_name_;
       Label vertex_label = gp.label_dict().GetLabelID(vertex_label_name_);
-      if (vertex_label == 0) {
+      if (vertex_label == -1) {
         std::cout << " not found." << std::endl;
         return -1;
       }
@@ -178,7 +178,7 @@ class GPActionSampling : public GPAction {
     } else if (!vertex_label_name_.empty() && num_ > 0) {      
       std::cout << "Vertex label: " << vertex_label_name_;
       Label vertex_label = gp.label_dict().GetLabelID(vertex_label_name_);
-      if (vertex_label == 0) {
+      if (vertex_label == -1) {
         std::cout << " not found." << std::endl;
         return -1;
       }
@@ -342,7 +342,7 @@ class GPActionRemoveEdge : public GPAction {
     if (!edge_label_name_.empty()) {
       std::cout << "Edge label: " << edge_label_name_;
       edge_label = gp.label_dict().GetLabelID(edge_label_name_);
-      if (edge_label == 0) {
+      if (edge_label == -1) {
         std::cout << " - not found." << std::endl;
         return -1;
       }

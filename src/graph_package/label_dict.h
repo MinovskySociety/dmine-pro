@@ -138,7 +138,7 @@ class LabelDict {
 
   Label GetLabelID(const std::string &name) const {
     auto iter = name_index_.find(name);
-    if (iter == name_index_.end()) return 0;
+    if (iter == name_index_.end()) return -1;
     return name_index_.at(name)->label_id;
   }
 

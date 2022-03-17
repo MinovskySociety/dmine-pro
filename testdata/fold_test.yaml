@@ -1,0 +1,26 @@
+Graph:
+  Dir: /afs/inf.ed.ac.uk/user/s18/s1842372/dmine-pro/testdata
+  Name: test_fold_graph
+  VertexFile:
+    - test_fold_graph.v
+  EdgeFile:
+    - test_fold_graph.e
+  LabelFile: test_fold_graph.lfile
+  AttributeFile: test_fold_graph.afile
+  TypeFile: test_fold_graph.tfile
+
+ActionList:
+  -
+    Action: FoldAttribute
+    VertexLabel:
+      - Location
+      - Gender
+
+ResultGraph: 
+  Dir: .
+  Name: folded_graph
+  IsGrouping: false
+  VertexFile:
+    - folded_graph.v
+  EdgeFile:
+    - folded_graph.e
