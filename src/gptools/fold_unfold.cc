@@ -2,6 +2,7 @@
 
 #include <set>
 #include <vector>
+#include <map>
 
 #include "gundam/component/attribute.h"
 #include "gundam/type_getter/vertex_handle.h"
@@ -16,7 +17,9 @@ int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
                   // Vertex &vertex,
                   GUNDAM::VertexHandle<Graph>::type &vertex,
                   std::vector<ID> &remove_vertex_list,
-                  std::vector<ID> &remove_edge_list) {
+                  std::vector<ID> &remove_edge_list,
+                  const std::set<Label> &fold_edge_label,
+                  const LabelDict& label_dict) {
   // T1 : x.a0(c0) ==> x -has-> a0_a.value(c0)|A|
   // T2 : x.a0(c0) ==> x -has-> a0_a_c0|V|
   // T3 : x.a0(c0) ==> x -has-> a0_a|V| -is-> t0_v.value(c0)|V|
@@ -26,87 +29,119 @@ int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
   // T7 : x.a0(c0) ==> x -has-> a0_a|A| -is-> t0_v|V| -equal-> t0_c_c0|V|
 
   int count = 0;
-  for (auto has_e_iter = vertex->OutEdgeBegin(ReservedLabel::kHas);
-       !has_e_iter.IsDone(); ++has_e_iter) {
-    auto attr_v = has_e_iter->const_dst_handle();
-    auto attr_iter = attr_dict.Find(attr_v->label());
-    if (attr_iter == attr_dict.end()) return -1;
 
-    if (!fold_attr_list.empty() &&
-        fold_attr_list.count(attr_iter->attr_key) == 0)
-      continue;
+  if (fold_edge_label.empty()) {
+    for (auto has_e_iter = vertex->OutEdgeBegin(ReservedLabel::kHas);
+          !has_e_iter.IsDone(); ++has_e_iter) {
+      auto attr_v = has_e_iter->const_dst_handle();
+      auto attr_iter = attr_dict.Find(attr_v->label());
+      if (attr_iter == attr_dict.end()) return -1;
 
-    std::string value_str;
-    if (attr_iter->attr_label_id == attr_v->label()) {
-      // T1, T3-T7
-      auto is_e_iter = attr_v->OutEdgeBegin(ReservedLabel::kIs);
-      if (is_e_iter.IsDone()) {
-        // T1
-        auto attr_ptr = attr_v->FindAttribute("value");
-        if (attr_ptr.IsNull()) return -1;
-        value_str = attr_ptr->value_str();
+      if (!fold_attr_list.empty() &&
+          fold_attr_list.count(attr_iter->attr_key) == 0)
+        continue;
 
-        remove_vertex_list.emplace_back(attr_v->id());
+      std::string value_str;
+      if (attr_iter->attr_label_id == attr_v->label()) {
+        // T1, T3-T7
+        auto is_e_iter = attr_v->OutEdgeBegin(ReservedLabel::kIs);
+        if (is_e_iter.IsDone()) {
+          // T1
+          auto attr_ptr = attr_v->FindAttribute("value");
+          if (attr_ptr.IsNull()) return -1;
+          value_str = attr_ptr->value_str();
 
-      } else {
-        // T3-T7
-        auto value_v = is_e_iter->const_dst_handle();
-        auto type_iter = type_dict.Find(attr_iter->type_name);
-        if (type_iter == type_dict.end()) return -1;
+          remove_vertex_list.emplace_back(attr_v->id());
 
-        if (type_iter->value_label_id == value_v->label()) {
-          // T3, T5-T7
-          auto equal_e_iter = value_v->OutEdgeBegin(ReservedLabel::kEqual);
-          if (is_e_iter.IsDone()) {
-            // T3, T5
-            auto attr_ptr = value_v->FindAttribute("value");
-            if (attr_ptr.IsNull()) return -1;
-            value_str = attr_ptr->value_str();
+        } else {
+          // T3-T7
+          auto value_v = is_e_iter->const_dst_handle();
+          auto type_iter = type_dict.Find(attr_iter->type_name);
+          if (type_iter == type_dict.end()) return -1;
 
+          if (type_iter->value_label_id == value_v->label()) {
+            // T3, T5-T7
+            auto equal_e_iter = value_v->OutEdgeBegin(ReservedLabel::kEqual);
+            if (is_e_iter.IsDone()) {
+              // T3, T5
+              auto attr_ptr = value_v->FindAttribute("value");
+              if (attr_ptr.IsNull()) return -1;
+              value_str = attr_ptr->value_str();
+
+            } else {
+              // T6, T7
+              auto constant_v = equal_e_iter->const_dst_handle();
+              auto type_value_iter = type_iter->Find(constant_v->label());
+              if (type_value_iter == type_iter->end()) return -1;
+              value_str = type_value_iter->value_str;
+            }
           } else {
-            // T6, T7
-            auto constant_v = equal_e_iter->const_dst_handle();
-            auto type_value_iter = type_iter->Find(constant_v->label());
+            // T4
+            auto type_value_iter = type_iter->Find(value_v->label());
             if (type_value_iter == type_iter->end()) return -1;
             value_str = type_value_iter->value_str;
           }
-        } else {
-          // T4
-          auto type_value_iter = type_iter->Find(value_v->label());
-          if (type_value_iter == type_iter->end()) return -1;
-          value_str = type_value_iter->value_str;
-        }
 
-        auto attr_value_iter = attr_iter->Find(value_str);
+          auto attr_value_iter = attr_iter->Find(value_str);
+          if (attr_value_iter == attr_iter->end()) return -1;
+          if (attr_value_iter->shared_attr_vertex_id != attr_v->id()) {
+            // T4, T5, T7
+            remove_vertex_list.emplace_back(attr_v->id());
+          } else {
+            // T3, T6
+            remove_edge_list.emplace_back(has_e_iter->id());
+          }
+        }
+      } else {
+        // T2
+        auto attr_value_iter = attr_iter->Find(attr_v->label());
         if (attr_value_iter == attr_iter->end()) return -1;
-        if (attr_value_iter->shared_attr_vertex_id != attr_v->id()) {
-          // T4, T5, T7
-          remove_vertex_list.emplace_back(attr_v->id());
-        } else {
-          // T3, T6
-          remove_edge_list.emplace_back(has_e_iter->id());
-        }
+        value_str = attr_value_iter->value_str;
+
+        remove_edge_list.emplace_back(has_e_iter->id());
       }
-    } else {
-      // T2
-      auto attr_value_iter = attr_iter->Find(attr_v->label());
-      if (attr_value_iter == attr_iter->end()) return -1;
-      value_str = attr_value_iter->value_str;
 
-      remove_edge_list.emplace_back(has_e_iter->id());
+      auto ret = vertex->AddAttribute(attr_iter->attr_key,
+                                      attr_iter->value_data_type, value_str);
+      if (!ret.second) return -1;
+      ++count;
     }
+  } else {
+    for (auto &e_label : fold_edge_label) {
+      for (auto has_e_iter = vertex->OutEdgeBegin(e_label);
+                !has_e_iter.IsDone(); ++has_e_iter) {
 
-    auto ret = vertex->AddAttribute(attr_iter->attr_key,
-                                    attr_iter->value_data_type, value_str);
-    if (!ret.second) return -1;
-    ++count;
+        auto attr_v = has_e_iter->const_dst_handle();
+        auto attr_iter = attr_dict.Find(attr_v->label());
+        if (attr_iter == attr_dict.end()) return -1;
+
+        if (!fold_attr_list.empty() &&
+            fold_attr_list.count(attr_iter->attr_key) == 0)
+          continue;
+
+        std::string value_str;
+        if (attr_iter->attr_label_id == attr_v->label()) {
+          auto attr_ptr = attr_v->FindAttribute("name");
+          if (attr_ptr.IsNull()) return -1;
+          value_str = attr_ptr->value_str();
+
+          remove_vertex_list.emplace_back(attr_v->id());
+        }
+
+        auto ret = vertex->AddAttribute(label_dict.GetLabelName(e_label),
+                                        attr_iter->value_data_type, value_str);
+        if (!ret.second) return -1;
+        ++count;
+      }
+    }
   }
-
   return count;
 }
 
+
 int FoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
-                  const std::set<AttributeKey> &fold_attr_list) {
+                  const std::set<AttributeKey> &fold_attr_list,
+                  const std::set<Label> &fold_edge_label) {
   int res;
 
   Graph &g = gp.graph();
@@ -125,7 +160,8 @@ int FoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
 
       GUNDAM::VertexHandle<Graph>::type v_ptr = v_iter;
       res = FoldAttribute(attr_dict, type_dict, fold_attr_list, v_ptr,
-                          remove_vertex_list, remove_edge_list);
+                          remove_vertex_list, remove_edge_list,
+                          fold_edge_label, label_dict);
       if (res < 0) return res;
 
       count_attr += res;
@@ -135,7 +171,8 @@ int FoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
       for (auto v_iter = g.VertexBegin(v_label); !v_iter.IsDone(); ++v_iter) {
         GUNDAM::VertexHandle<Graph>::type v_ptr = v_iter;
         res = FoldAttribute(attr_dict, type_dict, fold_attr_list, v_ptr,
-                            remove_vertex_list, remove_edge_list);
+                            remove_vertex_list, remove_edge_list,
+                            fold_edge_label, label_dict);
         if (res < 0) return res;
 
         count_attr += res;
@@ -459,7 +496,7 @@ int UnfoldAttribute(GraphPackage &gp, const std::set<Label> &vertex_label_list,
 }
 
 int FoldRelation(GraphPackage &gp, const std::set<Label> &fold_relation_list) {
-  int res = FoldAttribute(gp, fold_relation_list, {});
+  int res = FoldAttribute(gp, fold_relation_list, {}, {});
   if (res < 0) return res;
 
   auto &g = gp.graph();
