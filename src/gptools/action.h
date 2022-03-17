@@ -469,6 +469,17 @@ class GPActionFoldAttribute : public GPAction {
         attr_list_.emplace(v2.as<std::string>());
       }
     }
+
+    auto v3 = node["EdgeLabel"];
+    if (v3.IsDefined()) {
+      if (v3.IsSequence()) {
+        for (const auto &t : v3) {
+          edge_label_name_list_.emplace_back(t.as<std::string>());
+        }
+      } else {
+        edge_label_name_list_.emplace_back(v3.as<std::string>());
+      }
+    }
   }
 
   int Run(GraphPackage &gp) override final {
@@ -487,8 +498,15 @@ class GPActionFoldAttribute : public GPAction {
       std::cout << "  " << attr_key << std::endl;
     }
 
+    std::cout << "Edge label" << std::endl;
+    std::set<Label> edge_label_list;
+    res = GetLabelList(gp.label_dict(), edge_label_name_list_,
+                       edge_label_list);
+    if (res < 0 ) return res;
+
     std::cout << "Fold:" << std::endl;
-    res = FoldAttribute(gp, vertex_label_list, attr_list_);
+    res = FoldAttribute(gp, vertex_label_list, attr_list_,
+                        edge_label_list);
     if (res < 0) return res;
 
     return res;
@@ -496,6 +514,7 @@ class GPActionFoldAttribute : public GPAction {
 
  private:
   std::vector<std::string> vertex_label_name_list_;
+  std::vector<std::string> edge_label_name_list_;
   std::set<std::string> attr_list_;
 };
 
