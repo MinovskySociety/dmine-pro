@@ -1,0 +1,10 @@
+label_id:int,label_name:string,label_type:int
+0,Gender,1
+1,People,1
+2,Location,1
+3,is_gender,2
+4,is_location,2
+5,is_friend,2
+6,PhoneNum,1
+7,Company,1
+8,has_phone_num,2

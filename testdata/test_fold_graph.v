@@ -1,0 +1,11 @@
+vertex_id:int,label_id:int,name:string
+0,0,Male
+1,0,Female
+2,1,P1
+3,1,P2
+4,1,P3
+5,1,P4
+6,2,Beijing
+7,2,Shanghai
+8,6,+15011111111
+9,7,Company_Name_1

@@ -30,7 +30,8 @@ int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
 
   int count = 0;
 
-  if (fold_edge_label.empty()) {
+  if (!fold_attr_list.empty()) {
+    //std::cout << "fold edges with reserved labels" << std::endl;
     for (auto has_e_iter = vertex->OutEdgeBegin(ReservedLabel::kHas);
           !has_e_iter.IsDone(); ++has_e_iter) {
       auto attr_v = has_e_iter->const_dst_handle();
@@ -107,31 +108,35 @@ int FoldAttribute(const AttributeDict &attr_dict, const TypeDict &type_dict,
       ++count;
     }
   } else {
-    for (auto &e_label : fold_edge_label) {
-      for (auto has_e_iter = vertex->OutEdgeBegin(e_label);
-                !has_e_iter.IsDone(); ++has_e_iter) {
+    //std::cout << "fold edges with given labels" << std::endl;
 
-        auto attr_v = has_e_iter->const_dst_handle();
-        auto attr_iter = attr_dict.Find(attr_v->label());
-        if (attr_iter == attr_dict.end()) return -1;
+    for (auto has_e_iter = vertex->InEdgeBegin();
+              !has_e_iter.IsDone(); ++has_e_iter) {
 
-        if (!fold_attr_list.empty() &&
-            fold_attr_list.count(attr_iter->attr_key) == 0)
-          continue;
+      auto attr_v = has_e_iter->src_handle();
 
-        std::string value_str;
-        if (attr_iter->attr_label_id == attr_v->label()) {
-          auto attr_ptr = attr_v->FindAttribute("name");
-          if (attr_ptr.IsNull()) return -1;
-          value_str = attr_ptr->value_str();
+      std::string value_str;
 
-          remove_vertex_list.emplace_back(attr_v->id());
-        }
+      auto attr_ptr = vertex->FindAttribute("name");
+      if (attr_ptr.IsNull()) return -1;
+      value_str = attr_ptr->value_str();
 
-        auto ret = vertex->AddAttribute(label_dict.GetLabelName(e_label),
-                                        attr_iter->value_data_type, value_str);
-        if (!ret.second) return -1;
-        ++count;
+      //remove_vertex_list.emplace_back(attr_v->id());
+
+      auto ret = attr_v->AddAttribute(
+                              label_dict.GetLabelName(vertex->label()), value_str);
+      if (!ret.second) return -1;
+    }
+
+    auto out_e_iter = vertex->OutEdgeBegin();
+    if (out_e_iter.IsDone()) {
+      //std::cout << "remove vertex " << vertex->id() << std::endl;
+      remove_vertex_list.emplace_back(vertex->id());
+    } else {
+      for (auto has_e_iter = vertex->InEdgeBegin();
+                !has_e_iter.IsDone();
+                has_e_iter++) {
+        remove_edge_list.emplace_back(has_e_iter->id());
       }
     }
   }
